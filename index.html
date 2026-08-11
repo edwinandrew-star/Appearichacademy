@@ -1,1139 +1,1563 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>APPEARICH — The Future of Academic Experience</title>
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <!-- FontAwesome for Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <style>
-        :root {
-            /* APPEARICH Master Palette (Academic Blue, Deep Navy, Crisp White, Soft Gray) */
-            --bg-white: #FFFFFF;
-            --navy-primary: #0B1F3A;
-            --academic-blue: #155EEF;
-            --soft-blue: #EAF2FF;
-            --soft-gray: #F5F7FA;
-            --text-main: #101828;
-            --text-secondary: #667085;
-            --border-color: #E4E7EC;
-            
-            --success: #12B76A;
-            --warning: #F79009;
-            --error: #D92D20;
-            
-            --shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.05);
-            --shadow-md: 0 4px 12px rgba(11, 31, 58, 0.08);
-            --shadow-lg: 0 12px 28px rgba(11, 31, 58, 0.12);
-            --radius-sm: 8px;
-            --radius-md: 12px;
-            --radius-lg: 20px;
-            --radius-full: 9999px;
-            --transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            -webkit-font-smoothing: antialiased;
-        }
-
-        body {
-            background-color: var(--bg-white);
-            color: var(--text-main);
-            overflow-x: hidden;
-            min-height: 100vh;
-        }
-
-        /* App Shell */
-        #app {
-            width: 100%;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            position: relative;
-            background-color: var(--bg-white);
-        }
-
-        /* Screens */
-        .screen {
-            display: none;
-            width: 100%;
-            min-height: 100vh;
-            flex-direction: column;
-            position: absolute;
-            top: 0;
-            left: 0;
-            background-color: var(--bg-white);
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.4s ease;
-            z-index: 1;
-        }
-
-        .screen.active {
-            display: flex;
-            opacity: 1;
-            pointer-events: auto;
-            position: relative;
-            z-index: 10;
-        }
-
-        /* 1. SPLASH SCREEN */
-        #splash-screen {
-            background-color: #FFFFFF !important;
-            justify-content: center;
-            align-items: center;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            z-index: 9999;
-        }
-
-        .splash-content {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            animation: splashEntrance 1.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
-
-        .splash-logo-img {
-            width: 240px;
-            max-width: 80vw;
-            height: auto;
-            object-fit: contain;
-            filter: drop-shadow(0 10px 25px rgba(11, 31, 58, 0.12));
-            background: transparent !important;
-            border: none !important;
-        }
-
-        @keyframes splashEntrance {
-            0% {
-                opacity: 0;
-                transform: scale(0.88);
-            }
-            50% {
-                opacity: 1;
-                transform: scale(1.02);
-            }
-            100% {
-                opacity: 1;
-                transform: scale(1);
-            }
-        }
-
-        /* 2. AUTH / LOGIN / FORGOT PASSWORD SCREENS */
-        .auth-container {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 24px;
-            background-color: #FFFFFF;
-            max-width: 480px;
-            margin: 0 auto;
-            width: 100%;
-        }
-
-        .auth-header {
-            text-align: center;
-            margin-bottom: 32px;
-            width: 100%;
-        }
-
-        .auth-header h1 {
-            font-family: 'Outfit', sans-serif;
-            font-size: 32px;
-            font-weight: 800;
-            color: var(--navy-primary);
-            margin-bottom: 8px;
-        }
-
-        .auth-header p {
-            color: var(--text-secondary);
-            font-size: 15px;
-        }
-
-        .auth-form {
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        .input-group {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            width: 100%;
-        }
-
-        .input-group label {
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--navy-primary);
-        }
-
-        .input-wrapper {
-            position: relative;
-            display: flex;
-            align-items: center;
-        }
-
-        .input-wrapper i.field-icon {
-            position: absolute;
-            left: 16px;
-            color: var(--text-secondary);
-            font-size: 16px;
-        }
-
-        .input-wrapper input {
-            width: 100%;
-            padding: 14px 16px 14px 48px;
-            background-color: var(--soft-gray);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-md);
-            font-size: 15px;
-            color: var(--text-main);
-            transition: var(--transition);
-        }
-
-        .input-wrapper input:focus {
-            outline: none;
-            border-color: var(--academic-blue);
-            background-color: #FFFFFF;
-            box-shadow: 0 0 0 4px var(--soft-blue);
-        }
-
-        .form-actions {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 14px;
-        }
-
-        .forgot-password-link {
-            color: var(--academic-blue);
-            text-decoration: none;
-            font-weight: 600;
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 0;
-        }
-
-        .forgot-password-link:hover {
-            text-decoration: underline;
-        }
-
-        .btn-primary {
-            background-color: var(--academic-blue);
-            color: #FFFFFF;
-            border: none;
-            border-radius: var(--radius-md);
-            padding: 16px;
-            font-size: 16px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            box-shadow: 0 4px 12px rgba(21, 94, 239, 0.25);
-            width: 100%;
-        }
-
-        .btn-primary:hover {
-            background-color: #1045b8;
-            transform: translateY(-1px);
-        }
-
-        .btn-secondary {
-            background-color: var(--soft-gray);
-            color: var(--navy-primary);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-md);
-            padding: 14px;
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            width: 100%;
-        }
-
-        .btn-secondary:hover {
-            background-color: var(--border-color);
-        }
-
-        .back-nav-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            color: var(--navy-primary);
-            font-weight: 600;
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 15px;
-            margin-bottom: 24px;
-            padding: 0;
-            transition: var(--transition);
-        }
-
-        .back-nav-btn:hover {
-            color: var(--academic-blue);
-        }
-
-        .success-box {
-            background-color: #E6F4EA;
-            border: 1px solid #CEEAD6;
-            border-radius: var(--radius-md);
-            padding: 16px;
-            color: #137333;
-            font-size: 14px;
-            line-height: 1.5;
-            display: flex;
-            gap: 12px;
-            align-items: flex-start;
-            margin-bottom: 20px;
-        }
-
-        /* 3. MAIN APP INTERFACE (HOME & TABS) */
-        .app-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 16px 24px;
-            background-color: var(--bg-white);
-            border-bottom: 1px solid var(--border-color);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .header-logo-img {
-            height: 36px;
-            width: auto;
-            object-fit: contain;
-        }
-
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-
-        .notification-bell {
-            position: relative;
-            background: var(--soft-gray);
-            border: 1px solid var(--border-color);
-            width: 40px;
-            height: 40px;
-            border-radius: var(--radius-full);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--navy-primary);
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .notification-bell:hover {
-            background-color: var(--soft-blue);
-            color: var(--academic-blue);
-        }
-
-        .main-container {
-            flex: 1;
-            overflow-y: auto;
-            padding-bottom: 90px;
-        }
-
-        /* Hero Section */
-        .hero-section {
-            padding: 24px;
-            background: linear-gradient(135deg, #F5F7FA 0%, #EAF2FF 100%);
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .hero-card {
-            background-color: var(--bg-white);
-            border-radius: var(--radius-lg);
-            border: 1px solid var(--border-color);
-            box-shadow: var(--shadow-md);
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            position: relative;
-        }
-
-        .hero-banner-image {
-            width: 100%;
-            height: 200px;
-            object-fit: cover;
-            transition: filter 0.5s ease, opacity 0.5s ease;
-        }
-
-        .hero-banner-image.blur-effect {
-            filter: blur(8px);
-            opacity: 0.6;
-        }
-
-        .hero-content {
-            padding: 24px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .hero-greeting-tag {
-            font-size: 12px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--academic-blue);
-        }
-
-        .hero-title {
-            font-family: 'Outfit', sans-serif;
-            font-size: 24px;
-            font-weight: 800;
-            color: var(--navy-primary);
-        }
-
-        .hero-subtitle {
-            font-size: 14px;
-            color: var(--text-secondary);
-        }
-
-        .hero-controls-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 12px;
-            padding-top: 16px;
-            border-top: 1px solid var(--border-color);
-        }
-
-        .mode-toggle-badge {
-            background-color: var(--soft-blue);
-            color: var(--academic-blue);
-            padding: 6px 12px;
-            border-radius: var(--radius-full);
-            font-size: 12px;
-            font-weight: 700;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .btn-text {
-            background: none;
-            border: none;
-            color: var(--academic-blue);
-            font-weight: 600;
-            font-size: 14px;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .btn-text:hover {
-            text-decoration: underline;
-        }
-
-        /* Customize Hero Modal / Panel */
-        .customize-panel {
-            background-color: var(--bg-white);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-lg);
-            padding: 20px;
-            margin: 20px 24px;
-            box-shadow: var(--shadow-md);
-            display: none;
-        }
-
-        .customize-panel.open {
-            display: block;
-            animation: fadeIn 0.3s ease forwards;
-        }
-
-        .gallery-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-            gap: 12px;
-            margin-top: 12px;
-        }
-
-        .gallery-item {
-            position: relative;
-            border-radius: var(--radius-sm);
-            overflow: hidden;
-            border: 2px solid var(--border-color);
-            height: 70px;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .gallery-item.active {
-            border-color: var(--academic-blue);
-            box-shadow: 0 0 0 2px var(--soft-blue);
-        }
-
-        .gallery-item img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        /* Search Bar */
-        .search-section {
-            padding: 0 24px;
-            margin: 20px 0;
-        }
-
-        .search-bar-wrapper {
-            position: relative;
-            display: flex;
-            align-items: center;
-        }
-
-        .search-bar-wrapper i {
-            position: absolute;
-            left: 16px;
-            color: var(--text-secondary);
-        }
-
-        .search-bar-wrapper input {
-            width: 100%;
-            padding: 14px 16px 14px 46px;
-            background-color: var(--soft-gray);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-md);
-            font-size: 15px;
-            color: var(--text-main);
-        }
-
-        .search-bar-wrapper input:focus {
-            outline: none;
-            border-color: var(--academic-blue);
-            background-color: #FFFFFF;
-            box-shadow: 0 0 0 4px var(--soft-blue);
-        }
-
-        /* Dashboard Discovery Grid */
-        .dashboard-section {
-            padding: 0 24px;
-            margin-bottom: 32px;
-        }
-
-        .section-heading {
-            font-family: 'Outfit', sans-serif;
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--navy-primary);
-            margin-bottom: 16px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .cards-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-            gap: 16px;
-        }
-
-        .dash-card {
-            background-color: var(--soft-gray);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-lg);
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            cursor: pointer;
-            transition: var(--transition);
-            text-align: left;
-        }
-
-        .dash-card:hover {
-            transform: translateY(-3px);
-            background-color: var(--soft-blue);
-            border-color: var(--academic-blue);
-            box-shadow: var(--shadow-sm);
-        }
-
-        .dash-card-icon {
-            width: 44px;
-            height: 44px;
-            border-radius: var(--radius-md);
-            background-color: #FFFFFF;
-            color: var(--academic-blue);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            box-shadow: var(--shadow-sm);
-        }
-
-        .dash-card h3 {
-            font-size: 16px;
-            font-weight: 700;
-            color: var(--navy-primary);
-        }
-
-        .dash-card p {
-            font-size: 13px;
-            color: var(--text-secondary);
-        }
-
-        /* Bottom Navigation Bar */
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background-color: var(--bg-white);
-            border-top: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-around;
-            padding: 10px 16px;
-            z-index: 100;
-            box-shadow: 0 -4px 16px rgba(16, 24, 40, 0.05);
-        }
-
-        .nav-item {
-            background: none;
-            border: none;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-            color: var(--text-secondary);
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition);
-            padding: 6px 16px;
-            border-radius: var(--radius-md);
-        }
-
-        .nav-item i {
-            font-size: 20px;
-        }
-
-        .nav-item.active {
-            color: var(--academic-blue);
-            background-color: var(--soft-blue);
-        }
-
-        .nav-item:hover {
-            color: var(--academic-blue);
-        }
-
-        /* Generic Views for AI, Activity, Profile */
-        .tab-content-view {
-            padding: 24px;
-            max-width: 800px;
-            margin: 0 auto;
-            width: 100%;
-        }
-
-        .view-header {
-            margin-bottom: 24px;
-        }
-
-        .view-header h2 {
-            font-family: 'Outfit', sans-serif;
-            font-size: 28px;
-            font-weight: 800;
-            color: var(--navy-primary);
-            margin-bottom: 8px;
-        }
-
-        .view-header p {
-            color: var(--text-secondary);
-            font-size: 15px;
-        }
-
-        .card-container {
-            background-color: var(--soft-gray);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-lg);
-            padding: 24px;
-            margin-bottom: 20px;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(6px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Appearich — Next-Gen Academic Ecosystem</title>
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <style>
+    :root {
+      --bg-color: #f8fafc;
+      --surface-color: #ffffff;
+      --surface-elevated: #f1f5f9;
+      --border-color: #e2e8f0;
+      --text-main: #09090b;
+      --text-sub: #71717a;
+      --accent-gold: #d97706;
+      --accent-gold-glow: rgba(217, 119, 6, 0.12);
+      --accent-gold-border: rgba(217, 119, 6, 0.3);
+      --nav-bg: rgba(255, 255, 255, 0.85);
+      --shadow-lg: 0 20px 30px -10px rgba(0, 0, 0, 0.05);
+    }
+
+    [data-theme="dark"] {
+      --bg-color: #050505;
+      --surface-color: #121214;
+      --surface-elevated: #1a1a1e;
+      --border-color: #27272a;
+      --text-main: #f4f4f5;
+      --text-sub: #a1a1aa;
+      --accent-gold: #fbbf24;
+      --accent-gold-glow: rgba(251, 191, 36, 0.18);
+      --accent-gold-border: rgba(251, 191, 36, 0.4);
+      --nav-bg: rgba(18, 18, 20, 0.85);
+      --shadow-lg: 0 20px 40px -15px rgba(0, 0, 0, 0.7);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+      transition: background-color 0.3s cubic-bezier(0.16, 1, 0.3, 1), color 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow-x: hidden;
+    }
+
+    /* 1. APPEARICH OPENING EXPERIENCE — FORCED WHITE STARTUP */
+    #cinematic-splash {
+      position: fixed;
+      inset: 0;
+      background: #ffffff !important;
+      z-index: 99999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.6s;
+    }
+
+    .splash-logo-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      animation: logoCinematicEntrance 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .splash-logo-img {
+      width: 72px;
+      height: 72px;
+      object-fit: contain;
+      filter: drop-shadow(0 0 20px rgba(217, 119, 6, 0.25));
+      margin-bottom: 16px;
+    }
+
+    .splash-brand-title {
+      font-size: 1.1rem;
+      font-weight: 800;
+      letter-spacing: 5px;
+      color: #09090b;
+      text-transform: uppercase;
+    }
+
+    @keyframes logoCinematicEntrance {
+      0% { opacity: 0; transform: scale(0.92) translateY(6px); filter: blur(8px); }
+      50% { opacity: 1; transform: scale(1) translateY(0); filter: blur(0); }
+      80% { opacity: 1; transform: scale(1); filter: blur(0); }
+      100% { opacity: 0; transform: scale(1.04); filter: blur(4px); visibility: hidden; }
+    }
+
+    /* APP CONTAINER & SCREENS */
+    .app-viewport {
+      width: 100%;
+      max-width: 480px;
+      min-height: 100vh;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      padding-bottom: 90px;
+    }
+
+    .screen {
+      display: none;
+      flex-direction: column;
+      width: 100%;
+      padding: 20px 16px;
+      animation: screenFadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .screen.active {
+      display: flex;
+    }
+
+    @keyframes screenFadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* AUTHENTICATION SCREEN */
+    #screen-auth {
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 24px;
+    }
+
+    .auth-card {
+      width: 100%;
+      background: var(--surface-color);
+      border: 1px solid var(--border-color);
+      border-radius: 24px;
+      padding: 32px 24px;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .auth-brand-header {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    .auth-logo-small {
+      width: 42px;
+      height: 42px;
+      object-fit: contain;
+      margin-bottom: 12px;
+    }
+
+    .auth-title {
+      font-size: 1.5rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: var(--text-main);
+    }
+
+    .auth-subtitle {
+      font-size: 0.82rem;
+      color: var(--text-sub);
+      margin-top: 4px;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-sub);
+      margin-bottom: 6px;
+    }
+
+    .form-group input {
+      width: 100%;
+      background: var(--bg-color);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 12px 16px;
+      color: var(--text-main);
+      font-size: 0.9rem;
+      outline: none;
+    }
+
+    .form-group input:focus {
+      border-color: var(--accent-gold);
+      box-shadow: 0 0 0 3px var(--accent-gold-glow);
+    }
+
+    .primary-btn {
+      width: 100%;
+      background: var(--accent-gold);
+      color: #ffffff;
+      border: none;
+      padding: 14px;
+      border-radius: 12px;
+      font-weight: 800;
+      font-size: 0.9rem;
+      cursor: pointer;
+      margin-top: 8px;
+      box-shadow: 0 4px 12px var(--accent-gold-glow);
+    }
+
+    [data-theme="light"] .primary-btn {
+      color: #000000;
+    }
+
+    .auth-switch-text {
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--text-sub);
+      margin-top: 20px;
+      cursor: pointer;
+    }
+
+    .auth-switch-text span {
+      color: var(--accent-gold);
+      font-weight: 700;
+    }
+
+    /* TOP HEADER */
+    .app-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px;
+      background: var(--nav-bg);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .header-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+      font-size: 1.1rem;
+      letter-spacing: 0.5px;
+    }
+
+    .header-logo-icon {
+      width: 28px;
+      height: 28px;
+      object-fit: contain;
+    }
+
+    .icon-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: var(--surface-color);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+
+    /* 2. LOGO ON HOME SCREEN & HERO SYSTEM */
+    .hero-container {
+      position: relative;
+      width: 100%;
+      height: 240px;
+      border-radius: 20px;
+      overflow: hidden;
+      margin-bottom: 20px;
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .hero-bg-image {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: brightness(0.68);
+      transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), filter 0.6s ease;
+    }
+
+    .hero-container.transitioning .hero-bg-image {
+      filter: blur(8px) brightness(0.4);
+      transform: scale(1.05);
+    }
+
+    .hero-container:hover .hero-bg-image {
+      transform: scale(1.02);
+    }
+
+    .hero-gradient-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.25) 70%, transparent 100%);
+    }
+
+    /* Integrated Logo Badge inside Hero */
+    .hero-integrated-badge {
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(18, 18, 20, 0.75);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      padding: 6px 12px;
+      border-radius: 30px;
+      z-index: 3;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+      animation: floatBadge 4s ease-in-out infinite alternate;
+    }
+
+    @keyframes floatBadge {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(-3px); }
+    }
+
+    .hero-badge-logo {
+      width: 18px;
+      height: 18px;
+      object-fit: contain;
+    }
+
+    .hero-badge-text {
+      font-size: 0.7rem;
+      font-weight: 800;
+      letter-spacing: 1px;
+      color: #ffffff;
+      text-transform: uppercase;
+    }
+
+    .hero-content {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 20px;
+      z-index: 2;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+
+    .hero-greeting {
+      font-size: 1.35rem;
+      font-weight: 900;
+      color: #ffffff;
+      line-height: 1.2;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    }
+
+    .hero-msg {
+      font-size: 0.78rem;
+      color: var(--accent-gold);
+      font-weight: 700;
+      margin-top: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .hero-controls-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      align-items: flex-end;
+    }
+
+    .hero-control-btn {
+      background: rgba(0, 0, 0, 0.65);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #ffffff;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.68rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+    }
+
+    .hero-control-btn:hover {
+      border-color: var(--accent-gold);
+    }
+
+    /* COMMAND SEARCH BAR */
+    .search-command-bar {
+      position: relative;
+      margin-bottom: 24px;
+    }
+
+    .search-command-bar input {
+      width: 100%;
+      background: var(--surface-color);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 14px 16px 14px 44px;
+      color: var(--text-main);
+      font-size: 0.88rem;
+      outline: none;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+    }
+
+    .search-command-bar input:focus {
+      border-color: var(--accent-gold);
+      box-shadow: 0 0 0 3px var(--accent-gold-glow);
+    }
+
+    .search-command-bar i {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-sub);
+      font-size: 0.95rem;
+    }
+
+    /* DISCOVERY SECTION CARDS */
+    .section-header-title {
+      font-size: 0.8rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: var(--text-sub);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .cards-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .discovery-card {
+      background: var(--surface-color);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 18px;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 140px;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .discovery-card.featured {
+      grid-column: span 2;
+      height: 110px;
+      flex-direction: row;
+      align-items: center;
+    }
+
+    .discovery-card:hover {
+      border-color: var(--accent-gold-border);
+      transform: translateY(-2px);
+    }
+
+    .card-icon-wrap {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: var(--accent-gold-glow);
+      color: var(--accent-gold);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+    }
+
+    .card-title {
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: var(--text-main);
+      margin-top: 8px;
+    }
+
+    .card-desc {
+      font-size: 0.72rem;
+      color: var(--text-sub);
+      margin-top: 2px;
+    }
+
+    /* BOTTOM NAVIGATION */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 480px;
+      height: 72px;
+      background: var(--nav-bg);
+      backdrop-filter: blur(16px);
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      z-index: 1000;
+      padding: 0 10px;
+    }
+
+    .nav-item {
+      background: none;
+      border: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      color: var(--text-sub);
+      font-size: 0.7rem;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 8px 12px;
+      border-radius: 12px;
+    }
+
+    .nav-item i {
+      font-size: 1.2rem;
+    }
+
+    .nav-item.active {
+      color: var(--accent-gold);
+      background: var(--accent-gold-glow);
+    }
+
+    /* AI SECTION */
+    .ai-companion-hero {
+      background: var(--surface-color);
+      border: 1px solid var(--border-color);
+      border-radius: 24px;
+      padding: 24px;
+      text-align: center;
+      margin-bottom: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .ai-core-pulse {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      background: var(--accent-gold-glow);
+      border: 2px solid var(--accent-gold);
+      margin: 0 auto 16px auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent-gold);
+      font-size: 1.6rem;
+      box-shadow: 0 0 30px var(--accent-gold-glow);
+      animation: corePulse 2s infinite alternate;
+    }
+
+    @keyframes corePulse {
+      from { transform: scale(0.95); box-shadow: 0 0 15px var(--accent-gold-glow); }
+      to { transform: scale(1.05); box-shadow: 0 0 35px var(--accent-gold-glow); }
+    }
+
+    .ai-tools-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .ai-tool-card {
+      background: var(--surface-color);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 16px;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .ai-tool-card:hover {
+      border-color: var(--accent-gold);
+    }
+
+    /* ACTIVITY JOURNEY SECTION */
+    .journey-timeline {
+      position: relative;
+      padding-left: 24px;
+      margin-top: 10px;
+    }
+
+    .journey-timeline::before {
+      content: '';
+      position: absolute;
+      left: 7px;
+      top: 6px;
+      bottom: 6px;
+      width: 2px;
+      background: var(--border-color);
+    }
+
+    .timeline-node {
+      position: relative;
+      margin-bottom: 20px;
+    }
+
+    .timeline-node::before {
+      content: '';
+      position: absolute;
+      left: -20px;
+      top: 4px;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--accent-gold);
+      box-shadow: 0 0 8px var(--accent-gold);
+    }
+
+    .timeline-content {
+      background: var(--surface-color);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 14px;
+    }
+
+    /* PROFILE SCREEN */
+    .profile-card-header {
+      background: var(--surface-color);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 24px;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .profile-avatar-lg {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #fbbf24, #b45309);
+      color: #000000;
+      font-size: 1.8rem;
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 12px auto;
+    }
+
+    .settings-list {
+      background: var(--surface-color);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+
+    .settings-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border-color);
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .settings-item:last-child {
+      border-bottom: none;
+    }
+
+    .danger-btn {
+      width: 100%;
+      background: transparent;
+      border: 1.5px solid #ef4444;
+      color: #ef4444;
+      padding: 12px;
+      border-radius: 14px;
+      font-weight: 800;
+      font-size: 0.85rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    /* MODAL OVERLAYS & GALLERIES */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(8px);
+      z-index: 2000;
+      display: none;
+      justify-content: center;
+      align-items: flex-end;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-sheet {
+      width: 100%;
+      max-width: 480px;
+      background: var(--surface-color);
+      border: 1px solid var(--border-color);
+      border-top-left-radius: 24px;
+      border-top-right-radius: 24px;
+      padding: 24px 20px 40px 20px;
+      max-height: 85vh;
+      overflow-y: auto;
+    }
+
+    /* Gallery Grid in Modal */
+    .hero-gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin: 16px 0;
+    }
+
+    .gallery-thumb-card {
+      position: relative;
+      height: 80px;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 2px solid var(--border-color);
+      cursor: pointer;
+    }
+
+    .gallery-thumb-card.selected {
+      border-color: var(--accent-gold);
+      box-shadow: 0 0 10px var(--accent-gold-glow);
+    }
+
+    .gallery-thumb-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .gallery-thumb-delete {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      background: rgba(0,0,0,0.7);
+      color: #ef4444;
+      border: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      font-size: 0.65rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .gallery-add-tile {
+      height: 80px;
+      border-radius: 12px;
+      border: 2px dashed var(--border-color);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      cursor: pointer;
+      color: var(--text-sub);
+      background: var(--surface-elevated);
+    }
+
+    .gallery-add-tile:hover {
+      border-color: var(--accent-gold);
+      color: var(--accent-gold);
+    }
+
+    /* Segmented Control for Hero Mode */
+    .mode-switch-container {
+      display: flex;
+      background: var(--bg-color);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 4px;
+      margin-bottom: 16px;
+    }
+
+    .mode-switch-btn {
+      flex: 1;
+      background: transparent;
+      border: none;
+      padding: 10px;
+      border-radius: 10px;
+      font-size: 0.8rem;
+      font-weight: 800;
+      color: var(--text-sub);
+      cursor: pointer;
+    }
+
+    .mode-switch-btn.active {
+      background: var(--surface-elevated);
+      color: var(--text-main);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+  </style>
 </head>
 <body>
 
-    <div id="app">
+  <!-- 1. APPEARICH OPENING EXPERIENCE — FORCED WHITE STARTUP -->
+  <div id="cinematic-splash">
+    <div class="splash-logo-container">
+      <img src="images/appearich-logo.png" alt="Appearich" class="splash-logo-img">
+      <div class="splash-brand-title">Appearich</div>
+    </div>
+  </div>
+
+  <div class="app-viewport">
+
+    <!-- AUTHENTICATION SCREEN -->
+    <div id="screen-auth" class="screen active">
+      <div class="auth-card">
+        <div class="auth-brand-header">
+          <img src="images/appearich-logo.png" alt="Appearich" class="auth-logo-small">
+          <h1 class="auth-title" id="authTitleText">Welcome Scholar</h1>
+          <p class="auth-subtitle" id="authSubText">Authenticate to access your Cambridge matrix</p>
+        </div>
+
+        <div class="form-group" id="nameGroup" style="display: none;">
+          <label>Full Name</label>
+          <input type="text" id="regName" placeholder="e.g. Alistair Sterling">
+        </div>
+        <div class="form-group">
+          <label>University Email</label>
+          <input type="email" id="authEmail" placeholder="scholar@appearich.ac.uk">
+        </div>
+        <div class="form-group">
+          <label>Security Password</label>
+          <input type="password" id="authPassword" placeholder="••••••••••••">
+        </div>
+        <div class="form-group" id="programGroup" style="display: none;">
+          <label>Degree Program</label>
+          <input type="text" id="regProgram" placeholder="e.g. B.A. Computer Science & Tripos">
+        </div>
+
+        <button class="primary-btn" id="authActionBtn" onclick="handleAuthSubmit()">Initialize Session</button>
         
-        <!-- 1. SPLASH SCREEN -->
-        <div id="splash-screen" class="screen active">
-            <div class="splash-content">
-                <img src="images/appearich-logo.png" alt="Appearich Splash Logo" class="splash-logo-img" id="splashLogoImage">
-            </div>
+        <div class="auth-switch-text" onclick="toggleAuthMode()">
+          <span id="authSwitchPrompt">New researcher? <span>Create Account</span></span>
         </div>
-
-        <!-- 2. LOGIN SCREEN -->
-        <div id="login-screen" class="screen">
-            <div class="auth-container">
-                <div class="auth-header">
-                    <img src="images/appearich-logo1.png" alt="Appearich" style="height: 48px; margin-bottom: 20px;">
-                    <h1>Welcome Back</h1>
-                    <p>Log in to access your intelligent academic ecosystem.</p>
-                </div>
-                
-                <form class="auth-form" id="loginForm" onsubmit="handleLogin(event)">
-                    <div class="input-group">
-                        <label for="loginEmail">Email or Student ID</label>
-                        <div class="input-wrapper">
-                            <i class="fa-solid fa-envelope field-icon"></i>
-                            <input type="text" id="loginEmail" placeholder="student@university.edu" required value="alex.student@appearich.edu">
-                        </div>
-                    </div>
-
-                    <div class="input-group">
-                        <label for="loginPassword">Password</label>
-                        <div class="input-wrapper">
-                            <i class="fa-solid fa-lock field-icon"></i>
-                            <input type="password" id="loginPassword" placeholder="••••••••••••" required value="Password123!">
-                        </div>
-                        <div class="form-actions" style="justify-content: flex-end; margin-top: 4px;">
-                            <button type="button" class="forgot-password-link" onclick="switchScreen('forgot-screen')">Forgot Password?</button>
-                        </div>
-                    </div>
-
-                    <button type="submit" class="btn-primary">
-                        <span>Sign In</span>
-                        <i class="fa-solid fa-arrow-right"></i>
-                    </button>
-                </form>
-            </div>
-        </div>
-
-        <!-- 3. FORGOT PASSWORD & RECOVERY FLOW -->
-        <div id="forgot-screen" class="screen">
-            <div class="auth-container">
-                <button type="button" class="back-nav-btn" onclick="switchScreen('login-screen')">
-                    <i class="fa-solid fa-arrow-left"></i> Back to Login
-                </button>
-                
-                <div class="auth-header" style="text-align: left; margin-bottom: 20px;">
-                    <h1>Reset Password</h1>
-                    <p>Enter your registered university email to receive secure recovery instructions.</p>
-                </div>
-
-                <div id="recoverySuccessBox" class="success-box" style="display: none;">
-                    <i class="fa-solid fa-circle-check" style="font-size: 18px; margin-top: 2px;"></i>
-                    <div>
-                        <strong>Recovery link sent!</strong><br>
-                        Check your email for instructions to reset your password.
-                    </div>
-                </div>
-
-                <form class="auth-form" id="forgotForm" onsubmit="handleForgotPassword(event)">
-                    <div class="input-group">
-                        <label for="recoveryEmail">Registered Email Address</label>
-                        <div class="input-wrapper">
-                            <i class="fa-solid fa-envelope field-icon"></i>
-                            <input type="email" id="recoveryEmail" placeholder="student@university.edu" required>
-                        </div>
-                    </div>
-
-                    <button type="submit" class="btn-primary" id="recoverySubmitBtn">
-                        <span>Send Recovery Link</span>
-                        <i class="fa-solid fa-paper-plane"></i>
-                    </button>
-                </form>
-            </div>
-        </div>
-
-        <!-- 4. MAIN APP HOME SCREEN -->
-        <div id="home-screen" class="screen">
-            <!-- Header -->
-            <header class="app-header">
-                <img src="images/appearich-logo1.png" alt="Appearich Header Logo" class="header-logo-img">
-                <div class="header-right">
-                    <div class="notification-bell" title="Notifications">
-                        <i class="fa-solid fa-bell"></i>
-                    </div>
-                </div>
-            </header>
-
-            <div class="main-container">
-                <!-- Hero Section -->
-                <section class="hero-section">
-                    <div class="hero-card">
-                        <img src="" alt="Hero Academic Visual" class="hero-banner-image" id="heroBannerImg">
-                        <div class="hero-content">
-                            <div class="hero-greeting-tag" id="heroGreetingTag">Welcome Back</div>
-                            <h2 class="hero-title" id="heroStudentName">WELCOME, ALEX</h2>
-                            <p class="hero-subtitle" id="heroStatusText">Optimized for Academic Excellence & Focus</p>
-                            
-                            <div class="hero-controls-bar">
-                                <div class="mode-toggle-badge" id="heroModeBadge">
-                                    <i class="fa-solid fa-bolt"></i> Smart Hero Mode
-                                </div>
-                                <button type="button" class="btn-text" onclick="toggleCustomizeHero()">
-                                    <i class="fa-solid fa-sliders"></i> Customize Hero
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Customize Hero Expandable Panel -->
-                    <div class="customize-panel" id="customizeHeroPanel">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                            <h3 style="font-size: 16px; font-weight: 700; color: var(--navy-primary);">Hero Gallery & Modes</h3>
-                            <button type="button" class="btn-text" onclick="toggleSmartMode()" id="smartModeToggleBtn">Switch to Personal Mode</button>
-                        </div>
-                        <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 12px;">Select an image to pin as your current Hero or let Appearich auto-manage based on academic periods.</p>
-                        
-                        <div class="gallery-grid" id="heroGalleryGrid">
-                            <!-- Populated dynamically -->
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Search Bar -->
-                <section class="search-section">
-                    <div class="search-bar-wrapper">
-                        <i class="fa-solid fa-magnifying-glass"></i>
-                        <input type="text" placeholder="Search courses, assignments, lectures, notes, events...">
-                    </div>
-                </section>
-
-                <!-- Academic Dashboard Cards -->
-                <section class="dashboard-section">
-                    <div class="section-heading">
-                        <span>Academic Discovery</span>
-                    </div>
-                    <div class="cards-grid">
-                        <div class="dash-card" onclick="alert('Opening Academic Courses & Materials...')">
-                            <div class="dash-card-icon"><i class="fa-solid fa-graduation-cap"></i></div>
-                            <h3>Academic</h3>
-                            <p>Courses, assignments & materials</p>
-                        </div>
-                        <div class="dash-card" onclick="alert('Opening Upcoming Events & Deadlines...')">
-                            <div class="dash-card-icon"><i class="fa-solid fa-calendar-days"></i></div>
-                            <h3>Events</h3>
-                            <p>Seminars, lectures & deadlines</p>
-                        </div>
-                        <div class="dash-card" onclick="alert('Opening Sports & Athletics...')">
-                            <div class="dash-card-icon"><i class="fa-solid fa-trophy"></i></div>
-                            <h3>Sports</h3>
-                            <p>Teams, matches & training</p>
-                        </div>
-                        <div class="dash-card" onclick="alert('Opening University Library...')">
-                            <div class="dash-card-icon"><i class="fa-solid fa-book-open"></i></div>
-                            <h3>Library</h3>
-                            <p>Research books & notes</p>
-                        </div>
-                        <div class="dash-card" onclick="alert('Opening Student Community...')">
-                            <div class="dash-card-icon"><i class="fa-solid fa-users"></i></div>
-                            <h3>Community</h3>
-                            <p>Clubs, societies & groups</p>
-                        </div>
-                        <div class="dash-card" onclick="alert('Opening Student Activities...')">
-                            <div class="dash-card-icon"><i class="fa-solid fa-bolt"></i></div>
-                            <h3>Activities</h3>
-                            <p>Extracurricular & journey</p>
-                        </div>
-                    </div>
-                </section>
-            </div>
-
-            <!-- Bottom Navigation Bar -->
-            <nav class="bottom-nav">
-                <button class="nav-item active" onclick="switchMainTab('home-screen', this)">
-                    <i class="fa-solid fa-house"></i>
-                    <span>Home</span>
-                </button>
-                <button class="nav-item" onclick="switchMainTab('ai-screen', this)">
-                    <i class="fa-solid fa-wand-magic-sparkles"></i>
-                    <span>AI</span>
-                </button>
-                <button class="nav-item" onclick="switchMainTab('activity-screen', this)">
-                    <i class="fa-solid fa-chart-line"></i>
-                    <span>Activity</span>
-                </button>
-                <button class="nav-item" onclick="switchMainTab('profile-screen', this)">
-                    <i class="fa-solid fa-user-gear"></i>
-                    <span>Profile</span>
-                </button>
-            </nav>
-        </div>
-
-        <!-- 5. AI COMPANION TAB VIEW -->
-        <div id="ai-screen" class="screen">
-            <header class="app-header">
-                <img src="images/appearich-logo1.png" alt="Appearich Header Logo" class="header-logo-img">
-                <div class="header-right">
-                    <div class="notification-bell"><i class="fa-solid fa-bell"></i></div>
-                </div>
-            </header>
-            <div class="main-container">
-                <div class="tab-content-view">
-                    <div class="view-header">
-                        <h2>AI Academic Companion</h2>
-                        <p>Powered by advanced academic intelligence to assist with concepts, summaries & study plans.</p>
-                    </div>
-                    <div class="card-container">
-                        <h3 style="font-size: 18px; font-weight: 700; color: var(--navy-primary); margin-bottom: 12px;">How can I help your studies today?</h3>
-                        <p style="color: var(--text-secondary); margin-bottom: 20px;">Select a prompt or ask any complex academic question:</p>
-                        <div style="display: flex; flex-direction: column; gap: 10px;">
-                            <button class="btn-secondary" style="justify-content: flex-start;" onclick="alert('Generating summary for lecture notes...')">✨ Summarize my recent Quantum Physics notes</button>
-                            <button class="btn-secondary" style="justify-content: flex-start;" onclick="alert('Creating practice flashcards...')">💡 Create practice flashcards for Computer Science</button>
-                            <button class="btn-secondary" style="justify-content: flex-start;" onclick="alert('Building weekly study schedule...')">📅 Build an optimized study schedule for exams</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <nav class="bottom-nav">
-                <button class="nav-item" onclick="switchMainTab('home-screen', this)"><i class="fa-solid fa-house"></i><span>Home</span></button>
-                <button class="nav-item active" onclick="switchMainTab('ai-screen', this)"><i class="fa-solid fa-wand-magic-sparkles"></i><span>AI</span></button>
-                <button class="nav-item" onclick="switchMainTab('activity-screen', this)"><i class="fa-solid fa-chart-line"></i><span>Activity</span></button>
-                <button class="nav-item" onclick="switchMainTab('profile-screen', this)"><i class="fa-solid fa-user-gear"></i><span>Profile</span></button>
-            </nav>
-        </div>
-
-        <!-- 6. ACTIVITY TAB VIEW -->
-        <div id="activity-screen" class="screen">
-            <header class="app-header">
-                <img src="images/appearich-logo1.png" alt="Appearich Header Logo" class="header-logo-img">
-                <div class="header-right">
-                    <div class="notification-bell"><i class="fa-solid fa-bell"></i></div>
-                </div>
-            </header>
-            <div class="main-container">
-                <div class="tab-content-view">
-                    <div class="view-header">
-                        <h2>Academic Journey & Activity</h2>
-                        <p>Track your learning momentum, course milestones, and performance metrics.</p>
-                    </div>
-                    <div class="card-container">
-                        <h3 style="font-size: 18px; font-weight: 700; color: var(--navy-primary); margin-bottom: 12px;">Weekly Study Hours</h3>
-                        <div style="font-size: 32px; font-weight: 800; color: var(--academic-blue); margin-bottom: 8px;">28.5 hrs</div>
-                        <p style="color: var(--text-secondary); font-size: 14px;">+4.2 hrs compared to last week. Excellent consistency!</p>
-                    </div>
-                </div>
-            </div>
-            <nav class="bottom-nav">
-                <button class="nav-item" onclick="switchMainTab('home-screen', this)"><i class="fa-solid fa-house"></i><span>Home</span></button>
-                <button class="nav-item" onclick="switchMainTab('ai-screen', this)"><i class="fa-solid fa-wand-magic-sparkles"></i><span>AI</span></button>
-                <button class="nav-item active" onclick="switchMainTab('activity-screen', this)"><i class="fa-solid fa-chart-line"></i><span>Activity</span></button>
-                <button class="nav-item" onclick="switchMainTab('profile-screen', this)"><i class="fa-solid fa-user-gear"></i><span>Profile</span></button>
-            </nav>
-        </div>
-
-        <!-- 7. PROFILE TAB VIEW -->
-        <div id="profile-screen" class="screen">
-            <header class="app-header">
-                <img src="images/appearich-logo1.png" alt="Appearich Header Logo" class="header-logo-img">
-                <div class="header-right">
-                    <div class="notification-bell"><i class="fa-solid fa-bell"></i></div>
-                </div>
-            </header>
-            <div class="main-container">
-                <div class="tab-content-view">
-                    <div class="view-header">
-                        <h2>Student Profile</h2>
-                        <p>Manage your account settings, university program, and preferences.</p>
-                    </div>
-                    <div class="card-container">
-                        <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 20px;">
-                            <div style="width: 64px; height: 64px; border-radius: var(--radius-full); background: var(--academic-blue); color: white; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 700;" id="profileAvatarInitials">AS</div>
-                            <div>
-                                <h3 id="profileFullName" style="font-size: 18px; font-weight: 700; color: var(--navy-primary);">Alex Student</h3>
-                                <p id="profileEmailDisplay" style="font-size: 14px; color: var(--text-secondary);">alex.student@appearich.edu</p>
-                            </div>
-                        </div>
-                        <div style="display: flex; flex-direction: column; gap: 12px; border-top: 1px solid var(--border-color); padding-top: 16px;">
-                            <button class="btn-secondary" style="justify-content: space-between;" onclick="alert('Editing profile information...')"><span>Edit Profile</span><i class="fa-solid fa-chevron-right"></i></button>
-                            <button class="btn-secondary" style="justify-content: space-between;" onclick="alert('Opening Notification Preferences...')"><span>Notifications</span><i class="fa-solid fa-chevron-right"></i></button>
-                            <button class="btn-secondary" style="justify-content: space-between;" onclick="alert('Opening Security & Privacy...')"><span>Privacy & Security</span><i class="fa-solid fa-chevron-right"></i></button>
-                            <button class="btn-primary" style="background-color: var(--error); margin-top: 12px;" onclick="handleLogout()">Log Out</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <nav class="bottom-nav">
-                <button class="nav-item" onclick="switchMainTab('home-screen', this)"><i class="fa-solid fa-house"></i><span>Home</span></button>
-                <button class="nav-item" onclick="switchMainTab('ai-screen', this)"><i class="fa-solid fa-wand-magic-sparkles"></i><span>AI</span></button>
-                <button class="nav-item" onclick="switchMainTab('activity-screen', this)"><i class="fa-solid fa-chart-line"></i><span>Activity</span></button>
-                <button class="nav-item active" onclick="switchMainTab('profile-screen', this)"><i class="fa-solid fa-user-gear"></i><span>Profile</span></button>
-            </nav>
-        </div>
-
+      </div>
     </div>
 
-    <script>
-        // Application State
-        let currentUser = {
-            name: "Alex",
-            email: "alex.student@appearich.edu"
+    <!-- MAIN APP HEADER -->
+    <header class="app-header" id="mainHeader" style="display: none;">
+      <div class="header-brand">
+        <img src="images/appearich-logo.png" alt="Appearich" class="header-logo-icon">
+        <span>Appearich</span>
+      </div>
+      <div style="display: flex; gap: 8px;">
+        <button class="icon-btn" onclick="toggleThemeMode()" title="Toggle Theme">
+          <i class="fa-solid fa-moon" id="themeIcon"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- SCREEN 1: HOME (CENTRAL HUB) -->
+    <div id="screen-home" class="screen">
+      <!-- HERO BANNER WITH INTEGRATED LOGO -->
+      <div class="hero-container" id="heroContainer">
+        <img src="" alt="Hero Campus" class="hero-bg-image" id="heroImageElement">
+        <div class="hero-gradient-overlay"></div>
+        
+        <!-- Integrated Float Logo Badge -->
+        <div class="hero-integrated-badge">
+          <img src="images/appearich-logo1" alt="Appearich" class="hero-badge-logo">
+          <span class="hero-badge-text" id="heroBadgeLabel">Smart Matrix</span>
+        </div>
+
+        <div class="hero-content">
+          <div>
+            <h2 class="hero-greeting" id="dynamicGreeting">WELCOME, SCHOLAR</h2>
+            <div class="hero-msg" id="dynamicSubGreeting">Ready for another productive day?</div>
+          </div>
+          <div class="hero-controls-group">
+            <button class="hero-control-btn" onclick="openHeroPreferencesModal()">
+              <i class="fa-solid fa-sliders"></i> Customize Hero
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ACADEMIC COMMAND SEARCH -->
+      <div class="search-command-bar">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" placeholder="Search courses, lectures, assignments, or resources..." id="globalSearchInput" oninput="handleGlobalSearch(this.value)">
+      </div>
+
+      <!-- DISCOVERY SECTION -->
+      <div class="section-header-title">
+        <i class="fa-solid fa-compass" style="color: var(--accent-gold);"></i> Academic Discovery
+      </div>
+
+      <div class="cards-grid">
+        <div class="discovery-card featured" onclick="triggerDiscoveryModal('Academic Hub', 'Accessing Tripos modules, lecture archives, and assessment schedules.')">
+          <div>
+            <div class="card-icon-wrap"><i class="fa-solid fa-graduation-cap"></i></div>
+            <div class="card-title">Academic Core</div>
+            <div class="card-desc">Courses, assignments, timetables & grades</div>
+          </div>
+          <i class="fa-solid fa-chevron-right" style="color: var(--text-sub);"></i>
+        </div>
+
+        <div class="discovery-card" onclick="triggerDiscoveryModal('Upcoming Events', 'Seminars, supervisions, and examination deadlines.')">
+          <div>
+            <div class="card-icon-wrap"><i class="fa-solid fa-calendar-days"></i></div>
+            <div class="card-title">Events</div>
+            <div class="card-desc">Lectures & deadlines</div>
+          </div>
+        </div>
+
+        <div class="discovery-card" onclick="triggerDiscoveryModal('Library Repository', 'Digital texts, research papers, and archived journals.')">
+          <div>
+            <div class="card-icon-wrap"><i class="fa-solid fa-book-bookmark"></i></div>
+            <div class="card-title">Library</div>
+            <div class="card-desc">Research materials</div>
+          </div>
+        </div>
+
+        <div class="discovery-card" onclick="triggerDiscoveryModal('Student Community', 'College societies, syndicates, and peer collaboration groups.')">
+          <div>
+            <div class="card-icon-wrap"><i class="fa-solid fa-users-rectangle"></i></div>
+            <div class="card-title">Community</div>
+            <div class="card-desc">Clubs & discussions</div>
+          </div>
+        </div>
+
+        <div class="discovery-card" onclick="triggerDiscoveryModal('Athletics & Sports', 'College rowing, tennis fixtures, and training camps.')">
+          <div>
+            <div class="card-icon-wrap"><i class="fa-solid fa-medal"></i></div>
+            <div class="card-title">Sports</div>
+            <div class="card-desc">Teams & fixtures</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCREEN 2: AI COMPANION -->
+    <div id="screen-ai" class="screen">
+      <div class="ai-companion-hero">
+        <div class="ai-core-pulse">
+          <i class="fa-solid fa-microchip"></i>
+        </div>
+        <h2 style="font-size: 1.3rem; font-weight: 900; margin-bottom: 6px;">AI Academic Intelligence</h2>
+        <p style="font-size: 0.8rem; color: var(--text-sub); max-width: 280px; margin: 0 auto;">Your neural study partner trained on Cambridge Tripos syllabi and research datasets.</p>
+      </div>
+
+      <div class="section-header-title">
+        <i class="fa-solid fa-wand-magic-sparkles" style="color: var(--accent-gold);"></i> Intelligent Capabilities
+      </div>
+
+      <div class="ai-tools-grid">
+        <div class="ai-tool-card" onclick="triggerAiAction('Summarizing Material')">
+          <div class="card-icon-wrap"><i class="fa-solid fa-file-lines"></i></div>
+          <div class="card-title" style="font-size: 0.88rem;">Summarizer</div>
+          <div class="card-desc">Condense lecture notes</div>
+        </div>
+        <div class="ai-tool-card" onclick="triggerAiAction('Creating Practice Quizzes')">
+          <div class="card-icon-wrap"><i class="fa-solid fa-brain"></i></div>
+          <div class="card-title" style="font-size: 0.88rem;">Quiz Engine</div>
+          <div class="card-desc">Active recall tests</div>
+        </div>
+        <div class="ai-tool-card" onclick="triggerAiAction('Building Dynamic Study Plans')">
+          <div class="card-icon-wrap"><i class="fa-solid fa-timeline"></i></div>
+          <div class="card-title" style="font-size: 0.88rem;">Study Planner</div>
+          <div class="card-desc">Optimized revision schedules</div>
+        </div>
+        <div class="ai-tool-card" onclick="triggerAiAction('Explaining Complex Topics')">
+          <div class="card-icon-wrap"><i class="fa-solid fa-lightbulb"></i></div>
+          <div class="card-title" style="font-size: 0.88rem;">Concept Tutor</div>
+          <div class="card-desc">Break down difficult theories</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCREEN 3: ACTIVITY & 3D JOURNEY -->
+    <div id="screen-activity" class="screen">
+      <div class="section-header-title">
+        <i class="fa-solid fa-chart-line" style="color: var(--accent-gold);"></i> Academic Progression
+      </div>
+
+      <div style="background: var(--surface-color); border: 1px solid var(--border-color); border-radius: 20px; padding: 20px; margin-bottom: 24px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+          <span style="font-size: 0.85rem; font-weight: 800;">Semester Milestone Streak</span>
+          <span style="background: var(--accent-gold-glow); color: var(--accent-gold); padding: 4px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 800;">14 Days Active</span>
+        </div>
+        <div style="width: 100%; height: 8px; background: var(--bg-color); border-radius: 4px; overflow: hidden; border: 1px solid var(--border-color);">
+          <div style="width: 78%; height: 100%; background: var(--accent-gold); border-radius: 4px;"></div>
+        </div>
+        <div style="display: flex; justify-content: space-between; font-size: 0.72rem; color: var(--text-sub); margin-top: 8px;">
+          <span>Courses Completed: 12/16</span>
+          <span>78% Index</span>
+        </div>
+      </div>
+
+      <div class="section-header-title">
+        <i class="fa-solid fa-cube" style="color: var(--accent-gold);"></i> 3D Academic Journey
+      </div>
+
+      <div class="journey-timeline">
+        <div class="timeline-node">
+          <div class="timeline-content">
+            <div style="font-size: 0.7rem; color: var(--accent-gold); font-weight: 800; text-transform: uppercase;">Milestone 01</div>
+            <div style="font-size: 0.9rem; font-weight: 800; margin-top: 2px;">Advanced Algorithm Tripos</div>
+            <div style="font-size: 0.75rem; color: var(--text-sub); margin-top: 2px;">Completed lecture modules and practical lab work.</div>
+          </div>
+        </div>
+        <div class="timeline-node">
+          <div class="timeline-content">
+            <div style="font-size: 0.7rem; color: var(--accent-gold); font-weight: 800; text-transform: uppercase;">Milestone 02</div>
+            <div style="font-size: 0.9rem; font-weight: 800; margin-top: 2px;">Quantum Mechanics Seminar</div>
+            <div style="font-size: 0.75rem; color: var(--text-sub); margin-top: 2px;">Passed interactive quiz assessment with distinction.</div>
+          </div>
+        </div>
+        <div class="timeline-node">
+          <div class="timeline-content">
+            <div style="font-size: 0.7rem; color: var(--accent-gold); font-weight: 800; text-transform: uppercase;">Milestone 03 — Current</div>
+            <div style="font-size: 0.9rem; font-weight: 800; margin-top: 2px;">Thesis Dissertation Draft</div>
+            <div style="font-size: 0.75rem; color: var(--text-sub); margin-top: 2px;">Submissions open for supervisor peer review.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCREEN 4: PROFILE -->
+    <div id="screen-profile" class="screen">
+      <div class="profile-card-header">
+        <div class="profile-avatar-lg" id="profileInitial">A</div>
+        <h2 style="font-size: 1.2rem; font-weight: 900;" id="profileDisplayName">Alistair Sterling</h2>
+        <p style="font-size: 0.8rem; color: var(--accent-gold); font-weight: 700; margin-top: 2px;" id="profileDisplayProgram">B.A. Computer Science & Tripos</p>
+        <p style="font-size: 0.75rem; color: var(--text-sub); margin-top: 4px;" id="profileDisplayEmail">alistair@appearich.ac.uk</p>
+      </div>
+
+      <div class="section-header-title">Account Preferences</div>
+      <div class="settings-list">
+        <div class="settings-item" onclick="openHeroPreferencesModal()">
+          <span>Hero Visual System & Modes</span>
+          <i class="fa-solid fa-chevron-right" style="color: var(--text-sub); font-size: 0.75rem;"></i>
+        </div>
+        <div class="settings-item" onclick="alert('Notification settings updated.')">
+          <span>Push Notifications</span>
+          <i class="fa-solid fa-chevron-right" style="color: var(--text-sub); font-size: 0.75rem;"></i>
+        </div>
+        <div class="settings-item" onclick="alert('Privacy configuration secured.')">
+          <span>Privacy & Security</span>
+          <i class="fa-solid fa-chevron-right" style="color: var(--text-sub); font-size: 0.75rem;"></i>
+        </div>
+        <div class="settings-item" onclick="alert('Appearich Academic LMS v3.4.0 — Built for elite collegiate standards.')">
+          <span>About Appearich</span>
+          <i class="fa-solid fa-chevron-right" style="color: var(--text-sub); font-size: 0.75rem;"></i>
+        </div>
+      </div>
+
+      <button class="danger-btn" onclick="handleLogout()">
+        <i class="fa-solid fa-right-from-bracket"></i> Terminate Session
+      </button>
+    </div>
+
+    <!-- PERSISTENT BOTTOM NAVIGATION -->
+    <nav class="bottom-nav" id="mainNavBar" style="display: none;">
+      <button class="nav-item active" onclick="switchTab('screen-home', this)">
+        <i class="fa-solid fa-house"></i>
+        <span>Home</span>
+      </button>
+      <button class="nav-item" onclick="switchTab('screen-ai', this)">
+        <i class="fa-solid fa-robot"></i>
+        <span>AI</span>
+      </button>
+      <button class="nav-item" onclick="switchTab('screen-activity', this)">
+        <i class="fa-solid fa-chart-pie"></i>
+        <span>Activity</span>
+      </button>
+      <button class="nav-item" onclick="switchTab('screen-profile', this)">
+        <i class="fa-solid fa-user"></i>
+        <span>Profile</span>
+      </button>
+    </nav>
+
+  </div>
+
+  <!-- HERO PREFERENCES & GALLERY MODAL -->
+  <div id="heroPreferencesModal" class="modal-overlay">
+    <div class="modal-sheet">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <h3 style="font-size: 1.1rem; font-weight: 800;">Hero Visual Control</h3>
+        <i class="fa-solid fa-xmark" style="cursor: pointer; font-size: 1.2rem; color: var(--text-sub);" onclick="closeHeroPreferencesModal()"></i>
+      </div>
+
+      <!-- Mode Switcher (Personal vs Smart) -->
+      <div class="mode-switch-container">
+        <button class="mode-switch-btn" id="btnModePersonal" onclick="setHeroMode('personal')">Personal Mode</button>
+        <button class="mode-switch-btn" id="btnModeSmart" onclick="setHeroMode('smart')">Smart Mode</button>
+      </div>
+
+      <!-- My Hero Gallery Section -->
+      <div class="section-header-title" style="margin-top: 16px;">
+        <i class="fa-solid fa-images" style="color: var(--accent-gold);"></i> My Hero Gallery
+      </div>
+      <p style="font-size: 0.75rem; color: var(--text-sub); margin-bottom: 8px;">Tap any saved image to set it as current Hero or manage collection.</p>
+      
+      <div class="hero-gallery-grid" id="heroGalleryGrid">
+        <!-- Rendered via JS -->
+      </div>
+
+      <!-- Hidden file input for uploading custom images -->
+      <input type="file" id="heroImageFileInput" accept="image/*" style="display: none;" onchange="handleImageUpload(event)">
+
+      <!-- Period Specific Preferences Accordion / Section -->
+      <div id="periodPreferencesSection" style="margin-top: 20px;">
+        <div class="section-header-title">
+          <i class="fa-solid fa-calendar-check" style="color: var(--accent-gold);"></i> Period-Specific Assign
+        </div>
+        <p style="font-size: 0.75rem; color: var(--text-sub); margin-bottom: 10px;">Assign specific favorite images to periods in Smart Mode.</p>
+        
+        <div style="display: flex; flex-direction: column; gap: 8px;" id="periodAssignmentList">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <button class="primary-btn" style="margin-top: 24px;" onclick="closeHeroPreferencesModal()">Save & Apply Preferences</button>
+    </div>
+  </div>
+
+  <!-- DISCOVERY / ACTION MODAL -->
+  <div id="discoveryModal" class="modal-overlay">
+    <div class="modal-sheet">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <h3 id="modalDiscoveryTitle" style="font-size: 1.1rem; font-weight: 800;">Module Details</h3>
+        <i class="fa-solid fa-xmark" style="cursor: pointer; font-size: 1.2rem; color: var(--text-sub);" onclick="closeDiscoveryModal()"></i>
+      </div>
+      <p id="modalDiscoveryDesc" style="font-size: 0.85rem; color: var(--text-sub); line-height: 1.5; margin-bottom: 20px;"></p>
+      <button class="primary-btn" onclick="closeDiscoveryModal()">Dismiss Module</button>
+    </div>
+  </div>
+
+  <!-- APPLICATION LOGIC SCRIPT -->
+  <script>
+    let isRegisterState = false;
+    let currentUserProfile = {
+      name: "Alistair Sterling",
+      email: "scholar@appearich.ac.uk",
+      program: "B.A. Computer Science & Tripos"
+    };
+
+    const DEFAULT_HERO_IMAGES = [
+      { id: 'def_1', url: 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?q=80&w=800&auto=format&fit=cover', label: 'Library' },
+      { id: 'def_2', url: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=800&auto=format&fit=cover', label: 'Collegiate Hall' },
+      { id: 'def_3', url: 'https://images.unsplash.com/photo-1509062522246-3755977927d7?q=80&w=800&auto=format&fit=cover', label: 'Auditorium' },
+      { id: 'def_4', url: 'https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?q=80&w=800&auto=format&fit=cover', label: 'Weekend Social' },
+      { id: 'def_5', url: 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?q=80&w=800&auto=format&fit=cover', label: 'Long Break / Travel' }
+    ];
+
+    let appState = {
+      heroMode: 'smart',
+      currentHeroUrl: '',
+      gallery: [],
+      periodPreferences: {
+        academic: '',
+        weekend: '',
+        holiday: '',
+        shortBreak: '',
+        longBreak: '',
+        default: ''
+      }
+    };
+
+    window.addEventListener('DOMContentLoaded', () => {
+      // Force initial default theme strictly to Light/White Mode on first load/startup
+      const savedTheme = localStorage.getItem('appearich_theme_mode');
+      if (savedTheme) {
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        document.getElementById('themeIcon').className = savedTheme === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+      } else {
+        document.documentElement.setAttribute('data-theme', 'light');
+        localStorage.setItem('appearich_theme_mode', 'light');
+      }
+
+      loadStateFromStorage();
+
+      const savedUser = localStorage.getItem('appearich_student_profile');
+      if (savedUser) {
+        currentUserProfile = JSON.parse(savedUser);
+        launchMainDashboard();
+      }
+
+      setTimeout(() => {
+        const splash = document.getElementById('cinematic-splash');
+        if (splash) splash.style.display = 'none';
+      }, 1500);
+    });
+
+    function loadStateFromStorage() {
+      const storedGallery = localStorage.getItem('appearich_hero_gallery');
+      if (storedGallery) {
+        appState.gallery = JSON.parse(storedGallery);
+      } else {
+        appState.gallery = [...DEFAULT_HERO_IMAGES];
+        saveGalleryToStorage();
+      }
+
+      const storedMode = localStorage.getItem('appearich_hero_mode');
+      if (storedMode) appState.heroMode = storedMode;
+
+      const storedPrefs = localStorage.getItem('appearich_hero_period_prefs');
+      if (storedPrefs) appState.periodPreferences = JSON.parse(storedPrefs);
+
+      const storedCurrent = localStorage.getItem('appearich_current_hero');
+      if (storedCurrent) {
+        appState.currentHeroUrl = storedCurrent;
+      } else {
+        evaluateSmartHero();
+      }
+    }
+
+    function saveGalleryToStorage() {
+      localStorage.setItem('appearich_hero_gallery', JSON.stringify(appState.gallery));
+    }
+
+    function saveStateToStorage() {
+      localStorage.setItem('appearich_hero_mode', appState.heroMode);
+      localStorage.setItem('appearich_hero_period_prefs', JSON.stringify(appState.periodPreferences));
+      localStorage.setItem('appearich_current_hero', appState.currentHeroUrl);
+    }
+
+    function determineCurrentAcademicPeriod() {
+      const now = new Date();
+      const dayOfWeek = now.getDay();
+      const month = now.getMonth();
+
+      if (dayOfWeek === 0 || dayOfWeek === 6) {
+        return 'weekend';
+      }
+      if (month === 11 || month === 7) {
+        return 'holiday';
+      }
+      return 'academic';
+    }
+
+    function evaluateSmartHero() {
+      const period = determineCurrentAcademicPeriod();
+      let selectedUrl = '';
+      let badgeText = 'Smart Matrix';
+      let subGreetingText = 'Ready for another productive day?';
+
+      if (appState.heroMode === 'smart') {
+        if (appState.periodPreferences[period] && appState.periodPreferences[period] !== '') {
+          selectedUrl = appState.periodPreferences[period];
+        } else {
+          if (period === 'academic') {
+            selectedUrl = DEFAULT_HERO_IMAGES[0].url;
+            badgeText = 'Academic Period';
+            subGreetingText = 'Focus • Learning • Academic Excellence';
+          } else if (period === 'weekend') {
+            selectedUrl = DEFAULT_HERO_IMAGES[3].url;
+            badgeText = 'Weekend Mode';
+            subGreetingText = 'Take a moment to recharge and explore.';
+          } else if (period === 'holiday') {
+            selectedUrl = DEFAULT_HERO_IMAGES[4].url;
+            badgeText = 'Holiday Period';
+            subGreetingText = 'Enjoy your cultural and festive break.';
+          } else {
+            selectedUrl = DEFAULT_HERO_IMAGES[1].url;
+            badgeText = 'Active Session';
+            subGreetingText = 'Your academic journey continues.';
+          }
+        }
+      } else {
+        selectedUrl = appState.currentHeroUrl || appState.gallery[0].url;
+        badgeText = 'Personal Mode';
+        
+        const hour = new Date().getHours();
+        if (hour < 12) subGreetingText = 'Good morning. Ready for inquiry?';
+        else if (hour < 18) subGreetingText = 'Good afternoon. Maintain your focus.';
+        else subGreetingText = 'Good evening. Evening research session.';
+      }
+
+      setHeroImageWithCinematicTransition(selectedUrl, badgeText, subGreetingText);
+    }
+
+    function setHeroImageWithCinematicTransition(url, badgeText, subMsg) {
+      if (appState.currentHeroUrl === url && document.getElementById('heroImageElement').src) {
+        document.getElementById('heroBadgeLabel').innerText = badgeText;
+        if (subMsg) document.getElementById('dynamicSubGreeting').innerText = subMsg;
+        return;
+      }
+
+      const container = document.getElementById('heroContainer');
+      const imgEl = document.getElementById('heroImageElement');
+
+      container.classList.add('transitioning');
+
+      setTimeout(() => {
+        imgEl.src = url;
+        appState.currentHeroUrl = url;
+        document.getElementById('heroBadgeLabel').innerText = badgeText;
+        if (subMsg) document.getElementById('dynamicSubGreeting').innerText = subMsg;
+        saveStateToStorage();
+
+        setTimeout(() => {
+          container.classList.remove('transitioning');
+        }, 150);
+      }, 350);
+    }
+
+    function setHeroMode(mode) {
+      appState.heroMode = mode;
+      document.getElementById('btnModePersonal').className = `mode-switch-btn ${mode === 'personal' ? 'active' : ''}`;
+      document.getElementById('btnModeSmart').className = `mode-switch-btn ${mode === 'smart' ? 'active' : ''}`;
+      saveStateToStorage();
+      evaluateSmartHero();
+    }
+
+    function toggleAuthMode() {
+      isRegisterState = !isRegisterState;
+      document.getElementById('authTitleText').innerText = isRegisterState ? "Create Scholar ID" : "Welcome Scholar";
+      document.getElementById('authSubText').innerText = isRegisterState ? "Register your profile for Appearich LMS" : "Authenticate to access your Cambridge matrix";
+      document.getElementById('authActionBtn').innerText = isRegisterState ? "Complete Registration" : "Initialize Session";
+      document.getElementById('nameGroup').style.display = isRegisterState ? "block" : "none";
+      document.getElementById('programGroup').style.display = isRegisterState ? "block" : "none";
+      document.getElementById('authSwitchPrompt').innerHTML = isRegisterState ? "Existing scholar? <span>Sign In</span>" : "New researcher? <span>Create Account</span>";
+    }
+
+    function handleAuthSubmit() {
+      const email = document.getElementById('authEmail').value.trim();
+      const pass = document.getElementById('authPassword').value.trim();
+      const nameInput = document.getElementById('regName').value.trim();
+      const programInput = document.getElementById('regProgram').value.trim();
+
+      if (!email || !pass) {
+        alert("Please enter valid academic credentials.");
+        return;
+      }
+
+      if (isRegisterState && nameInput) {
+        currentUserProfile.name = nameInput;
+        currentUserProfile.email = email;
+        if (programInput) currentUserProfile.program = programInput;
+      } else {
+        currentUserProfile.email = email;
+        currentUserProfile.name = email.split('@')[0].toUpperCase();
+      }
+
+      localStorage.setItem('appearich_student_profile', JSON.stringify(currentUserProfile));
+      launchMainDashboard();
+    }
+
+    function launchMainDashboard() {
+      document.getElementById('screen-auth').classList.remove('active');
+      document.getElementById('screen-home').classList.add('active');
+      document.getElementById('mainHeader').style.display = 'flex';
+      document.getElementById('mainNavBar').style.display = 'flex';
+
+      const hour = new Date().getHours();
+      let timeGreeting = "WELCOME";
+      if (hour < 12) timeGreeting = "GOOD MORNING";
+      else if (hour < 18) timeGreeting = "GOOD AFTERNOON";
+      else timeGreeting = "GOOD EVENING";
+
+      document.getElementById('dynamicGreeting').innerText = `${timeGreeting}, ${currentUserProfile.name.toUpperCase()}`;
+      document.getElementById('profileDisplayName').innerText = currentUserProfile.name;
+      document.getElementById('profileDisplayEmail').innerText = currentUserProfile.email;
+      document.getElementById('profileDisplayProgram').innerText = currentUserProfile.program;
+      document.getElementById('profileInitial').innerText = currentUserProfile.name.charAt(0).toUpperCase();
+
+      evaluateSmartHero();
+    }
+
+    function handleLogout() {
+      localStorage.removeItem('appearich_student_profile');
+      document.getElementById('mainHeader').style.display = 'none';
+      document.getElementById('mainNavBar').style.display = 'none';
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById('screen-auth').classList.add('active');
+    }
+
+    function switchTab(screenId, element) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      document.getElementById(screenId).classList.add('active');
+      if (element) element.classList.add('active');
+    }
+
+    function toggleThemeMode() {
+      const htmlEl = document.documentElement;
+      const icon = document.getElementById('themeIcon');
+      if (htmlEl.getAttribute('data-theme') === 'dark') {
+        htmlEl.setAttribute('data-theme', 'light');
+        localStorage.setItem('appearich_theme_mode', 'light');
+        icon.className = 'fa-solid fa-moon';
+      } else {
+        htmlEl.setAttribute('data-theme', 'dark');
+        localStorage.setItem('appearich_theme_mode', 'dark');
+        icon.className = 'fa-solid fa-sun';
+      }
+    }
+
+    function openHeroPreferencesModal() {
+      renderHeroGalleryModal();
+      renderPeriodPreferencesUI();
+      document.getElementById('btnModePersonal').className = `mode-switch-btn ${appState.heroMode === 'personal' ? 'active' : ''}`;
+      document.getElementById('btnModeSmart').className = `mode-switch-btn ${appState.heroMode === 'smart' ? 'active' : ''}`;
+      document.getElementById('heroPreferencesModal').classList.add('active');
+    }
+
+    function closeHeroPreferencesModal() {
+      document.getElementById('heroPreferencesModal').classList.remove('active');
+      evaluateSmartHero();
+    }
+
+    function renderHeroGalleryModal() {
+      const grid = document.getElementById('heroGalleryGrid');
+      let html = '';
+
+      appState.gallery.forEach((imgObj) => {
+        const isSelected = appState.currentHeroUrl === imgObj.url ? 'selected' : '';
+        html += `
+          <div class="gallery-thumb-card ${isSelected}" onclick="selectHeroImage('${imgObj.url}')">
+            <img src="${imgObj.url}" alt="${imgObj.label || 'Hero'}">
+            <button class="gallery-thumb-delete" onclick="event.stopPropagation(); deleteGalleryImage('${imgObj.id}')" title="Delete">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+        `;
+      });
+
+      html += `
+        <div class="gallery-add-tile" onclick="triggerImageUploadDialog()">
+          <i class="fa-solid fa-plus" style="font-size: 1.2rem;"></i>
+          <span style="font-size: 0.65rem; font-weight: 700;">Add Image</span>
+        </div>
+      `;
+
+      grid.innerHTML = html;
+    }
+
+    function triggerImageUploadDialog() {
+      document.getElementById('heroImageFileInput').click();
+    }
+
+    function handleImageUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const newImg = {
+          id: 'custom_' + Date.now(),
+          url: e.target.result,
+          label: 'Custom Upload'
         };
+        appState.gallery.push(newImg);
+        saveGalleryToStorage();
+        renderHeroGalleryModal();
+      };
+      reader.readAsDataURL(file);
+    }
 
-        const heroGalleryImages = [
-            { id: 1, title: "University Library", url: "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=1200&q=80", type: "Academic" },
-            { id: 2, title: "Campus Lecture Hall", url: "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=1200&q=80", type: "Lecture" },
-            { id: 3, title: "Weekend Nature", url: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80", type: "Weekend" },
-            { id: 4, title: "Short Break Coffee", url: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=1200&q=80", type: "Short Break" },
-            { id: 5, title: "Long Break Exploration", url: "https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=1200&q=80", type: "Long Break" },
-            { id: 6, title: "Holiday Celebration", url: "https://images.unsplash.com/photo-1513151233558-d860c5398176?auto=format&fit=crop&w=1200&q=80", type: "Holiday" }
-        ];
+    function selectHeroImage(url) {
+      appState.heroMode = 'personal';
+      appState.currentHeroUrl = url;
+      document.getElementById('btnModePersonal').className = 'mode-switch-btn active';
+      document.getElementById('btnModeSmart').className = 'mode-switch-btn';
+      saveStateToStorage();
+      renderHeroGalleryModal();
+      evaluateSmartHero();
+    }
 
-        let currentHeroIndex = 0;
-        let isSmartMode = true;
+    function deleteGalleryImage(id) {
+      if (appState.gallery.length <= 1) {
+        alert("You must retain at least one image in your gallery.");
+        return;
+      }
+      appState.gallery = appState.gallery.filter(item => item.id !== id);
+      saveGalleryToStorage();
+      renderHeroGalleryModal();
+    }
 
-        // Initialization & Splash Sequence
-        window.addEventListener('DOMContentLoaded', () => {
-            // Run splash screen animation for 2.2 seconds then transition to login
-            setTimeout(() => {
-                const splash = document.getElementById('splash-screen');
-                splash.style.opacity = '0';
-                setTimeout(() => {
-                    splash.classList.remove('active');
-                    document.getElementById('login-screen').classList.add('active');
-                }, 400);
-            }, 2200);
+    function renderPeriodPreferencesUI() {
+      const listContainer = document.getElementById('periodPreferencesList');
+      const periods = [
+        { key: 'academic', label: 'Academic Period' },
+        { key: 'weekend', label: 'Weekend Mode' },
+        { key: 'holiday', label: 'Holiday Period' },
+        { key: 'shortBreak', label: 'Short Break' },
+        { key: 'longBreak', label: 'Long Break' }
+      ];
 
-            renderHeroGallery();
-            updateHeroImageDisplay();
-        });
+      let html = '';
+      periods.forEach(p => {
+        const currentVal = appState.periodPreferences[p.key] || '';
+        html += `
+          <div style="display: flex; justify-content: space-between; align-items: center; background: var(--surface-elevated); padding: 10px 14px; border-radius: 12px; border: 1px solid var(--border-color);">
+            <span style="font-size: 0.8rem; font-weight: 700;">${p.label}</span>
+            <select style="background: var(--bg-color); color: var(--text-main); border: 1px solid var(--border-color); border-radius: 8px; padding: 6px 10px; font-size: 0.75rem; outline: none;" onchange="updatePeriodPreference('${p.key}', this.value)">
+              <option value="">Default System Image</option>
+              ${appState.gallery.map(img => `<option value="${img.url}" ${currentVal === img.url ? 'selected' : ''}>${img.label || 'Gallery Image'}</option>`).join('')}
+            </select>
+          </div>
+        `;
+      });
 
-        function switchScreen(targetScreenId) {
-            document.querySelectorAll('.screen').forEach(s => {
-                s.classList.remove('active');
-            });
-            document.getElementById(targetScreenId).classList.add('active');
-        }
+      listContainer.innerHTML = html;
+    }
 
-        function switchMainTab(targetScreenId, navElement) {
-            document.querySelectorAll('.screen').forEach(s => {
-                s.classList.remove('active');
-            });
-            document.getElementById(targetScreenId).classList.add('active');
+    function updatePeriodPreference(periodKey, url) {
+      appState.periodPreferences[periodKey] = url;
+      saveStateToStorage();
+    }
 
-            // Update active nav indicators across screens
-            document.querySelectorAll('.bottom-nav').forEach(nav => {
-                nav.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-            });
-            // Find corresponding nav buttons
-            const navIndex = targetScreenId === 'home-screen' ? 0 : targetScreenId === 'ai-screen' ? 1 : targetScreenId === 'activity-screen' ? 2 : 3;
-            document.querySelectorAll('.bottom-nav').forEach(nav => {
-                const items = nav.querySelectorAll('.nav-item');
-                if(items[navIndex]) items[navIndex].classList.add('active');
-            });
-        }
+    function triggerDiscoveryModal(title, desc) {
+      document.getElementById('modalDiscoveryTitle').innerText = title;
+      document.getElementById('modalDiscoveryDesc').innerText = desc;
+      document.getElementById('discoveryModal').classList.add('active');
+    }
 
-        function handleLogin(event) {
-            event.preventDefault();
-            const emailInput = document.getElementById('loginEmail').value;
-            if(emailInput) {
-                currentUser.email = emailInput;
-                const namePart = emailInput.split('@')[0];
-                currentUser.name = namePart.charAt(0).toUpperCase() + namePart.slice(1).replace('.', ' ');
-            }
+    function closeDiscoveryModal() {
+      document.getElementById('discoveryModal').classList.remove('active');
+    }
 
-            // Update UI with authenticated student info
-            document.getElementById('heroStudentName').innerText = `WELCOME, ${currentUser.name.toUpperCase()}`;
-            document.getElementById('profileFullName').innerText = currentUser.name;
-            document.getElementById('profileEmailDisplay').innerText = currentUser.email;
-            document.getElementById('profileAvatarInitials').innerText = currentUser.name.split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase();
+    function triggerAiAction(actionName) {
+      alert(`Appearich AI Companion initializing protocol: ${actionName}...`);
+    }
 
-            switchMainTab('home-screen');
-        }
-
-        function handleForgotPassword(event) {
-            event.preventDefault();
-            const email = document.getElementById('recoveryEmail').value;
-            if(email) {
-                document.getElementById('recoverySuccessBox').style.display = 'flex';
-                document.getElementById('recoverySubmitBtn').innerText = 'Link Sent Successfully';
-                document.getElementById('recoverySubmitBtn').style.backgroundColor = 'var(--success)';
-            }
-        }
-
-        function toggleCustomizeHero() {
-            const panel = document.getElementById('customizeHeroPanel');
-            panel.classList.toggle('open');
-        }
-
-        function toggleSmartMode() {
-            isSmartMode = !isSmartMode;
-            const badge = document.getElementById('heroModeBadge');
-            const toggleBtn = document.getElementById('smartModeToggleBtn');
-            
-            if(isSmartMode) {
-                badge.innerHTML = '<i class="fa-solid fa-bolt"></i> Smart Hero Mode';
-                toggleBtn.innerText = 'Switch to Personal Mode';
-            } else {
-                badge.innerHTML = '<i class="fa-solid fa-user"></i> Personal Hero Mode';
-                toggleBtn.innerText = 'Switch to Smart Mode';
-            }
-            updateHeroImageDisplay();
-        }
-
-        function renderHeroGallery() {
-            const grid = document.getElementById('heroGalleryGrid');
-            grid.innerHTML = '';
-            heroGalleryImages.forEach((img, idx) => {
-                const div = document.createElement('div');
-                div.className = `gallery-item ${idx === currentHeroIndex ? 'active' : ''}`;
-                div.innerHTML = `<img src="${img.url}" alt="${img.title}">`;
-                div.onclick = () => {
-                    isSmartMode = false;
-                    document.getElementById('heroModeBadge').innerHTML = '<i class="fa-solid fa-user"></i> Personal Hero Mode';
-                    document.getElementById('smartModeToggleBtn').innerText = 'Switch to Smart Mode';
-                    currentHeroIndex = idx;
-                    updateHeroImageDisplay();
-                    renderHeroGallery();
-                };
-                grid.appendChild(div);
-            });
-        }
-
-        function updateHeroImageDisplay() {
-            const imgElement = document.getElementById('heroBannerImg');
-            // Transition effect: blur -> fade -> focus
-            imgElement.classList.add('blur-effect');
-            
-            setTimeout(() => {
-                imgElement.src = heroGalleryImages[currentHeroIndex].url;
-                document.getElementById('heroGreetingTag').innerText = `Smart Period: ${heroGalleryImages[currentHeroIndex].type}`;
-                imgElement.classList.remove('blur-effect');
-            }, 250);
-        }
-
-        function handleLogout() {
-            switchScreen('login-screen');
-        }
-    </script>
+    function handleGlobalSearch(query) {
+      if (query.trim().length > 2) {
+        console.log(`Searching academic matrix for: ${query}`);
+      }
+    }
+  </script>
 </body>
 </html>
