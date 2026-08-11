@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>APPEARICH — Future Cambridge-Inspired LMS</title>
+    <!-- Google Fonts for superior editorial typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -11,6 +15,10 @@
             darkMode: 'class',
             theme: {
                 extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        mono: ['"Space Grotesk"', 'monospace'],
+                    },
                     colors: {
                         appearichGold: '#FFD700',
                     }
@@ -37,7 +45,7 @@
             const [activeSubView, setActiveSubView] = useState(null);
             const [darkMode, setDarkMode] = useState(true);
 
-            // Persistent Hero Image State with multiple updates/deletes support
+            // Persistent Hero Image State with multiple updates/deletes support & creative editorial imagery
             const [heroImage, setHeroImage] = useState('https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&q=80&w=1200');
             const [isBwMode, setIsBwMode] = useState(false);
             const [showHeroMenu, setShowHeroMenu] = useState(false);
@@ -79,7 +87,7 @@
             }
 
             return (
-                <div className="max-w-md mx-auto min-h-screen bg-white dark:bg-neutral-950 text-neutral-900 dark:text-neutral-100 flex flex-col justify-between shadow-2xl relative pb-24 transition-colors duration-300">
+                <div className="max-w-md mx-auto min-h-screen bg-white dark:bg-neutral-950 text-neutral-900 dark:text-neutral-100 flex flex-col justify-between shadow-2xl relative pb-28 transition-colors duration-300">
                     
                     {/* Top Header */}
                     <header className="flex justify-between items-center px-6 pt-5 pb-3 border-b border-neutral-100 dark:border-neutral-900 bg-white/80 dark:bg-neutral-950/80 backdrop-blur-md sticky top-0 z-40">
@@ -87,25 +95,25 @@
                             onClick={() => setActiveSubView(null)}
                             className="w-10 h-10 rounded-full border border-neutral-200 dark:border-neutral-800 flex items-center justify-center cursor-pointer hover:bg-neutral-100 dark:hover:bg-neutral-900 shadow-sm text-sm font-bold transition-all"
                         >
-                            ←
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>
                         </div>
                         <div className="flex items-center space-x-2 font-black text-lg tracking-tight">
-                            <span className="w-6 h-6 bg-black dark:bg-[#FFD700] text-[#FFD700] dark:text-black rounded-lg flex items-center justify-center text-xs shadow-sm font-mono">⚡</span>
-                            <span className="font-extrabold tracking-wider">APPEARICH</span>
+                            <span className="w-6 h-6 bg-black dark:bg-[#FFD700] text-[#FFD700] dark:text-black rounded-lg flex items-center justify-center text-xs shadow-sm font-mono font-bold">A</span>
+                            <span className="font-extrabold tracking-wider font-mono">APPEARICH</span>
                         </div>
                         <div className="flex items-center space-x-2">
                             <button 
                                 onClick={() => setIsBwMode(!isBwMode)}
-                                className={`w-9 h-9 rounded-full border border-neutral-200 dark:border-neutral-800 flex items-center justify-center text-xs font-mono transition-colors ${isBwMode ? 'bg-neutral-900 text-white' : 'hover:bg-neutral-100 dark:hover:bg-neutral-900'}`}
+                                className={`px-2.5 h-9 rounded-full border border-neutral-200 dark:border-neutral-800 flex items-center justify-center text-[10px] font-mono font-bold transition-colors ${isBwMode ? 'bg-neutral-900 text-white border-black' : 'hover:bg-neutral-100 dark:hover:bg-neutral-900'}`}
                                 title="Toggle B&W Mode"
                             >
-                                B/W
+                                MONO
                             </button>
                             <button 
                                 onClick={() => setDarkMode(!darkMode)}
                                 className="w-9 h-9 rounded-full border border-neutral-200 dark:border-neutral-800 flex items-center justify-center text-xs hover:bg-neutral-100 dark:hover:bg-neutral-900 transition-colors"
                             >
-                                {darkMode ? '☀️' : '🌙'}
+                                {darkMode ? 'LIGHT' : 'DARK'}
                             </button>
                         </div>
                     </header>
@@ -140,21 +148,20 @@
                     {/* Hidden file input for hero management */}
                     <input type="file" ref={fileInputRef} onChange={handleImageUpload} accept="image/*" className="hidden" />
 
-                    {/* Bottom Navigation */}
-                    <nav className="absolute bottom-0 left-0 right-0 bg-white/90 dark:bg-neutral-950/90 backdrop-blur-lg border-t border-neutral-200 dark:border-neutral-900 px-6 py-3 flex justify-between items-center z-30 shadow-2xl">
+                    {/* Creative Bottom Navigation Bar (No Emojis) */}
+                    <nav className="absolute bottom-0 left-0 right-0 bg-white/90 dark:bg-neutral-950/90 backdrop-blur-lg border-t border-neutral-200 dark:border-neutral-900 px-4 py-3 flex justify-around items-center z-30 shadow-2xl">
                         {[
-                            { name: 'Home', icon: '🏛️' },
-                            { name: 'AI', icon: '🔮' },
-                            { name: 'Activity', icon: '⚡' },
-                            { name: 'Profile', icon: '🧬' }
+                            { name: 'Home', label: 'CAMPUS' },
+                            { name: 'AI', label: 'MENTOR' },
+                            { name: 'Activity', label: 'JOURNEY' },
+                            { name: 'Profile', label: 'DOSSIER' }
                         ].map((tab) => (
                             <button 
                                 key={tab.name}
                                 onClick={() => { setCurrentTab(tab.name); setActiveSubView(null); }}
-                                className={`flex flex-col items-center space-y-1 transition-all ${currentTab === tab.name ? 'text-[#FFD700] font-black scale-105' : 'text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200'}`}
+                                className={`flex flex-col items-center space-y-1 transition-all py-1 px-3 rounded-xl ${currentTab === tab.name ? 'bg-[#FFD700] text-black font-black shadow-md scale-105' : 'text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200'}`}
                             >
-                                <span className="text-xl">{tab.icon}</span>
-                                <span className="text-[10px] tracking-widest font-mono">{tab.name}</span>
+                                <span className="text-[10px] tracking-widest font-mono">{tab.label}</span>
                             </button>
                         ))}
                     </nav>
@@ -168,15 +175,14 @@
             const [nameInput, setNameInput] = useState('William');
 
             return (
-                <div className="max-w-md mx-auto min-h-screen bg-black text-white flex flex-col justify-between p-8 relative overflow-hidden">
+                <div className="max-w-md mx-auto min-h-screen bg-black text-white flex flex-col justify-between p-8 relative overflow-hidden font-sans">
                     <div className="absolute -top-32 -right-32 w-96 h-96 rounded-full bg-[#FFD700]/10 blur-3xl pointer-events-none"></div>
-                    <div className="absolute -bottom-32 -left-32 w-96 h-96 rounded-full bg-blue-500/10 blur-3xl pointer-events-none"></div>
                     
                     <div className="space-y-3 pt-12 z-10">
                         <div className="inline-block bg-[#FFD700] text-black font-mono text-[10px] px-2.5 py-1 font-extrabold rounded">
                             CAMBRIDGE DIGITAL OS v3.0
                         </div>
-                        <h1 className="text-5xl font-black tracking-tighter leading-none text-white">
+                        <h1 className="text-5xl font-black tracking-tighter leading-none text-white font-mono">
                             APPEARICH<span className="text-[#FFD700]">.</span>
                         </h1>
                         <p className="text-xs text-neutral-400 font-medium pt-1">
@@ -197,9 +203,9 @@
                         </div>
                         <button 
                             onClick={() => onLogin(nameInput)}
-                            className="w-full bg-[#FFD700] text-black font-black py-4 rounded-2xl tracking-wider text-xs hover:bg-white transition-all shadow-xl shadow-[#FFD700]/10 flex items-center justify-center space-x-2"
+                            className="w-full bg-[#FFD700] text-black font-black py-4 rounded-2xl tracking-wider text-xs hover:bg-white transition-all shadow-xl shadow-[#FFD700]/10 flex items-center justify-center space-x-2 font-mono uppercase"
                         >
-                            <span>ENTER CAMPUS ENVIRONMENT</span>
+                            <span>Enter Campus Environment</span>
                             <span>→</span>
                         </button>
                     </div>
@@ -228,12 +234,12 @@
             return (
                 <div className="px-5 py-4 space-y-6 animate-fadeIn">
                     
-                    {/* Heroic Personal Image Environment */}
-                    <div className="relative rounded-3xl overflow-hidden bg-neutral-900 text-white shadow-2xl h-56 flex flex-col justify-end group border border-neutral-800">
+                    {/* Heroic Personal Image Environment with Creative Cover Menu */}
+                    <div className="relative rounded-3xl overflow-hidden bg-neutral-900 text-white shadow-2xl h-60 flex flex-col justify-end group border border-neutral-800">
                         {heroImage ? (
                             <img 
                                 src={heroImage} 
-                                className={`absolute inset-0 w-full h-full object-cover transition-all duration-700 group-hover:scale-105 ${isBwMode ? 'grayscale contrast-125' : 'opacity-80'}`} 
+                                className={`absolute inset-0 w-full h-full object-cover transition-all duration-700 group-hover:scale-105 ${isBwMode ? 'grayscale contrast-125' : 'opacity-85'}`} 
                             />
                         ) : (
                             <div className="absolute inset-0 bg-gradient-to-br from-neutral-900 to-neutral-800"></div>
@@ -244,53 +250,53 @@
                         <div className="absolute top-4 right-4 z-20">
                             <button 
                                 onClick={() => setShowHeroMenu(!showHeroMenu)}
-                                className="bg-black/70 backdrop-blur-md border border-white/20 text-white text-[10px] font-mono px-3 py-1.5 rounded-full hover:bg-black transition-all flex items-center space-x-1 shadow-lg"
+                                className="bg-black/80 backdrop-blur-md border border-white/20 text-white text-[10px] font-mono px-3.5 py-2 rounded-full hover:bg-black transition-all flex items-center space-x-1.5 shadow-xl uppercase font-semibold"
                             >
-                                <span>⚙ Change Cover</span>
+                                <span>Manage Visual</span>
                             </button>
 
                             {showHeroMenu && (
                                 <div className="absolute right-0 mt-2 w-52 bg-neutral-900 border border-neutral-800 rounded-2xl shadow-2xl py-2 z-30 text-xs font-medium space-y-1">
                                     <button 
                                         onClick={() => { fileInputRef.current.click(); setShowHeroMenu(false); }}
-                                        className="w-full text-left px-4 py-2.5 hover:bg-neutral-800 text-white flex items-center space-x-2 transition-colors"
+                                        className="w-full text-left px-4 py-2.5 hover:bg-neutral-800 text-white flex items-center space-x-2 transition-colors font-mono text-[11px]"
                                     >
-                                        <span>📁 Upload / Replace image</span>
+                                        <span>Upload / Replace Image</span>
                                     </button>
                                     <button 
                                         onClick={() => { setHeroImage(''); setShowHeroMenu(false); }}
-                                        className="w-full text-left px-4 py-2.5 hover:bg-neutral-800 text-red-400 flex items-center space-x-2 transition-colors"
+                                        className="w-full text-left px-4 py-2.5 hover:bg-neutral-800 text-red-400 flex items-center space-x-2 transition-colors font-mono text-[11px]"
                                     >
-                                        <span>✕ Remove image</span>
+                                        <span>Remove Image</span>
                                     </button>
                                     <button 
                                         onClick={() => { setHeroImage('https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&q=80&w=1200'); setShowHeroMenu(false); }}
-                                        className="w-full text-left px-4 py-2.5 hover:bg-neutral-800 text-[#FFD700] flex items-center space-x-2 transition-colors"
+                                        className="w-full text-left px-4 py-2.5 hover:bg-neutral-800 text-[#FFD700] flex items-center space-x-2 transition-colors font-mono text-[11px]"
                                     >
-                                        <span>↺ Restore default hero</span>
+                                        <span>Restore Default</span>
                                     </button>
                                 </div>
                             )}
                         </div>
 
                         {/* Personalized Greeting */}
-                        <div className="relative z-10 p-6 space-y-1.5">
-                            <div className="inline-block bg-[#FFD700] text-black font-mono text-[9px] px-2 py-0.5 font-black uppercase tracking-wider rounded">
-                                ACTIVE SESSION
+                        <div className="relative z-10 p-6 space-y-2">
+                            <div className="inline-block bg-[#FFD700] text-black font-mono text-[9px] px-2 py-0.5 font-extrabold uppercase tracking-widest rounded">
+                                CAMBRIDGE SCHOLAR
                             </div>
-                            <h1 className="text-2xl font-black tracking-tight text-white uppercase">
+                            <h1 className="text-2xl font-black tracking-tight text-white uppercase font-mono">
                                 WELCOME, {userName}
                             </h1>
                             <p className="text-xs text-[#FFD700] font-medium tracking-wide">
-                                Ready to continue your Cambridge academic journey?
+                                Ready to continue your academic journey?
                             </p>
                         </div>
                     </div>
 
                     {/* Futuristic Search Bar */}
                     <div className="relative">
-                        <div className={`flex items-center border rounded-2xl bg-neutral-50 dark:bg-neutral-900 px-4 py-3 space-x-3 transition-all duration-300 ${isSearchFocused ? 'border-[#FFD700] shadow-lg shadow-[#FFD700]/5 ring-1 ring-[#FFD700]' : 'border-neutral-200 dark:border-neutral-800'}`}>
-                            <span className="text-neutral-400 text-base">🔍</span>
+                        <div className={`flex items-center border rounded-2xl bg-neutral-50 dark:bg-neutral-900 px-4 py-3.5 space-x-3 transition-all duration-300 ${isSearchFocused ? 'border-[#FFD700] shadow-lg shadow-[#FFD700]/5 ring-1 ring-[#FFD700]' : 'border-neutral-200 dark:border-neutral-800'}`}>
+                            <span className="text-neutral-400 text-xs font-mono font-bold">[SEARCH]</span>
                             <input 
                                 type="text" 
                                 value={searchQuery}
@@ -301,7 +307,7 @@
                                 className="bg-transparent text-xs flex-1 focus:outline-none text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-400 font-medium"
                             />
                             {searchQuery && (
-                                <button onClick={() => setSearchQuery('')} className="text-xs text-neutral-400 hover:text-neutral-600">✕</button>
+                                <button onClick={() => setSearchQuery('')} className="text-xs text-neutral-400 hover:text-neutral-600 font-mono">CLEAR</button>
                             )}
                         </div>
                     </div>
@@ -314,31 +320,31 @@
                         </div>
                         
                         <div className="grid grid-cols-2 gap-3">
-                            {/* Academic Card */}
+                            {/* Academic Card with Creative Imagery */}
                             <div 
                                 onClick={() => setActiveSubView('academics')}
-                                className="bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-3xl p-5 space-y-3 cursor-pointer hover:border-[#FFD700] transition-all group shadow-sm"
+                                className="relative rounded-3xl overflow-hidden h-44 bg-neutral-900 p-4 flex flex-col justify-end shadow-md cursor-pointer group border border-neutral-800"
                             >
-                                <div className="w-10 h-10 rounded-2xl bg-[#FFD700]/10 text-[#FFD700] flex items-center justify-center text-lg font-black group-hover:scale-110 transition-transform">
-                                    🎓
-                                </div>
-                                <div>
-                                    <h3 className="font-black text-sm">Academic</h3>
-                                    <p className="text-[10px] text-neutral-500 dark:text-neutral-400 mt-0.5">Courses & Lectures</p>
+                                <div className="absolute inset-0 bg-cover bg-center opacity-40 group-hover:scale-105 transition-transform duration-500" style={{ backgroundImage: `url('https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&q=80&w=600')` }}></div>
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent"></div>
+                                <div className="relative z-10 space-y-1">
+                                    <span className="text-[9px] font-mono text-[#FFD700] font-bold">MODULE 01</span>
+                                    <h3 className="font-black text-base text-white">Academics</h3>
+                                    <p className="text-[10px] text-neutral-300 font-medium">Courses & Lectures</p>
                                 </div>
                             </div>
 
-                            {/* Upcoming Events Card */}
+                            {/* Upcoming Events Card with Creative Imagery */}
                             <div 
                                 onClick={() => setActiveSubView('events')}
-                                className="bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-3xl p-5 space-y-3 cursor-pointer hover:border-[#FFD700] transition-all group shadow-sm"
+                                className="relative rounded-3xl overflow-hidden h-44 bg-neutral-900 p-4 flex flex-col justify-end shadow-md cursor-pointer group border border-neutral-800"
                             >
-                                <div className="w-10 h-10 rounded-2xl bg-[#FFD700]/10 text-[#FFD700] flex items-center justify-center text-lg font-black group-hover:scale-110 transition-transform">
-                                    📅
-                                </div>
-                                <div>
-                                    <h3 className="font-black text-sm">Upcoming Events</h3>
-                                    <p className="text-[10px] text-neutral-500 dark:text-neutral-400 mt-0.5">Seminars & Deadlines</p>
+                                <div className="absolute inset-0 bg-cover bg-center opacity-40 group-hover:scale-105 transition-transform duration-500" style={{ backgroundImage: `url('https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?auto=format&fit=crop&q=80&w=600')` }}></div>
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent"></div>
+                                <div className="relative z-10 space-y-1">
+                                    <span className="text-[9px] font-mono text-[#FFD700] font-bold">SCHEDULE</span>
+                                    <h3 className="font-black text-base text-white">Upcoming Events</h3>
+                                    <p className="text-[10px] text-neutral-300 font-medium">Seminars & Deadlines</p>
                                 </div>
                             </div>
                         </div>
@@ -350,13 +356,13 @@
                                 className="bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-4 flex items-center justify-between cursor-pointer hover:border-[#FFD700] transition-all group"
                             >
                                 <div className="flex items-center space-x-3.5">
-                                    <div className="w-10 h-10 rounded-xl bg-neutral-200 dark:bg-neutral-800 flex items-center justify-center text-base">⚽</div>
+                                    <div className="w-10 h-10 rounded-xl bg-neutral-200 dark:bg-neutral-800 flex items-center justify-center text-xs font-mono font-bold">ATH</div>
                                     <div>
                                         <h4 className="font-black text-xs">University Sports & Fitness</h4>
                                         <p className="text-[10px] text-neutral-500 dark:text-neutral-400">Upcoming matches & training schedules</p>
                                     </div>
                                 </div>
-                                <span className="text-xs text-neutral-400 group-hover:translate-x-1 transition-transform">→</span>
+                                <span className="text-xs font-mono text-neutral-400 group-hover:translate-x-1 transition-transform">→</span>
                             </div>
 
                             <div 
@@ -364,13 +370,13 @@
                                 className="bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-4 flex items-center justify-between cursor-pointer hover:border-[#FFD700] transition-all group"
                             >
                                 <div className="flex items-center space-x-3.5">
-                                    <div className="w-10 h-10 rounded-xl bg-neutral-200 dark:bg-neutral-800 flex items-center justify-center text-base">📚</div>
+                                    <div className="w-10 h-10 rounded-xl bg-neutral-200 dark:bg-neutral-800 flex items-center justify-center text-xs font-mono font-bold">LIB</div>
                                     <div>
                                         <h4 className="font-black text-xs">Digital Library & Resources</h4>
                                         <p className="text-[10px] text-neutral-500 dark:text-neutral-400">Research papers, books & notes</p>
                                     </div>
                                 </div>
-                                <span className="text-xs text-neutral-400 group-hover:translate-x-1 transition-transform">→</span>
+                                <span className="text-xs font-mono text-neutral-400 group-hover:translate-x-1 transition-transform">→</span>
                             </div>
 
                             <div 
@@ -378,13 +384,13 @@
                                 className="bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-4 flex items-center justify-between cursor-pointer hover:border-[#FFD700] transition-all group"
                             >
                                 <div className="flex items-center space-x-3.5">
-                                    <div className="w-10 h-10 rounded-xl bg-neutral-200 dark:bg-neutral-800 flex items-center justify-center text-base">🌐</div>
+                                    <div className="w-10 h-10 rounded-xl bg-neutral-200 dark:bg-neutral-800 flex items-center justify-center text-xs font-mono font-bold">COM</div>
                                     <div>
                                         <h4 className="font-black text-xs">Student Community & Societies</h4>
                                         <p className="text-[10px] text-neutral-500 dark:text-neutral-400">Discussions and academic groups</p>
                                     </div>
                                 </div>
-                                <span className="text-xs text-neutral-400 group-hover:translate-x-1 transition-transform">→</span>
+                                <span className="text-xs font-mono text-neutral-400 group-hover:translate-x-1 transition-transform">→</span>
                             </div>
                         </div>
                     </div>
@@ -428,8 +434,8 @@
                         {/* AI Core Interactive Banner */}
                         <div className="bg-black text-white rounded-3xl p-6 text-center relative overflow-hidden shadow-xl space-y-3 border border-neutral-800">
                             <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-neutral-800 via-black to-black opacity-50"></div>
-                            <div className="relative z-10 w-14 h-14 mx-auto rounded-full bg-[#FFD700]/20 border border-[#FFD700] flex items-center justify-center animate-pulse shadow-lg shadow-[#FFD700]/10">
-                                <span className="text-xl">🔮</span>
+                            <div className="relative z-10 w-14 h-14 mx-auto rounded-full bg-[#FFD700]/20 border border-[#FFD700] flex items-center justify-center animate-pulse shadow-lg shadow-[#FFD700]/10 font-mono font-black text-[#FFD700]">
+                                AI
                             </div>
                             <div className="relative z-10">
                                 <h4 className="font-black text-xs text-[#FFD700] tracking-wider uppercase font-mono">KNOWLEDGE TELEMETRY ACTIVE</h4>
@@ -450,7 +456,7 @@
                         </div>
                     </div>
 
-                    {/* Input Bar */}
+                    {/* Input Bar with Creative Button */}
                     <div className="pt-2">
                         <div className="flex items-center border border-neutral-200 dark:border-neutral-800 rounded-2xl bg-neutral-50 dark:bg-neutral-900 px-3 py-2 space-x-2 focus-within:border-[#FFD700] transition-colors">
                             <input 
@@ -463,9 +469,9 @@
                             />
                             <button 
                                 onClick={handleSend}
-                                className="bg-[#FFD700] text-black font-black text-xs px-4 py-2 rounded-xl hover:bg-white transition-all shadow-sm"
+                                className="bg-[#FFD700] text-black font-mono font-black text-[10px] uppercase tracking-wider px-4 py-2.5 rounded-xl hover:bg-white transition-all shadow-sm"
                             >
-                                Ask
+                                Query AI
                             </button>
                         </div>
                     </div>
@@ -486,12 +492,12 @@
                     <div className="grid grid-cols-2 gap-3">
                         <div className="bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-4 space-y-1">
                             <span className="text-[10px] font-mono text-neutral-400 uppercase">Courses</span>
-                            <div className="text-2xl font-black">4 / 6</div>
+                            <div className="text-2xl font-black font-mono">4 / 6</div>
                             <p className="text-[10px] text-[#FFD700] font-medium">78% Progress</p>
                         </div>
                         <div className="bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-4 space-y-1">
                             <span className="text-[10px] font-mono text-neutral-400 uppercase">Study Streak</span>
-                            <div className="text-2xl font-black">12 Days</div>
+                            <div className="text-2xl font-black font-mono">12 Days</div>
                             <p className="text-[10px] text-[#FFD700] font-medium">Top 5% Student</p>
                         </div>
                     </div>
@@ -510,9 +516,9 @@
                                 <div key={idx} className={`border rounded-2xl p-4 flex items-center justify-between ${item.status === 'current' ? 'border-[#FFD700] bg-[#FFD700]/5' : 'border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900'}`}>
                                     <div className="space-y-0.5">
                                         <h4 className="font-black text-xs">{item.title}</h4>
-                                        <p className="text-[10px] text-neutral-500">{item.time}</p>
+                                        <p className="text-[10px] text-neutral-500 font-mono">{item.time}</p>
                                     </div>
-                                    <span className={`text-[10px] font-mono px-2 py-1 rounded font-bold ${item.status === 'current' ? 'bg-[#FFD700] text-black' : 'bg-neutral-200 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300'}`}>
+                                    <span className={`text-[9px] font-mono px-2.5 py-1 rounded font-bold tracking-wider ${item.status === 'current' ? 'bg-[#FFD700] text-black' : 'bg-neutral-200 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300'}`}>
                                         {item.status === 'current' ? 'ACTIVE' : 'DONE'}
                                     </span>
                                 </div>
@@ -528,12 +534,12 @@
             return (
                 <div className="p-6 space-y-6 animate-fadeIn">
                     <div className="flex items-center space-x-4 border-b border-neutral-200 dark:border-neutral-900 pb-6">
-                        <div className="w-16 h-16 rounded-full bg-neutral-900 text-[#FFD700] font-black flex items-center justify-center text-xl overflow-hidden border-2 border-[#FFD700] shadow-lg shrink-0">
+                        <div className="w-16 h-16 rounded-full bg-neutral-900 text-[#FFD700] font-black flex items-center justify-center text-xl overflow-hidden border-2 border-[#FFD700] shadow-lg shrink-0 font-mono">
                             {heroImage ? <img src={heroImage} className="w-full h-full object-cover" /> : userName[0]}
                         </div>
                         <div>
-                            <h2 className="font-black text-lg tracking-tight uppercase">{userName}</h2>
-                            <p className="text-xs text-neutral-500">Cambridge Scholar ID: #CAM-9042</p>
+                            <h2 className="font-black text-lg tracking-tight uppercase font-mono">{userName}</h2>
+                            <p className="text-xs text-neutral-500 font-mono">Cambridge Scholar ID: #CAM-9042</p>
                             <span className="inline-block mt-1.5 bg-[#FFD700] text-black font-mono text-[9px] px-2 py-0.5 font-extrabold uppercase rounded">
                                 Premium University Tier
                             </span>
@@ -545,28 +551,28 @@
                         <div className="bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl overflow-hidden divide-y divide-neutral-200 dark:divide-neutral-800 text-xs font-bold">
                             <div className="p-4 hover:bg-neutral-100 dark:hover:bg-neutral-800 cursor-pointer flex justify-between items-center transition-colors">
                                 <span>Edit Personal Profile</span>
-                                <span className="text-neutral-400">→</span>
+                                <span className="text-neutral-400 font-mono">→</span>
                             </div>
                             <div className="p-4 hover:bg-neutral-100 dark:hover:bg-neutral-800 cursor-pointer flex justify-between items-center transition-colors">
                                 <span>Notification Preferences</span>
-                                <span className="text-neutral-400">→</span>
+                                <span className="text-neutral-400 font-mono">→</span>
                             </div>
                             <div className="p-4 hover:bg-neutral-100 dark:hover:bg-neutral-800 cursor-pointer flex justify-between items-center transition-colors">
                                 <span>Privacy & Security</span>
-                                <span className="text-neutral-400">→</span>
+                                <span className="text-neutral-400 font-mono">→</span>
                             </div>
                             <div className="p-4 hover:bg-neutral-100 dark:hover:bg-neutral-800 cursor-pointer flex justify-between items-center transition-colors">
                                 <span>Help & Academic Support</span>
-                                <span className="text-neutral-400">→</span>
+                                <span className="text-neutral-400 font-mono">→</span>
                             </div>
                         </div>
                     </div>
 
                     <button 
                         onClick={onLogout}
-                        className="w-full border-2 border-red-500/50 text-red-500 font-black py-3.5 rounded-2xl text-xs hover:bg-red-500 hover:text-white transition-all shadow-sm"
+                        className="w-full border-2 border-red-500/50 text-red-500 font-mono font-bold py-3.5 rounded-2xl text-[10px] uppercase tracking-widest hover:bg-red-500 hover:text-white transition-all shadow-sm"
                     >
-                        LOG OUT SECURELY
+                        Log Out Securely
                     </button>
                 </div>
             );
@@ -576,14 +582,14 @@
         function AcademicsView({ onBack }) {
             return (
                 <div className="p-6 space-y-4 animate-fadeIn">
-                    <button onClick={onBack} className="text-xs font-mono font-bold text-neutral-400 hover:text-neutral-900 dark:hover:text-white">← BACK TO HOME</button>
+                    <button onClick={onBack} className="text-xs font-mono font-bold text-neutral-400 hover:text-neutral-900 dark:hover:text-white uppercase tracking-wider">← Back to Campus</button>
                     <h2 className="text-xl font-black">Academic Courses & Lectures</h2>
                     <div className="space-y-3">
                         {['Advanced Mathematical Analysis', 'Theoretical Physics II', 'Cambridge Modern Philosophy'].map((c, i) => (
                             <div key={i} className="border border-neutral-200 dark:border-neutral-800 rounded-2xl p-4 bg-neutral-50 dark:bg-neutral-900 space-y-1">
                                 <span className="text-[10px] font-mono text-neutral-400">[ MODULE 0{i+1} ]</span>
                                 <h4 className="font-bold text-sm">{c}</h4>
-                                <div className="flex justify-between text-[10px] text-neutral-500 pt-2">
+                                <div className="flex justify-between text-[10px] text-neutral-500 pt-2 font-mono">
                                     <span>Professor Assigned</span>
                                     <span className="font-bold text-neutral-900 dark:text-neutral-100">Active</span>
                                 </div>
@@ -597,13 +603,13 @@
         function EventsView({ onBack }) {
             return (
                 <div className="p-6 space-y-4 animate-fadeIn">
-                    <button onClick={onBack} className="text-xs font-mono font-bold text-neutral-400 hover:text-neutral-900 dark:hover:text-white">← BACK TO HOME</button>
+                    <button onClick={onBack} className="text-xs font-mono font-bold text-neutral-400 hover:text-neutral-900 dark:hover:text-white uppercase tracking-wider">← Back to Campus</button>
                     <h2 className="text-xl font-black">Upcoming University Events</h2>
                     <div className="space-y-3">
                         <div className="bg-[#FFD700] text-black border border-yellow-500 rounded-2xl p-4 space-y-1 shadow-md">
                             <span className="text-[10px] font-mono font-bold">14 AUG • 10:00 AM</span>
                             <h4 className="font-black text-sm">Advanced Mathematics Lecture</h4>
-                            <p className="text-[10px] text-black/80 font-medium">Science Building • Hall A</p>
+                            <p className="text-[10px] text-black/80 font-medium font-mono">Science Building • Hall A</p>
                         </div>
                     </div>
                 </div>
@@ -613,13 +619,13 @@
         function SportsView({ onBack }) {
             return (
                 <div className="p-6 space-y-4 animate-fadeIn">
-                    <button onClick={onBack} className="text-xs font-mono font-bold text-neutral-400 hover:text-neutral-900 dark:hover:text-white">← BACK TO HOME</button>
+                    <button onClick={onBack} className="text-xs font-mono font-bold text-neutral-400 hover:text-neutral-900 dark:hover:text-white uppercase tracking-wider">← Back to Campus</button>
                     <h2 className="text-xl font-black">Sports & Fitness Arena</h2>
                     <div className="space-y-3">
                         <div className="border border-neutral-200 dark:border-neutral-800 rounded-2xl p-4 bg-neutral-50 dark:bg-neutral-900 space-y-1">
                             <span className="text-[10px] font-mono text-[#FFD700]">UNIVERSITY ROWING CLUB</span>
                             <h4 className="font-bold text-sm">River Cam Training Session</h4>
-                            <p className="text-[10px] text-neutral-500">Tomorrow at 06:00 AM</p>
+                            <p className="text-[10px] text-neutral-500 font-mono">Tomorrow at 06:00 AM</p>
                         </div>
                     </div>
                 </div>
@@ -629,7 +635,7 @@
         function LibraryView({ onBack }) {
             return (
                 <div className="p-6 space-y-4 animate-fadeIn">
-                    <button onClick={onBack} className="text-xs font-mono font-bold text-neutral-400 hover:text-neutral-900 dark:hover:text-white">← BACK TO HOME</button>
+                    <button onClick={onBack} className="text-xs font-mono font-bold text-neutral-400 hover:text-neutral-900 dark:hover:text-white uppercase tracking-wider">← Back to Campus</button>
                     <h2 className="text-xl font-black">Digital University Library</h2>
                     <div className="space-y-3">
                         {['Principia Mathematica (Archive)', 'Quantum Mechanics Primer', 'Cambridge Historical Essays'].map((lib, i) => (
@@ -638,7 +644,7 @@
                                     <span className="text-[10px] font-mono text-neutral-400">[ VAULT 0{i+1} ]</span>
                                     <h4 className="font-bold text-sm mt-0.5">{lib}</h4>
                                 </div>
-                                <span className="text-xs font-bold text-black bg-[#FFD700] px-3 py-1 rounded-xl">Read</span>
+                                <span className="text-[10px] font-mono font-bold text-black bg-[#FFD700] px-3.5 py-1.5 rounded-xl uppercase">Read</span>
                             </div>
                         ))}
                     </div>
@@ -649,13 +655,13 @@
         function CommunityView({ onBack }) {
             return (
                 <div className="p-6 space-y-4 animate-fadeIn">
-                    <button onClick={onBack} className="text-xs font-mono font-bold text-neutral-400 hover:text-neutral-900 dark:hover:text-white">← BACK TO HOME</button>
+                    <button onClick={onBack} className="text-xs font-mono font-bold text-neutral-400 hover:text-neutral-900 dark:hover:text-white uppercase tracking-wider">← Back to Campus</button>
                     <h2 className="text-xl font-black">Student Societies & Discussions</h2>
                     <div className="space-y-3">
                         <div className="border border-neutral-200 dark:border-neutral-800 rounded-2xl p-4 bg-neutral-50 dark:bg-neutral-900 space-y-1">
                             <span className="text-[10px] font-mono text-[#FFD700]">ACTIVE DISCUSSION</span>
                             <h4 className="font-bold text-sm">Artificial Intelligence Ethics in Modern Academia</h4>
-                            <p className="text-[10px] text-neutral-500">142 Participants • Joined by Dr. Harrison</p>
+                            <p className="text-[10px] text-neutral-500 font-mono">142 Participants • Joined by Dr. Harrison</p>
                         </div>
                     </div>
                 </div>
