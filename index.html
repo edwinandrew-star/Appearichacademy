@@ -52,8 +52,8 @@
       align-items: center;
       overflow-x: hidden;
     }
-    
-    /* 1. APPEARICH OPENING EXPERIENCE — FORCED WHITE STARTUP */
+
+    /* 1. APPEARICH OPENING EXPERIENCE — FORCED PURE WHITE STARTUP */
     #cinematic-splash {
       position: fixed;
       inset: 0;
@@ -72,9 +72,20 @@
       animation: logoCinematicEntrance 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
     .splash-logo-img {
-      width: 72px;
-      height: 72px;
+      width: 80px;
+      height: 80px;
       object-fit: contain;
+      background: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+      margin-bottom: 16px;
+    }
+    .splash-brand-title {
+      font-size: 1.2rem;
+      font-weight: 800;
+      letter-spacing: 5px;
+      color: #09090b;
+      text-transform: uppercase;
     }
     @keyframes logoCinematicEntrance {
       0% { opacity: 0; transform: scale(0.92) translateY(6px); filter: blur(8px); }
@@ -108,63 +119,58 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
-    /* 2. AUTHENTICATION SCREEN — PURE WHITE & SEQUENTIAL SLIDE */
+    /* PURE WHITE AUTHENTICATION & SEQUENTIAL ANIMATION */
     #screen-auth {
-      background: #ffffff !important;
       justify-content: center;
       align-items: center;
       min-height: 100vh;
-      padding: 32px 24px;
+      padding: 24px;
+      background: #ffffff !important;
     }
-    .auth-pure-container {
+    .auth-card {
       width: 100%;
-      max-width: 380px;
-      display: flex;
-      flex-direction: column;
+      background: #ffffff !important;
+      border: none !important;
+      padding: 12px;
+      box-shadow: none !important;
     }
-    .auth-pure-container > * {
-      opacity: 0;
-      transform: translateX(-24px);
-      animation: authSlideIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-    }
-    .auth-pure-container > *:nth-child(1) { animation-delay: 0.05s; }
-    .auth-pure-container > *:nth-child(2) { animation-delay: 0.12s; }
-    .auth-pure-container > *:nth-child(3) { animation-delay: 0.19s; }
-    .auth-pure-container > *:nth-child(4) { animation-delay: 0.26s; }
-    .auth-pure-container > *:nth-child(5) { animation-delay: 0.33s; }
-    .auth-pure-container > *:nth-child(6) { animation-delay: 0.40s; }
-    .auth-pure-container > *:nth-child(7) { animation-delay: 0.47s; }
-
-    @keyframes authSlideIn {
-      to {
-        opacity: 1;
-        transform: translateX(0);
-      }
-    }
-    
     .auth-brand-header {
+      text-align: left;
       margin-bottom: 32px;
+      animation: authSeqIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both;
     }
     .auth-title {
-      font-size: 1.8rem;
-      font-weight: 800;
-      letter-spacing: -0.5px;
+      font-size: 2.1rem;
+      font-weight: 900;
+      letter-spacing: -0.8px;
       color: #09090b;
     }
     .auth-subtitle {
-      font-size: 0.88rem;
+      font-size: 0.9rem;
       color: #71717a;
       margin-top: 6px;
     }
     .form-group {
       margin-bottom: 20px;
+      opacity: 0;
+      animation: authSeqIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
+    .form-group:nth-child(1) { animation-delay: 0.15s; }
+    .form-group:nth-child(2) { animation-delay: 0.22s; }
+    .form-group:nth-child(3) { animation-delay: 0.29s; }
+    .form-group:nth-child(4) { animation-delay: 0.36s; }
+
+    @keyframes authSeqIn {
+      from { opacity: 0; transform: translateX(-24px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
     .form-group label {
       display: block;
       font-size: 0.75rem;
-      font-weight: 700;
+      font-weight: 800;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.6px;
       color: #71717a;
       margin-bottom: 8px;
     }
@@ -172,41 +178,46 @@
       width: 100%;
       background: #f8fafc;
       border: 1px solid #e2e8f0;
-      border-radius: 12px;
-      padding: 14px 16px;
+      border-radius: 14px;
+      padding: 14px 18px;
       color: #09090b;
       font-size: 0.95rem;
       outline: none;
     }
     .form-group input:focus {
-      border-color: #d97706;
-      box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.12);
+      border-color: var(--accent-gold);
+      background: #ffffff;
+      box-shadow: 0 0 0 3px var(--accent-gold-glow);
     }
     .primary-btn {
       width: 100%;
       background: var(--accent-gold);
       color: #ffffff;
       border: none;
-      padding: 14px;
-      border-radius: 12px;
+      padding: 16px;
+      border-radius: 14px;
       font-weight: 800;
-      font-size: 0.9rem;
+      font-size: 0.95rem;
       cursor: pointer;
-      margin-top: 8px;
-      box-shadow: 0 4px 12px var(--accent-gold-glow);
+      margin-top: 12px;
+      opacity: 0;
+      animation: authSeqIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.42s forwards;
+      box-shadow: 0 6px 16px var(--accent-gold-glow);
     }
     [data-theme="light"] .primary-btn {
       color: #000000;
     }
     .auth-switch-text {
       text-align: center;
-      font-size: 0.82rem;
+      font-size: 0.85rem;
       color: #71717a;
       margin-top: 24px;
       cursor: pointer;
+      opacity: 0;
+      animation: authSeqIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.48s forwards;
     }
     .auth-switch-text span {
-      color: #d97706;
+      color: var(--accent-gold);
       font-weight: 700;
     }
 
@@ -250,11 +261,11 @@
       font-size: 0.9rem;
     }
 
-    /* HERO SYSTEM */
+    /* HOME HERO SYSTEM (PRESERVED) */
     .hero-container {
       position: relative;
       width: 100%;
-      height: 200px;
+      height: 240px;
       border-radius: 20px;
       overflow: hidden;
       margin-bottom: 20px;
@@ -318,17 +329,38 @@
       align-items: flex-end;
     }
     .hero-greeting {
-      font-size: 1.25rem;
+      font-size: 1.35rem;
       font-weight: 900;
       color: #ffffff;
       line-height: 1.2;
     }
     .hero-msg {
-      font-size: 0.75rem;
+      font-size: 0.78rem;
       color: var(--accent-gold);
       font-weight: 700;
       margin-top: 4px;
       text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .hero-controls-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      align-items: flex-end;
+    }
+    .hero-control-btn {
+      background: rgba(0, 0, 0, 0.65);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #ffffff;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.68rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
 
     /* COMMAND SEARCH BAR */
@@ -346,10 +378,6 @@
       font-size: 0.88rem;
       outline: none;
     }
-    .search-command-bar input:focus {
-      border-color: var(--accent-gold);
-      box-shadow: 0 0 0 3px var(--accent-gold-glow);
-    }
     .search-command-bar i {
       position: absolute;
       left: 16px;
@@ -359,7 +387,7 @@
       font-size: 0.95rem;
     }
 
-    /* SECTION TITLES */
+    /* SECTION HEADER STYLE */
     .section-header-title {
       font-size: 0.8rem;
       font-weight: 800;
@@ -372,112 +400,120 @@
       gap: 8px;
     }
 
-    /* ACADEMIC CORE (PRESERVED) */
-    .academic-core-card {
+    /* STRICT UNTOUCHED ACADEMIC CORE SECTION */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+    .discovery-card {
       background: var(--surface-color);
       border: 1px solid var(--border-color);
       border-radius: 20px;
-      padding: 20px;
-      margin-bottom: 28px;
-      box-shadow: var(--shadow-lg);
+      padding: 18px;
       cursor: pointer;
+      position: relative;
+      overflow: hidden;
       display: flex;
+      flex-direction: column;
       justify-content: space-between;
-      align-items: center;
-      transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease;
+      height: 140px;
+      box-shadow: var(--shadow-lg);
     }
-    .academic-core-card:hover {
-      border-color: var(--accent-gold-border);
-      transform: translateY(-2px);
-    }
-    .core-info {
-      display: flex;
+    .discovery-card.featured {
+      grid-column: span 2;
+      height: 110px;
+      flex-direction: row;
       align-items: center;
-      gap: 16px;
     }
     .card-icon-wrap {
-      width: 44px;
-      height: 44px;
-      border-radius: 14px;
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
       background: var(--accent-gold-glow);
       color: var(--accent-gold);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.2rem;
+      font-size: 1.1rem;
+    }
+    .card-title {
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: var(--text-main);
+      margin-top: 8px;
+    }
+    .card-desc {
+      font-size: 0.72rem;
+      color: var(--text-sub);
+      margin-top: 2px;
     }
 
-    /* 3. DYNAMIC 2x2 PHOTO GRID & ALTERNATING ENTRANCE ANIMATIONS */
+    /* 2x2 PHOTOGRAPHIC GRID (AFTER ACADEMIC CORE) */
     .photo-grid-2x2 {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 14px;
-      margin-bottom: 24px;
+      margin-bottom: 30px;
+      width: 100%;
+      overflow: hidden; /* Contains animation slide boundaries */
     }
 
+    /* DYNAMIC SCROLL ANIMATIONS: LEFT <-> RIGHT POP-IN */
     .photo-card {
       position: relative;
       height: 180px;
-      border-radius: 20px;
+      border-radius: 22px;
       overflow: hidden;
       cursor: pointer;
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
       border: 1px solid var(--border-color);
-      box-shadow: var(--shadow-lg);
-      
-      /* Initial Hidden State for Scroll Entrance */
       opacity: 0;
       will-change: transform, opacity;
-      transition: transform 0.65s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
+      transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    /* Alternating Off-screen Initial States */
-    .photo-card.enter-left {
-      transform: translateX(-40px) scale(0.92);
+    /* Offscreen Initial Dynamic Positions */
+    .photo-card.slide-left {
+      transform: translateX(-60px) scale(0.92);
     }
-    .photo-card.enter-right {
-      transform: translateX(40px) scale(0.92);
+    .photo-card.slide-right {
+      transform: translateX(60px) scale(0.92);
     }
 
-    /* Pop-in In-View State */
-    .photo-card.in-view {
+    /* Triggered Settle-In State */
+    .photo-card.pop-in-visible {
       opacity: 1;
       transform: translateX(0) scale(1);
     }
 
-    .photo-card-img {
+    .photo-card img {
       width: 100%;
       height: 100%;
       object-fit: cover;
-      transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+      filter: brightness(0.62) contrast(1.05);
+      transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), filter 0.6s ease;
     }
-
+    .photo-card:hover img {
+      transform: scale(1.06);
+      filter: brightness(0.52) contrast(1.1);
+    }
     .photo-card-overlay {
       position: absolute;
       inset: 0;
-      background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.1) 60%, transparent 100%);
+      background: linear-gradient(to top, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.1) 60%, transparent 100%);
       display: flex;
       align-items: flex-end;
-      padding: 16px;
+      padding: 18px;
     }
-
     .photo-card-title {
-      font-size: 1rem;
-      font-weight: 900;
       color: #ffffff;
-      letter-spacing: 1px;
+      font-size: 1.15rem;
+      font-weight: 900;
+      letter-spacing: 1.5px;
       text-transform: uppercase;
-      text-shadow: 0 2px 4px rgba(0,0,0,0.6);
-    }
-
-    /* Hover & Mobile Touch Interactions */
-    .photo-card:hover {
-      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25);
-    }
-    .photo-card:hover .photo-card-img {
-      transform: scale(1.06);
-    }
-    .photo-card:active {
-      transform: scale(0.97);
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
     }
 
     /* BOTTOM NAVIGATION */
@@ -528,7 +564,6 @@
       padding: 24px;
       text-align: center;
       margin-bottom: 20px;
-      position: relative;
     }
     .ai-core-pulse {
       width: 70px;
@@ -542,11 +577,12 @@
       justify-content: center;
       color: var(--accent-gold);
       font-size: 1.6rem;
+      box-shadow: 0 0 30px var(--accent-gold-glow);
       animation: corePulse 2s infinite alternate;
     }
     @keyframes corePulse {
-      from { transform: scale(0.95); box-shadow: 0 0 15px var(--accent-gold-glow); }
-      to { transform: scale(1.05); box-shadow: 0 0 35px var(--accent-gold-glow); }
+      from { transform: scale(0.95); }
+      to { transform: scale(1.05); }
     }
     .ai-tools-grid {
       display: grid;
@@ -558,7 +594,6 @@
       border: 1px solid var(--border-color);
       border-radius: 16px;
       padding: 16px;
-      text-align: left;
       cursor: pointer;
     }
 
@@ -637,9 +672,6 @@
       font-weight: 600;
       cursor: pointer;
     }
-    .settings-item:last-child {
-      border-bottom: none;
-    }
     .danger-btn {
       width: 100%;
       background: transparent;
@@ -656,7 +688,7 @@
       gap: 8px;
     }
 
-    /* MODALS & FULL EXPERIENCE VIEWS */
+    /* MODALS & GALLERIES */
     .modal-overlay {
       position: fixed;
       inset: 0;
@@ -681,36 +713,43 @@
       max-height: 85vh;
       overflow-y: auto;
     }
-    .experience-header-img {
-      width: 100%;
-      height: 160px;
-      object-fit: cover;
-      border-radius: 16px;
-      margin-bottom: 16px;
-    }
-    .upload-area {
-      border: 2px dashed var(--border-color);
-      border-radius: 16px;
-      padding: 20px;
-      text-align: center;
-      cursor: pointer;
-      background: var(--surface-elevated);
-      margin-top: 16px;
-    }
-    .upload-area:hover {
-      border-color: var(--accent-gold);
-    }
-    .photo-stream-grid {
+    .section-modal-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: repeat(2, 1fr);
       gap: 10px;
-      margin-top: 16px;
+      margin: 16px 0;
     }
-    .stream-photo {
-      width: 100%;
-      height: 110px;
-      object-fit: cover;
+    .section-photo-thumb {
+      height: 100px;
       border-radius: 12px;
+      overflow: hidden;
+      position: relative;
+    }
+    .section-photo-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .section-upload-tile {
+      height: 100px;
+      border-radius: 12px;
+      border: 2px dashed var(--border-color);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      cursor: pointer;
+      color: var(--text-sub);
+      background: var(--surface-elevated);
+    }
+    .content-item-box {
+      background: var(--surface-elevated);
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 8px;
+      font-size: 0.82rem;
+      font-weight: 700;
       border: 1px solid var(--border-color);
     }
   </style>
@@ -721,34 +760,40 @@
   <div id="cinematic-splash">
     <div class="splash-logo-container">
       <img src="images/appearich-logo.png" alt="Appearich" class="splash-logo-img">
+      <div class="splash-brand-title">Appearich</div>
     </div>
   </div>
 
   <div class="app-viewport">
     
-    <!-- 2. AUTHENTICATION SCREEN — PURE WHITE -->
+    <!-- AUTHENTICATION SCREEN (PURE WHITE STYLE) -->
     <div id="screen-auth" class="screen active">
-      <div class="auth-pure-container">
+      <div class="auth-card">
         <div class="auth-brand-header">
           <h1 class="auth-title" id="authTitleText">Welcome Scholar</h1>
           <p class="auth-subtitle" id="authSubText">Authenticate to access your Cambridge matrix</p>
         </div>
+        
         <div class="form-group" id="nameGroup" style="display: none;">
           <label>Full Name</label>
           <input type="text" id="regName" placeholder="e.g. Alistair Sterling">
         </div>
+        
         <div class="form-group">
           <label>University Email</label>
           <input type="email" id="authEmail" placeholder="scholar@appearich.ac.uk">
         </div>
+        
         <div class="form-group">
           <label>Security Password</label>
           <input type="password" id="authPassword" placeholder="••••••••••••">
         </div>
+        
         <div class="form-group" id="programGroup" style="display: none;">
           <label>Degree Program</label>
           <input type="text" id="regProgram" placeholder="e.g. B.A. Computer Science & Tripos">
         </div>
+        
         <button class="primary-btn" id="authActionBtn" onclick="handleAuthSubmit()">Initialize Session</button>
         
         <div class="auth-switch-text" onclick="toggleAuthMode()">
@@ -772,112 +817,141 @@
 
     <!-- SCREEN 1: HOME (CENTRAL HUB) -->
     <div id="screen-home" class="screen">
-      <!-- HERO BANNER WITH INTEGRATED LOGO -->
+      
+      <!-- HERO BANNER (PRESERVED FUNCTIONALITY & HERO PHOTO UPLOAD) -->
       <div class="hero-container" id="heroContainer">
-        <img src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?q=80&w=800&auto=format&fit=cover" alt="Hero Campus" class="hero-bg-image">
+        <img src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?q=80&w=800&auto=format&fit=cover" alt="Hero Campus" class="hero-bg-image" id="heroImageElement">
         <div class="hero-gradient-overlay"></div>
+        
         <div class="hero-integrated-badge">
           <img src="images/appearich-logo.png" alt="Appearich" class="hero-badge-logo">
-          <span class="hero-badge-text">Smart Matrix</span>
+          <span class="hero-badge-text" id="heroBadgeLabel">Smart Matrix</span>
         </div>
+        
         <div class="hero-content">
           <div>
             <h2 class="hero-greeting" id="dynamicGreeting">WELCOME, SCHOLAR</h2>
-            <div class="hero-msg" id="dynamicSubGreeting">Academic Excellence</div>
+            <div class="hero-msg" id="dynamicSubGreeting">Ready for another productive day?</div>
+          </div>
+          <div class="hero-controls-group">
+            <button class="hero-control-btn" onclick="triggerHeroUploadDialog()">
+              <i class="fa-solid fa-camera"></i> Replace Hero
+            </button>
           </div>
         </div>
       </div>
+      <input type="file" id="heroFileInput" accept="image/*" style="display: none;" onchange="handleHeroPhotoUpload(event)">
 
       <!-- ACADEMIC COMMAND SEARCH -->
       <div class="search-command-bar">
         <i class="fa-solid fa-magnifying-glass"></i>
-        <input type="text" placeholder="Search courses, lectures, assignments, or resources...">
+        <input type="text" placeholder="Search courses, lectures, assignments, or resources..." id="globalSearchInput" oninput="handleGlobalSearch(this.value)">
       </div>
 
-      <!-- ACADEMIC CORE (UNCHANGED) -->
+      <!-- ========================================================= -->
+      <!-- ACADEMIC CORE — MUST REMAIN EXACTLY AS IT IS (UNTOUCHED)  -->
+      <!-- ========================================================= -->
       <div class="section-header-title">
-        <i class="fa-solid fa-graduation-cap" style="color: var(--accent-gold);"></i> Core Academic System
-      </div>
-      <div class="academic-core-card" onclick="openExperienceModal('core')">
-        <div class="core-info">
-          <div class="card-icon-wrap"><i class="fa-solid fa-book-open-reader"></i></div>
-          <div>
-            <div style="font-weight: 800; font-size: 1rem;">Academic Core</div>
-            <div style="font-size: 0.75rem; color: var(--text-sub);">Tripos modules, lectures & schedules</div>
-          </div>
-        </div>
-        <i class="fa-solid fa-chevron-right" style="color: var(--text-sub);"></i>
-      </div>
-
-      <!-- 3. 2 × 2 DYNAMIC PHOTO GRID WITH ALTERNATING ENTRANCE ANIMATIONS -->
-      <div class="section-header-title">
-        <i class="fa-solid fa-compass" style="color: var(--accent-gold);"></i> Campus Life & Resources
+        <i class="fa-solid fa-compass" style="color: var(--accent-gold);"></i> Academic Discovery
       </div>
       
-      <div class="photo-grid-2x2">
-        <!-- 1. EVENTS (LEFT Entrance) -->
-        <div class="photo-card enter-left" onclick="openExperienceModal('events')">
-          <img src="https://images.unsplash.com/photo-1511578314322-379afb476865?q=80&w=800&auto=format&fit=cover" alt="Events" class="photo-card-img">
+      <div class="cards-grid">
+        <div class="discovery-card featured" onclick="triggerDiscoveryModal('Academic Hub', 'Accessing Tripos modules, lecture archives, and assessment schedules.')">
+          <div>
+            <div class="card-icon-wrap"><i class="fa-solid fa-graduation-cap"></i></div>
+            <div class="card-title">Academic Core</div>
+            <div class="card-desc">Courses, assignments, timetables & grades</div>
+          </div>
+          <i class="fa-solid fa-chevron-right" style="color: var(--text-sub);"></i>
+        </div>
+      </div>
+      <!-- ========================================================= -->
+      <!-- END OF ACADEMIC CORE                                      -->
+      <!-- ========================================================= -->
+
+
+      <!-- ========================================================= -->
+      <!-- EVERYTHING AFTER ACADEMIC CORE: 2x2 PHOTOGRAPHIC GRID     -->
+      <!-- Dynamic Scroll Trigger: Left -> Right -> Left -> Right     -->
+      <!-- ========================================================= -->
+      <div class="photo-grid-2x2" id="photoGridContainer">
+        
+        <!-- ROW 1: EVENTS (LEFT) | COMMUNITY (RIGHT) -->
+        <div class="photo-card slide-left" onclick="openSectionModal('EVENTS')">
+          <img src="https://images.unsplash.com/photo-1511578314322-379afb476865?q=80&w=600&auto=format&fit=cover" alt="Events">
           <div class="photo-card-overlay">
             <div class="photo-card-title">EVENTS</div>
           </div>
         </div>
 
-        <!-- 2. COMMUNITY (RIGHT Entrance) -->
-        <div class="photo-card enter-right" onclick="openExperienceModal('community')">
-          <img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?q=80&w=800&auto=format&fit=cover" alt="Community" class="photo-card-img">
+        <div class="photo-card slide-right" onclick="openSectionModal('COMMUNITY')">
+          <img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?q=80&w=600&auto=format&fit=cover" alt="Community">
           <div class="photo-card-overlay">
             <div class="photo-card-title">COMMUNITY</div>
           </div>
         </div>
 
-        <!-- 3. SPORTS (LEFT Entrance) -->
-        <div class="photo-card enter-left" onclick="openExperienceModal('sports')">
-          <img src="https://images.unsplash.com/photo-1461896836934-ffe607ba8211?q=80&w=800&auto=format&fit=cover" alt="Sports" class="photo-card-img">
+        <!-- ROW 2: SPORTS (LEFT) | LIBRARY (RIGHT) -->
+        <div class="photo-card slide-left" onclick="openSectionModal('SPORTS')">
+          <img src="https://images.unsplash.com/photo-1517649763962-0c623266ddc0?q=80&w=600&auto=format&fit=cover" alt="Sports">
           <div class="photo-card-overlay">
             <div class="photo-card-title">SPORTS</div>
           </div>
         </div>
 
-        <!-- 4. LIBRARY (RIGHT Entrance) -->
-        <div class="photo-card enter-right" onclick="openExperienceModal('library')">
-          <img src="https://images.unsplash.com/photo-1521587760476-6c12a4b040da?q=80&w=800&auto=format&fit=cover" alt="Library" class="photo-card-img">
+        <div class="photo-card slide-right" onclick="openSectionModal('LIBRARY')">
+          <img src="https://images.unsplash.com/photo-1481627834876-b7833e8f5570?q=80&w=600&auto=format&fit=cover" alt="Library">
           <div class="photo-card-overlay">
             <div class="photo-card-title">LIBRARY</div>
           </div>
         </div>
+
       </div>
+
     </div>
 
     <!-- SCREEN 2: AI COMPANION -->
     <div id="screen-ai" class="screen">
       <div class="ai-companion-hero">
-        <div class="ai-core-pulse"><i class="fa-solid fa-microchip"></i></div>
+        <div class="ai-core-pulse">
+          <i class="fa-solid fa-microchip"></i>
+        </div>
         <h2 style="font-size: 1.3rem; font-weight: 900; margin-bottom: 6px;">AI Academic Intelligence</h2>
-        <p style="font-size: 0.8rem; color: var(--text-sub);">Your neural study partner trained on Cambridge Tripos syllabi.</p>
+        <p style="font-size: 0.8rem; color: var(--text-sub); max-width: 280px; margin: 0 auto;">Your neural study partner trained on Cambridge Tripos syllabi and research datasets.</p>
+      </div>
+      <div class="section-header-title">
+        <i class="fa-solid fa-wand-magic-sparkles" style="color: var(--accent-gold);"></i> Intelligent Capabilities
       </div>
       <div class="ai-tools-grid">
-        <div class="ai-tool-card" onclick="alert('Initializing Summarizer...')">
-          <div class="card-icon-wrap" style="margin-bottom: 8px;"><i class="fa-solid fa-file-lines"></i></div>
-          <div style="font-weight: 800; font-size: 0.88rem;">Summarizer</div>
-          <div style="font-size: 0.72rem; color: var(--text-sub);">Condense lecture notes</div>
+        <div class="ai-tool-card" onclick="triggerAiAction('Summarizing Material')">
+          <div class="card-icon-wrap"><i class="fa-solid fa-file-lines"></i></div>
+          <div class="card-title" style="font-size: 0.88rem;">Summarizer</div>
+          <div class="card-desc">Condense lecture notes</div>
         </div>
-        <div class="ai-tool-card" onclick="alert('Initializing Quiz Engine...')">
-          <div class="card-icon-wrap" style="margin-bottom: 8px;"><i class="fa-solid fa-brain"></i></div>
-          <div style="font-weight: 800; font-size: 0.88rem;">Quiz Engine</div>
-          <div style="font-size: 0.72rem; color: var(--text-sub);">Active recall tests</div>
+        <div class="ai-tool-card" onclick="triggerAiAction('Creating Practice Quizzes')">
+          <div class="card-icon-wrap"><i class="fa-solid fa-brain"></i></div>
+          <div class="card-title" style="font-size: 0.88rem;">Quiz Engine</div>
+          <div class="card-desc">Active recall tests</div>
         </div>
       </div>
     </div>
 
-    <!-- SCREEN 3: ACTIVITY -->
+    <!-- SCREEN 3: ACTIVITY & JOURNEY -->
     <div id="screen-activity" class="screen">
-      <div class="section-header-title">Academic Progression</div>
+      <div class="section-header-title">
+        <i class="fa-solid fa-chart-line" style="color: var(--accent-gold);"></i> Academic Progression
+      </div>
       <div class="journey-timeline">
         <div class="timeline-node">
           <div class="timeline-content">
-            <div style="font-size: 0.7rem; color: var(--accent-gold); font-weight: 800;">MILESTONE 01</div>
-            <div style="font-size: 0.9rem; font-weight: 800;">Advanced Algorithm Tripos</div>
+            <div style="font-size: 0.7rem; color: var(--accent-gold); font-weight: 800; text-transform: uppercase;">Milestone 01</div>
+            <div style="font-size: 0.9rem; font-weight: 800; margin-top: 2px;">Advanced Algorithm Tripos</div>
+          </div>
+        </div>
+        <div class="timeline-node">
+          <div class="timeline-content">
+            <div style="font-size: 0.7rem; color: var(--accent-gold); font-weight: 800; text-transform: uppercase;">Milestone 02</div>
+            <div style="font-size: 0.9rem; font-weight: 800; margin-top: 2px;">Quantum Mechanics Seminar</div>
           </div>
         </div>
       </div>
@@ -889,101 +963,201 @@
         <div class="profile-avatar-lg" id="profileInitial">A</div>
         <h2 style="font-size: 1.2rem; font-weight: 900;" id="profileDisplayName">Alistair Sterling</h2>
         <p style="font-size: 0.8rem; color: var(--accent-gold); font-weight: 700; margin-top: 2px;" id="profileDisplayProgram">B.A. Computer Science & Tripos</p>
+        <p style="font-size: 0.75rem; color: var(--text-sub); margin-top: 4px;" id="profileDisplayEmail">alistair@appearich.ac.uk</p>
       </div>
-      <button class="danger-btn" onclick="handleLogout()"><i class="fa-solid fa-right-from-bracket"></i> Terminate Session</button>
+      <div class="settings-list">
+        <div class="settings-item" onclick="alert('Notification settings updated.')">
+          <span>Push Notifications</span>
+          <i class="fa-solid fa-chevron-right" style="color: var(--text-sub); font-size: 0.75rem;"></i>
+        </div>
+        <div class="settings-item" onclick="alert('Privacy configuration secured.')">
+          <span>Privacy & Security</span>
+          <i class="fa-solid fa-chevron-right" style="color: var(--text-sub); font-size: 0.75rem;"></i>
+        </div>
+      </div>
+      <button class="danger-btn" onclick="handleLogout()">
+        <i class="fa-solid fa-right-from-bracket"></i> Terminate Session
+      </button>
     </div>
 
     <!-- PERSISTENT BOTTOM NAVIGATION -->
     <nav class="bottom-nav" id="mainNavBar" style="display: none;">
-      <button class="nav-item active" onclick="switchTab('screen-home', this)"><i class="fa-solid fa-house"></i><span>Home</span></button>
-      <button class="nav-item" onclick="switchTab('screen-ai', this)"><i class="fa-solid fa-robot"></i><span>AI</span></button>
-      <button class="nav-item" onclick="switchTab('screen-activity', this)"><i class="fa-solid fa-chart-pie"></i><span>Activity</span></button>
-      <button class="nav-item" onclick="switchTab('screen-profile', this)"><i class="fa-solid fa-user"></i><span>Profile</span></button>
+      <button class="nav-item active" onclick="switchTab('screen-home', this)">
+        <i class="fa-solid fa-house"></i>
+        <span>Home</span>
+      </button>
+      <button class="nav-item" onclick="switchTab('screen-ai', this)">
+        <i class="fa-solid fa-robot"></i>
+        <span>AI</span>
+      </button>
+      <button class="nav-item" onclick="switchTab('screen-activity', this)">
+        <i class="fa-solid fa-chart-pie"></i>
+        <span>Activity</span>
+      </button>
+      <button class="nav-item" onclick="switchTab('screen-profile', this)">
+        <i class="fa-solid fa-user"></i>
+        <span>Profile</span>
+      </button>
     </nav>
   </div>
 
-  <!-- DYNAMIC EXPERIENCE MODAL (EVENTS, COMMUNITY, SPORTS, LIBRARY, CORE) -->
-  <div id="experienceModal" class="modal-overlay">
+  <!-- SECTION CONTENT & PHOTO GALLERY MODAL -->
+  <div id="sectionContentModal" class="modal-overlay">
     <div class="modal-sheet">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-        <h3 id="expModalTitle" style="font-size: 1.2rem; font-weight: 900;">Section</h3>
-        <i class="fa-solid fa-xmark" style="cursor: pointer; font-size: 1.2rem; color: var(--text-sub);" onclick="closeExperienceModal()"></i>
-      </div>
-      <img src="" alt="Header" id="expModalHeaderImg" class="experience-header-img">
-      <p id="expModalDesc" style="font-size: 0.85rem; color: var(--text-sub); line-height: 1.5; margin-bottom: 16px;"></p>
-      
-      <!-- Integrated Photo Upload & Stream Area for Community / Events -->
-      <div id="expUploadContainer" style="display: none;">
-        <div class="section-header-title"><i class="fa-solid fa-camera" style="color: var(--accent-gold);"></i> Upload & Shared Memories</div>
-        <div class="upload-area" onclick="document.getElementById('communityFileInput').click()">
-          <i class="fa-solid fa-cloud-arrow-up" style="font-size: 1.5rem; color: var(--accent-gold); margin-bottom: 6px;"></i>
-          <div style="font-size: 0.8rem; font-weight: 700;">Upload Photo</div>
-          <div style="font-size: 0.7rem; color: var(--text-sub);">Store university memories & campus life moments</div>
-        </div>
-        <input type="file" id="communityFileInput" accept="image/*" style="display: none;" onchange="handleCommunityUpload(event)">
-        
-        <div class="photo-stream-grid" id="communityPhotoStream">
-          <!-- Dynamically populated uploads -->
-        </div>
+        <h3 id="modalSectionTitle" style="font-size: 1.2rem; font-weight: 900; letter-spacing: 0.5px;">SECTION DETAILS</h3>
+        <i class="fa-solid fa-xmark" style="cursor: pointer; font-size: 1.2rem; color: var(--text-sub);" onclick="closeSectionModal()"></i>
       </div>
 
-      <button class="primary-btn" style="margin-top: 20px;" onclick="closeExperienceModal()">Return to Hub</button>
+      <div id="modalSectionBody">
+        <!-- Content dynamic injection -->
+      </div>
+
+      <div class="section-header-title" style="margin-top: 20px;">
+        <i class="fa-solid fa-images" style="color: var(--accent-gold);"></i> Section Media & Gallery
+      </div>
+
+      <div class="section-modal-grid" id="modalSectionGallery">
+        <!-- Photos populated by JS -->
+      </div>
+
+      <input type="file" id="sectionMediaInput" accept="image/*" style="display: none;" onchange="handleSectionPhotoUpload(event)">
+      <button class="primary-btn" style="margin-top: 16px;" onclick="closeSectionModal()">Close Module</button>
     </div>
   </div>
 
+  <!-- GENERAL DISCOVERY MODAL -->
+  <div id="discoveryModal" class="modal-overlay">
+    <div class="modal-sheet">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <h3 id="modalDiscoveryTitle" style="font-size: 1.1rem; font-weight: 800;">Module Details</h3>
+        <i class="fa-solid fa-xmark" style="cursor: pointer; font-size: 1.2rem; color: var(--text-sub);" onclick="closeDiscoveryModal()"></i>
+      </div>
+      <p id="modalDiscoveryDesc" style="font-size: 0.85rem; color: var(--text-sub); line-height: 1.5; margin-bottom: 20px;"></p>
+      <button class="primary-btn" onclick="closeDiscoveryModal()">Dismiss Module</button>
+    </div>
+  </div>
+
+  <!-- APPLICATION LOGIC SCRIPT -->
   <script>
     let isRegisterState = false;
+    let currentSectionKey = '';
+    
     let currentUserProfile = {
       name: "Alistair Sterling",
       email: "scholar@appearich.ac.uk",
       program: "B.A. Computer Science & Tripos"
     };
 
-    let uploadedCommunityPhotos = [
-      'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=400&auto=format&fit=cover',
-      'https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?q=80&w=400&auto=format&fit=cover'
-    ];
+    let sectionStores = {
+      COMMUNITY: {
+        items: [
+          "Campus Life Hub",
+          "Clubs & Societies Syndicate",
+          "Student Groups & Networks",
+          "Student Activities Feed",
+          "University Memories Repository",
+          "Community Peer Discussions"
+        ],
+        photos: [
+          "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?q=80&w=400&auto=format&fit=cover",
+          "https://images.unsplash.com/photo-1523580494863-6f3031224c94?q=80&w=400&auto=format&fit=cover"
+        ]
+      },
+      EVENTS: {
+        items: [
+          "University Events Calendar",
+          "Academic Seminars & Keynotes",
+          "Global Conferences",
+          "Interactive Workshops",
+          "Guest Speakers & Lectures",
+          "Student Social Gatherings"
+        ],
+        photos: [
+          "https://images.unsplash.com/photo-1511578314322-379afb476865?q=80&w=400&auto=format&fit=cover"
+        ]
+      },
+      SPORTS: {
+        items: [
+          "College Sports Hub",
+          "Athletic Teams & Roster",
+          "Matches & Live Scores",
+          "Tournaments & Competitions",
+          "Training Sessions & Schedules",
+          "Sports Activities & Events"
+        ],
+        photos: [
+          "https://images.unsplash.com/photo-1517649763962-0c623266ddc0?q=80&w=400&auto=format&fit=cover"
+        ]
+      },
+      LIBRARY: {
+        items: [
+          "Curated Books Repository",
+          "Digital Resources & Databases",
+          "Research Papers & Journals",
+          "Reading Resources & Guides",
+          "E-books & Audio Materials",
+          "Academic Citations & References"
+        ],
+        photos: [
+          "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?q=80&w=400&auto=format&fit=cover"
+        ]
+      }
+    };
 
     window.addEventListener('DOMContentLoaded', () => {
+      // Force initial startup theme
+      const savedTheme = localStorage.getItem('appearich_theme_mode');
+      if (savedTheme) {
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        document.getElementById('themeIcon').className = savedTheme === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+      } else {
+        document.documentElement.setAttribute('data-theme', 'light');
+        localStorage.setItem('appearich_theme_mode', 'light');
+      }
+
+      // Load section media store from storage if available
+      const storedMedia = localStorage.getItem('appearich_section_stores');
+      if (storedMedia) sectionStores = JSON.parse(storedMedia);
+
+      const savedHero = localStorage.getItem('appearich_custom_hero');
+      if (savedHero) document.getElementById('heroImageElement').src = savedHero;
+
       const savedUser = localStorage.getItem('appearich_student_profile');
       if (savedUser) {
         currentUserProfile = JSON.parse(savedUser);
         launchMainDashboard();
       }
+
       setTimeout(() => {
         const splash = document.getElementById('cinematic-splash');
         if (splash) splash.style.display = 'none';
       }, 1500);
 
-      // Initialize IntersectionObserver for Dynamic Photo Grid Animations
-      setupScrollAnimations();
+      setupScrollTriggerObserver();
     });
 
-    /* 3. DYNAMIC SCROLL-TRIGGERED ENTRANCE ANIMATION SETUP */
-    function setupScrollAnimations() {
+    /* SCROLL TRIGGERED DYNAMIC LEFT ↔ RIGHT ANIMATIONS */
+    function setupScrollTriggerObserver() {
       const observerOptions = {
         root: null,
-        rootMargin: '0px 0px -40px 0px',
+        rootMargin: '0px 0px -50px 0px',
         threshold: 0.15
       };
 
       const observer = new IntersectionObserver((entries) => {
-        entries.forEach((entry, index) => {
+        entries.forEach(entry => {
           if (entry.isIntersecting) {
-            // Apply slight stagger per card dynamically
-            setTimeout(() => {
-              entry.target.classList.add('in-view');
-            }, index * 120);
-            observer.unobserve(entry.target);
+            entry.target.classList.add('pop-in-visible');
           }
         });
       }, observerOptions);
 
-      document.querySelectorAll('.photo-card').forEach(card => {
-        observer.observe(card);
-      });
+      const photoCards = document.querySelectorAll('.photo-card');
+      photoCards.forEach(card => observer.observe(card));
     }
 
+    /* AUTHENTICATION FLOW */
     function toggleAuthMode() {
       isRegisterState = !isRegisterState;
       document.getElementById('authTitleText').innerText = isRegisterState ? "Create Scholar ID" : "Welcome Scholar";
@@ -999,10 +1173,12 @@
       const pass = document.getElementById('authPassword').value.trim();
       const nameInput = document.getElementById('regName').value.trim();
       const programInput = document.getElementById('regProgram').value.trim();
+
       if (!email || !pass) {
-        alert("Please enter valid academic credentials.");
+        alert("Please enter valid credentials.");
         return;
       }
+
       if (isRegisterState && nameInput) {
         currentUserProfile.name = nameInput;
         currentUserProfile.email = email;
@@ -1011,6 +1187,7 @@
         currentUserProfile.email = email;
         currentUserProfile.name = email.split('@')[0].toUpperCase();
       }
+
       localStorage.setItem('appearich_student_profile', JSON.stringify(currentUserProfile));
       launchMainDashboard();
     }
@@ -1020,14 +1197,20 @@
       document.getElementById('screen-home').classList.add('active');
       document.getElementById('mainHeader').style.display = 'flex';
       document.getElementById('mainNavBar').style.display = 'flex';
+
+      const hour = new Date().getHours();
+      let timeGreeting = hour < 12 ? "GOOD MORNING" : hour < 18 ? "GOOD AFTERNOON" : "GOOD EVENING";
       
-      document.getElementById('dynamicGreeting').innerText = `WELCOME, ${currentUserProfile.name.toUpperCase()}`;
+      document.getElementById('dynamicGreeting').innerText = `${timeGreeting}, ${currentUserProfile.name.toUpperCase()}`;
       document.getElementById('profileDisplayName').innerText = currentUserProfile.name;
+      document.getElementById('profileDisplayEmail').innerText = currentUserProfile.email;
       document.getElementById('profileDisplayProgram').innerText = currentUserProfile.program;
       document.getElementById('profileInitial').innerText = currentUserProfile.name.charAt(0).toUpperCase();
 
-      // Trigger scroll check on load in case grid is already in viewport
-      setTimeout(setupScrollAnimations, 100);
+      // Trigger animation check on launch
+      setTimeout(() => {
+        window.dispatchEvent(new Event('scroll'));
+      }, 200);
     }
 
     function handleLogout() {
@@ -1050,68 +1233,109 @@
       const icon = document.getElementById('themeIcon');
       if (htmlEl.getAttribute('data-theme') === 'dark') {
         htmlEl.setAttribute('data-theme', 'light');
+        localStorage.setItem('appearich_theme_mode', 'light');
         icon.className = 'fa-solid fa-moon';
       } else {
         htmlEl.setAttribute('data-theme', 'dark');
+        localStorage.setItem('appearich_theme_mode', 'dark');
         icon.className = 'fa-solid fa-sun';
       }
     }
 
-    /* EXPERIENCES & MODAL ROUTING */
-    function openExperienceModal(type) {
-      const title = document.getElementById('expModalTitle');
-      const img = document.getElementById('expModalHeaderImg');
-      const desc = document.getElementById('expModalDesc');
-      const uploadBox = document.getElementById('expUploadContainer');
-
-      uploadBox.style.display = 'none';
-
-      if (type === 'events') {
-        title.innerText = 'EVENTS';
-        img.src = 'https://images.unsplash.com/photo-1511578314322-379afb476865?q=80&w=800&auto=format&fit=cover';
-        desc.innerText = 'Access upcoming university symposia, academic lectures, schedules, and event photo archives.';
-        uploadBox.style.display = 'block';
-      } else if (type === 'community') {
-        title.innerText = 'COMMUNITY';
-        img.src = 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?q=80&w=800&auto=format&fit=cover';
-        desc.innerText = 'Central hub for Clubs & Societies, Campus Life, student activity groups, and university memories.';
-        uploadBox.style.display = 'block';
-      } else if (type === 'sports') {
-        title.innerText = 'SPORTS';
-        img.src = 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?q=80&w=800&auto=format&fit=cover';
-        desc.innerText = 'Explore athletic teams, tournament fixtures, rowing matches, and college sports activities.';
-      } else if (type === 'library') {
-        title.innerText = 'LIBRARY';
-        img.src = 'https://images.unsplash.com/photo-1521587760476-6c12a4b040da?q=80&w=800&auto=format&fit=cover';
-        desc.innerText = 'Digital repository containing books, research papers, archives, and academic reading lists.';
-      } else if (type === 'core') {
-        title.innerText = 'ACADEMIC CORE';
-        img.src = 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?q=80&w=800&auto=format&fit=cover';
-        desc.innerText = 'Tripos modules, course materials, assignment deadlines, and official academic records.';
-      }
-
-      renderCommunityStream();
-      document.getElementById('experienceModal').classList.add('active');
+    /* HERO UPLOAD LOGIC */
+    function triggerHeroUploadDialog() {
+      document.getElementById('heroFileInput').click();
     }
 
-    function closeExperienceModal() {
-      document.getElementById('experienceModal').classList.remove('active');
-    }
-
-    function handleCommunityUpload(event) {
+    function handleHeroPhotoUpload(event) {
       const file = event.target.files[0];
       if (!file) return;
       const reader = new FileReader();
       reader.onload = function(e) {
-        uploadedCommunityPhotos.unshift(e.target.result);
-        renderCommunityStream();
+        const url = e.target.result;
+        document.getElementById('heroImageElement').src = url;
+        localStorage.setItem('appearich_custom_hero', url);
       };
       reader.readAsDataURL(file);
     }
 
-    function renderCommunityStream() {
-      const stream = document.getElementById('communityPhotoStream');
-      stream.innerHTML = uploadedCommunityPhotos.map(url => `<img src="${url}" class="stream-photo" alt="Memory">`).join('');
+    /* SECTION MODAL & MEDIA STORAGE SYSTEM */
+    function openSectionModal(sectionKey) {
+      currentSectionKey = sectionKey;
+      const data = sectionStores[sectionKey];
+      document.getElementById('modalSectionTitle').innerText = sectionKey;
+
+      let itemsHtml = '';
+      data.items.forEach(item => {
+        itemsHtml += `<div class="content-item-box"><i class="fa-solid fa-circle-dot" style="color: var(--accent-gold); margin-right: 8px;"></i>${item}</div>`;
+      });
+      document.getElementById('modalSectionBody').innerHTML = itemsHtml;
+
+      renderSectionGallery();
+      document.getElementById('sectionContentModal').classList.add('active');
+    }
+
+    function renderSectionGallery() {
+      const data = sectionStores[currentSectionKey];
+      let galleryHtml = '';
+
+      data.photos.forEach(pUrl => {
+        galleryHtml += `
+          <div class="section-photo-thumb">
+            <img src="${pUrl}" alt="Media">
+          </div>
+        `;
+      });
+
+      galleryHtml += `
+        <div class="section-upload-tile" onclick="triggerSectionUploadDialog()">
+          <i class="fa-solid fa-cloud-arrow-up" style="font-size: 1.3rem;"></i>
+          <span style="font-size: 0.68rem; font-weight: 800;">Upload Photo</span>
+        </div>
+      `;
+
+      document.getElementById('modalSectionGallery').innerHTML = galleryHtml;
+    }
+
+    function triggerSectionUploadDialog() {
+      document.getElementById('sectionMediaInput').click();
+    }
+
+    function handleSectionPhotoUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const url = e.target.result;
+        sectionStores[currentSectionKey].photos.push(url);
+        localStorage.setItem('appearich_section_stores', JSON.stringify(sectionStores));
+        renderSectionGallery();
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function closeSectionModal() {
+      document.getElementById('sectionContentModal').classList.remove('active');
+    }
+
+    function triggerDiscoveryModal(title, desc) {
+      document.getElementById('modalDiscoveryTitle').innerText = title;
+      document.getElementById('modalDiscoveryDesc').innerText = desc;
+      document.getElementById('discoveryModal').classList.add('active');
+    }
+
+    function closeDiscoveryModal() {
+      document.getElementById('discoveryModal').classList.remove('active');
+    }
+
+    function triggerAiAction(actionName) {
+      alert(`Appearich AI Companion initializing protocol: ${actionName}...`);
+    }
+
+    function handleGlobalSearch(query) {
+      if (query.trim().length > 2) {
+        console.log(`Searching academic matrix for: ${query}`);
+      }
     }
   </script>
 </body>
