@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,32 +9,21 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   
   <style>
+    /* ==========================================================================
+       1. GLOBAL DESIGN SYSTEM & PALETTE
+       ========================================================================== */
     :root {
-      --bg-color: #f8fafc;
-      --surface-color: #ffffff;
-      --surface-elevated: #f1f5f9;
-      --border-color: #e2e8f0;
-      --text-main: #09090b;
-      --text-sub: #71717a;
-      --accent-gold: #d97706;
-      --accent-gold-glow: rgba(217, 119, 6, 0.12);
-      --accent-gold-border: rgba(217, 119, 6, 0.3);
-      --nav-bg: rgba(255, 255, 255, 0.85);
-      --shadow-lg: 0 20px 30px -10px rgba(0, 0, 0, 0.05);
-    }
-
-    [data-theme="dark"] {
-      --bg-color: #050505;
-      --surface-color: #121214;
-      --surface-elevated: #1a1a1e;
-      --border-color: #27272a;
-      --text-main: #f4f4f5;
-      --text-sub: #a1a1aa;
-      --accent-gold: #fbbf24;
-      --accent-gold-glow: rgba(251, 191, 36, 0.18);
-      --accent-gold-border: rgba(251, 191, 36, 0.4);
-      --nav-bg: rgba(18, 18, 20, 0.85);
-      --shadow-lg: 0 20px 40px -15px rgba(0, 0, 0, 0.7);
+      --bg-pure-white: #FFFFFF;
+      --bg-light-gray: #F5F5F5;
+      --bg-medium-gray: #E5E5E5;
+      --border-color: #E5E5E5;
+      --text-deep-black: #000000;
+      --text-soft-black: #111111;
+      --text-dark-gray: #333333;
+      --text-secondary: #666666;
+      --shadow-subtle: 0 10px 30px -10px rgba(0, 0, 0, 0.05);
+      --shadow-card-hover: 0 20px 40px -15px rgba(0, 0, 0, 0.12);
+      --transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     * {
@@ -43,134 +32,179 @@
       padding: 0;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       -webkit-tap-highlight-color: transparent;
-      transition: background-color 0.3s cubic-bezier(0.16, 1, 0.3, 1), color 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     body {
-      background-color: var(--bg-color);
-      color: var(--text-main);
+      background-color: var(--bg-pure-white);
+      color: var(--text-soft-black);
       min-height: 100vh;
+      overflow-x: hidden;
       display: flex;
       flex-direction: column;
       align-items: center;
-      overflow-x: hidden;
     }
 
-    /* 1. APPEARICH OPENING EXPERIENCE — FORCED WHITE STARTUP */
-    #cinematic-splash {
+    /* ==========================================================================
+       2. SPLASH SCREEN (PURE WHITE & SEAMLESS LOGO)
+       ========================================================================== */
+    #splash-screen {
       position: fixed;
       inset: 0;
-      background: #ffffff !important;
+      background: var(--bg-pure-white);
       z-index: 99999;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.6s;
+      transition: opacity 0.8s var(--transition-smooth), visibility 0.8s;
     }
 
-    .splash-logo-container {
+    .splash-logo-wrap {
       display: flex;
       flex-direction: column;
       align-items: center;
-      animation: logoCinematicEntrance 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      animation: splashEntrance 1.8s var(--transition-smooth) forwards;
     }
 
     .splash-logo-img {
-      width: 72px;
-      height: 72px;
+      width: 90px;
+      height: 90px;
       object-fit: contain;
-      filter: drop-shadow(0 0 20px rgba(217, 119, 6, 0.25));
-      margin-bottom: 16px;
+      mix-blend-mode: multiply;
+      margin-bottom: 20px;
     }
 
     .splash-brand-title {
-      font-size: 1.1rem;
+      font-size: 1.25rem;
       font-weight: 800;
-      letter-spacing: 5px;
-      color: #09090b;
+      letter-spacing: 6px;
+      color: var(--text-deep-black);
       text-transform: uppercase;
+      opacity: 0;
+      animation: textFadeIn 1s var(--transition-smooth) 0.6s forwards;
     }
 
-    @keyframes logoCinematicEntrance {
-      0% { opacity: 0; transform: scale(0.92) translateY(6px); filter: blur(8px); }
-      50% { opacity: 1; transform: scale(1) translateY(0); filter: blur(0); }
-      80% { opacity: 1; transform: scale(1); filter: blur(0); }
-      100% { opacity: 0; transform: scale(1.04); filter: blur(4px); visibility: hidden; }
+    @keyframes splashEntrance {
+      0% {
+        opacity: 0;
+        transform: scale(0.96);
+        filter: blur(4px);
+      }
+      40% {
+        opacity: 1;
+        transform: scale(1);
+        filter: blur(0);
+      }
+      80% {
+        opacity: 1;
+        transform: scale(1);
+      }
+      100% {
+        opacity: 0;
+        transform: scale(1.02);
+      }
     }
 
-    /* APP CONTAINER & SCREENS */
+    @keyframes textFadeIn {
+      to { opacity: 1; }
+    }
+
+    /* ==========================================================================
+       3. APPLICATION CONTAINER & VIEWPORT
+       ========================================================================== */
     .app-viewport {
       width: 100%;
-      max-width: 480px;
+      max-width: 1200px;
       min-height: 100vh;
       position: relative;
       display: flex;
       flex-direction: column;
-      padding-bottom: 90px;
     }
 
     .screen {
       display: none;
       flex-direction: column;
       width: 100%;
-      padding: 20px 16px;
-      animation: screenFadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      padding: 32px 24px 120px 24px;
+      animation: pageTransition 0.5s var(--transition-smooth) forwards;
     }
 
     .screen.active {
       display: flex;
     }
 
-    @keyframes screenFadeIn {
-      from { opacity: 0; transform: translateY(8px); }
+    @keyframes pageTransition {
+      from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
     }
 
-    /* AUTHENTICATION SCREEN */
-    #screen-auth {
+    /* ==========================================================================
+       4. AUTHENTICATION (LOGIN & SIGN UP STAGGERED ANIMATIONS)
+       ========================================================================== */
+    .auth-container {
+      display: none;
       justify-content: center;
       align-items: center;
       min-height: 100vh;
       padding: 24px;
+      background: var(--bg-pure-white);
+      width: 100%;
+    }
+
+    .auth-container.active {
+      display: flex;
     }
 
     .auth-card {
       width: 100%;
-      background: var(--surface-color);
-      border: 1px solid var(--border-color);
-      border-radius: 24px;
-      padding: 32px 24px;
-      box-shadow: var(--shadow-lg);
+      max-width: 440px;
+      padding: 48px 36px;
+      background: var(--bg-pure-white);
+      border: 1px solid var(--bg-medium-gray);
+      border-radius: 16px;
+      box-shadow: var(--shadow-subtle);
     }
 
-    .auth-brand-header {
-      text-align: center;
-      margin-bottom: 28px;
+    /* Staggered Left-to-Right Entrance */
+    .stagger-item {
+      opacity: 0;
+      transform: translateX(-30px);
+      transition: opacity 0.6s var(--transition-smooth), transform 0.6s var(--transition-smooth);
     }
 
-    .auth-logo-small {
-      width: 42px;
-      height: 42px;
-      object-fit: contain;
-      margin-bottom: 12px;
+    .auth-card.animate-in .stagger-item {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .auth-card.animate-in .stagger-1 { transition-delay: 0.1s; }
+    .auth-card.animate-in .stagger-2 { transition-delay: 0.2s; }
+    .auth-card.animate-in .stagger-3 { transition-delay: 0.3s; }
+    .auth-card.animate-in .stagger-4 { transition-delay: 0.4s; }
+    .auth-card.animate-in .stagger-5 { transition-delay: 0.5s; }
+    .auth-card.animate-in .stagger-6 { transition-delay: 0.6s; }
+    .auth-card.animate-in .stagger-7 { transition-delay: 0.7s; }
+
+    .auth-header {
+      margin-bottom: 32px;
     }
 
     .auth-title {
-      font-size: 1.5rem;
+      font-size: 1.85rem;
       font-weight: 800;
+      color: var(--text-deep-black);
       letter-spacing: -0.5px;
-      color: var(--text-main);
     }
 
     .auth-subtitle {
-      font-size: 0.82rem;
-      color: var(--text-sub);
-      margin-top: 4px;
+      font-size: 0.9rem;
+      color: var(--text-dark-gray);
+      margin-top: 8px;
     }
 
     .form-group {
-      margin-bottom: 16px;
+      margin-bottom: 20px;
+      position: relative;
     }
 
     .form-group label {
@@ -178,173 +212,182 @@
       font-size: 0.75rem;
       font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: var(--text-sub);
-      margin-bottom: 6px;
+      letter-spacing: 0.8px;
+      color: var(--text-dark-gray);
+      margin-bottom: 8px;
     }
 
-    .form-group input {
+    .form-group input, .form-group select {
       width: 100%;
-      background: var(--bg-color);
+      background: var(--bg-light-gray);
       border: 1px solid var(--border-color);
-      border-radius: 12px;
-      padding: 12px 16px;
-      color: var(--text-main);
-      font-size: 0.9rem;
+      border-radius: 8px;
+      padding: 14px 16px;
+      color: var(--text-soft-black);
+      font-size: 0.92rem;
       outline: none;
+      transition: border-color 0.2s ease, background 0.2s ease;
     }
 
-    .form-group input:focus {
-      border-color: var(--accent-gold);
-      box-shadow: 0 0 0 3px var(--accent-gold-glow);
+    .form-group input:focus, .form-group select:focus {
+      border-color: var(--text-deep-black);
+      background: var(--bg-pure-white);
     }
 
-    .primary-btn {
-      width: 100%;
-      background: var(--accent-gold);
-      color: #ffffff;
-      border: none;
-      padding: 14px;
-      border-radius: 12px;
-      font-weight: 800;
-      font-size: 0.9rem;
+    .password-toggle {
+      position: absolute;
+      right: 16px;
+      top: 38px;
+      font-size: 0.85rem;
+      color: var(--text-dark-gray);
       cursor: pointer;
-      margin-top: 8px;
-      box-shadow: 0 4px 12px var(--accent-gold-glow);
     }
 
-    [data-theme="light"] .primary-btn {
-      color: #000000;
+    .forgot-link {
+      display: block;
+      text-align: right;
+      font-size: 0.8rem;
+      color: var(--text-dark-gray);
+      text-decoration: none;
+      margin-bottom: 24px;
+      font-weight: 600;
+    }
+
+    .forgot-link:hover {
+      color: var(--text-deep-black);
+      text-decoration: underline;
+    }
+
+    .btn-primary-black {
+      width: 100%;
+      background: var(--text-deep-black);
+      color: var(--bg-pure-white);
+      border: none;
+      padding: 16px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: background 0.2s ease, transform 0.1s ease;
+    }
+
+    .btn-primary-black:hover {
+      background: var(--text-soft-black);
+    }
+
+    .btn-primary-black:active {
+      transform: scale(0.99);
     }
 
     .auth-switch-text {
       text-align: center;
-      font-size: 0.8rem;
-      color: var(--text-sub);
-      margin-top: 20px;
-      cursor: pointer;
+      font-size: 0.85rem;
+      color: var(--text-dark-gray);
+      margin-top: 24px;
     }
 
-    .auth-switch-text span {
-      color: var(--accent-gold);
+    .auth-switch-text button {
+      background: none;
+      border: none;
+      color: var(--text-deep-black);
       font-weight: 700;
+      cursor: pointer;
+      text-decoration: underline;
     }
 
-    /* TOP HEADER */
+    /* ==========================================================================
+       5. NAVIGATION BAR
+       ========================================================================== */
     .app-header {
       position: sticky;
       top: 0;
-      z-index: 100;
+      z-index: 1000;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 16px 20px;
-      background: var(--nav-bg);
+      padding: 18px 32px;
+      background: rgba(255, 255, 255, 0.9);
       backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border-color);
+      border-bottom: 1px solid var(--bg-medium-gray);
     }
 
     .header-brand {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
       font-weight: 800;
-      font-size: 1.1rem;
-      letter-spacing: 0.5px;
+      font-size: 1.15rem;
+      letter-spacing: 1px;
+      color: var(--text-deep-black);
+      text-transform: uppercase;
     }
 
-    .header-logo-icon {
+    .header-logo {
       width: 28px;
       height: 28px;
       object-fit: contain;
+      mix-blend-mode: multiply;
     }
 
-    .icon-btn {
-      width: 38px;
-      height: 38px;
-      border-radius: 50%;
-      background: var(--surface-color);
-      border: 1px solid var(--border-color);
-      color: var(--text-main);
+    .nav-links {
       display: flex;
-      align-items: center;
-      justify-content: center;
+      gap: 8px;
+    }
+
+    .nav-item {
+      background: transparent;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-dark-gray);
       cursor: pointer;
-      font-size: 0.9rem;
-    }
-
-    /* 2. LOGO ON HOME SCREEN & HERO SYSTEM */
-    .hero-container {
-      position: relative;
-      width: 100%;
-      height: 240px;
-      border-radius: 20px;
-      overflow: hidden;
-      margin-bottom: 20px;
-      border: 1px solid var(--border-color);
-      box-shadow: var(--shadow-lg);
-    }
-
-    .hero-bg-image {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      filter: brightness(0.68);
-      transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), filter 0.6s ease;
-    }
-
-    .hero-container.transitioning .hero-bg-image {
-      filter: blur(8px) brightness(0.4);
-      transform: scale(1.05);
-    }
-
-    .hero-container:hover .hero-bg-image {
-      transform: scale(1.02);
-    }
-
-    .hero-gradient-overlay {
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.25) 70%, transparent 100%);
-    }
-
-    /* Integrated Logo Badge inside Hero */
-    .hero-integrated-badge {
-      position: absolute;
-      top: 16px;
-      left: 16px;
+      transition: all 0.2s ease;
       display: flex;
       align-items: center;
       gap: 8px;
-      background: rgba(18, 18, 20, 0.75);
-      backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      padding: 6px 12px;
-      border-radius: 30px;
-      z-index: 3;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
-      animation: floatBadge 4s ease-in-out infinite alternate;
     }
 
-    @keyframes floatBadge {
-      0% { transform: translateY(0); }
-      100% { transform: translateY(-3px); }
+    .nav-item:hover {
+      background: var(--bg-light-gray);
+      color: var(--text-deep-black);
     }
 
-    .hero-badge-logo {
-      width: 18px;
-      height: 18px;
-      object-fit: contain;
+    .nav-item.active {
+      background: var(--text-deep-black);
+      color: var(--bg-pure-white);
     }
 
-    .hero-badge-text {
-      font-size: 0.7rem;
-      font-weight: 800;
-      letter-spacing: 1px;
-      color: #ffffff;
-      text-transform: uppercase;
+    /* ==========================================================================
+       6. HOME / DASHBOARD HERO SECTION & USER CUSTOMIZATION
+       ========================================================================== */
+    .hero-container {
+      position: relative;
+      width: 100%;
+      height: 320px;
+      border-radius: 16px;
+      overflow: hidden;
+      margin-bottom: 36px;
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow-subtle);
+    }
+
+    .hero-bg-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.6s var(--transition-smooth);
+    }
+
+    .hero-container:hover .hero-bg-img {
+      transform: scale(1.02);
+    }
+
+    .hero-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(0, 0, 0, 0.75) 0%, rgba(0, 0, 0, 0.15) 60%, transparent 100%);
     }
 
     .hero-content {
@@ -352,1211 +395,704 @@
       bottom: 0;
       left: 0;
       right: 0;
-      padding: 20px;
+      padding: 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
       z-index: 2;
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-end;
     }
 
-    .hero-greeting {
-      font-size: 1.35rem;
-      font-weight: 900;
-      color: #ffffff;
-      line-height: 1.2;
-      text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    .hero-text h1 {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--bg-pure-white);
+      letter-spacing: -0.5px;
     }
 
-    .hero-msg {
-      font-size: 0.78rem;
-      color: var(--accent-gold);
-      font-weight: 700;
-      margin-top: 4px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .hero-controls-group {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      align-items: flex-end;
-    }
-
-    .hero-control-btn {
-      background: rgba(0, 0, 0, 0.65);
-      backdrop-filter: blur(8px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      color: #ffffff;
-      padding: 6px 12px;
-      border-radius: 20px;
-      font-size: 0.68rem;
-      font-weight: 700;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      white-space: nowrap;
-    }
-
-    .hero-control-btn:hover {
-      border-color: var(--accent-gold);
-    }
-
-    /* COMMAND SEARCH BAR */
-    .search-command-bar {
-      position: relative;
-      margin-bottom: 24px;
-    }
-
-    .search-command-bar input {
-      width: 100%;
-      background: var(--surface-color);
-      border: 1px solid var(--border-color);
-      border-radius: 16px;
-      padding: 14px 16px 14px 44px;
-      color: var(--text-main);
-      font-size: 0.88rem;
-      outline: none;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-    }
-
-    .search-command-bar input:focus {
-      border-color: var(--accent-gold);
-      box-shadow: 0 0 0 3px var(--accent-gold-glow);
-    }
-
-    .search-command-bar i {
-      position: absolute;
-      left: 16px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--text-sub);
+    .hero-text p {
       font-size: 0.95rem;
+      color: var(--bg-medium-gray);
+      margin-top: 6px;
     }
 
-    /* DISCOVERY SECTION CARDS */
-    .section-header-title {
+    .hero-actions {
+      display: flex;
+      gap: 12px;
+    }
+
+    .btn-hero-action {
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      color: var(--bg-pure-white);
+      padding: 10px 18px;
+      border-radius: 8px;
       font-size: 0.8rem;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 1.2px;
-      color: var(--text-sub);
-      margin-bottom: 12px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .cards-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-bottom: 24px;
-    }
-
-    .discovery-card {
-      background: var(--surface-color);
-      border: 1px solid var(--border-color);
-      border-radius: 20px;
-      padding: 18px;
-      cursor: pointer;
-      position: relative;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      height: 140px;
-      box-shadow: var(--shadow-lg);
-    }
-
-    .discovery-card.featured {
-      grid-column: span 2;
-      height: 110px;
-      flex-direction: row;
-      align-items: center;
-    }
-
-    .discovery-card:hover {
-      border-color: var(--accent-gold-border);
-      transform: translateY(-2px);
-    }
-
-    .card-icon-wrap {
-      width: 40px;
-      height: 40px;
-      border-radius: 12px;
-      background: var(--accent-gold-glow);
-      color: var(--accent-gold);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.1rem;
-    }
-
-    .card-title {
-      font-size: 0.95rem;
-      font-weight: 800;
-      color: var(--text-main);
-      margin-top: 8px;
-    }
-
-    .card-desc {
-      font-size: 0.72rem;
-      color: var(--text-sub);
-      margin-top: 2px;
-    }
-
-    /* BOTTOM NAVIGATION */
-    .bottom-nav {
-      position: fixed;
-      bottom: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 100%;
-      max-width: 480px;
-      height: 72px;
-      background: var(--nav-bg);
-      backdrop-filter: blur(16px);
-      border-top: 1px solid var(--border-color);
-      display: flex;
-      justify-content: space-around;
-      align-items: center;
-      z-index: 1000;
-      padding: 0 10px;
-    }
-
-    .nav-item {
-      background: none;
-      border: none;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 4px;
-      color: var(--text-sub);
-      font-size: 0.7rem;
       font-weight: 700;
       cursor: pointer;
-      padding: 8px 12px;
-      border-radius: 12px;
-    }
-
-    .nav-item i {
-      font-size: 1.2rem;
-    }
-
-    .nav-item.active {
-      color: var(--accent-gold);
-      background: var(--accent-gold-glow);
-    }
-
-    /* AI SECTION */
-    .ai-companion-hero {
-      background: var(--surface-color);
-      border: 1px solid var(--border-color);
-      border-radius: 24px;
-      padding: 24px;
-      text-align: center;
-      margin-bottom: 20px;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .ai-core-pulse {
-      width: 70px;
-      height: 70px;
-      border-radius: 50%;
-      background: var(--accent-gold-glow);
-      border: 2px solid var(--accent-gold);
-      margin: 0 auto 16px auto;
+      transition: all 0.2s ease;
       display: flex;
       align-items: center;
-      justify-content: center;
-      color: var(--accent-gold);
-      font-size: 1.6rem;
-      box-shadow: 0 0 30px var(--accent-gold-glow);
-      animation: corePulse 2s infinite alternate;
-    }
-
-    @keyframes corePulse {
-      from { transform: scale(0.95); box-shadow: 0 0 15px var(--accent-gold-glow); }
-      to { transform: scale(1.05); box-shadow: 0 0 35px var(--accent-gold-glow); }
-    }
-
-    .ai-tools-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-
-    .ai-tool-card {
-      background: var(--surface-color);
-      border: 1px solid var(--border-color);
-      border-radius: 16px;
-      padding: 16px;
-      text-align: left;
-      cursor: pointer;
-    }
-
-    .ai-tool-card:hover {
-      border-color: var(--accent-gold);
-    }
-
-    /* ACTIVITY JOURNEY SECTION */
-    .journey-timeline {
-      position: relative;
-      padding-left: 24px;
-      margin-top: 10px;
-    }
-
-    .journey-timeline::before {
-      content: '';
-      position: absolute;
-      left: 7px;
-      top: 6px;
-      bottom: 6px;
-      width: 2px;
-      background: var(--border-color);
-    }
-
-    .timeline-node {
-      position: relative;
-      margin-bottom: 20px;
-    }
-
-    .timeline-node::before {
-      content: '';
-      position: absolute;
-      left: -20px;
-      top: 4px;
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      background: var(--accent-gold);
-      box-shadow: 0 0 8px var(--accent-gold);
-    }
-
-    .timeline-content {
-      background: var(--surface-color);
-      border: 1px solid var(--border-color);
-      border-radius: 14px;
-      padding: 14px;
-    }
-
-    /* PROFILE SCREEN */
-    .profile-card-header {
-      background: var(--surface-color);
-      border: 1px solid var(--border-color);
-      border-radius: 20px;
-      padding: 24px;
-      text-align: center;
-      margin-bottom: 20px;
-    }
-
-    .profile-avatar-lg {
-      width: 72px;
-      height: 72px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #fbbf24, #b45309);
-      color: #000000;
-      font-size: 1.8rem;
-      font-weight: 900;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto 12px auto;
-    }
-
-    .settings-list {
-      background: var(--surface-color);
-      border: 1px solid var(--border-color);
-      border-radius: 16px;
-      overflow: hidden;
-      margin-bottom: 20px;
-    }
-
-    .settings-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 14px 16px;
-      border-bottom: 1px solid var(--border-color);
-      font-size: 0.85rem;
-      font-weight: 600;
-      cursor: pointer;
-    }
-
-    .settings-item:last-child {
-      border-bottom: none;
-    }
-
-    .danger-btn {
-      width: 100%;
-      background: transparent;
-      border: 1.5px solid #ef4444;
-      color: #ef4444;
-      padding: 12px;
-      border-radius: 14px;
-      font-weight: 800;
-      font-size: 0.85rem;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
       gap: 8px;
     }
 
-    /* MODAL OVERLAYS & GALLERIES */
+    .btn-hero-action:hover {
+      background: var(--bg-pure-white);
+      color: var(--text-deep-black);
+    }
+
+    /* ==========================================================================
+       7. 3D CARD SYSTEM & LAYOUT SECTIONS
+       ========================================================================== */
+    .section-title {
+      font-size: 1.1rem;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      color: var(--text-deep-black);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-transform: uppercase;
+    }
+
+    .section-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--bg-medium-gray);
+    }
+
+    .grid-3d {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 24px;
+      margin-bottom: 48px;
+      perspective: 1000px;
+    }
+
+    .card-3d {
+      background: var(--bg-pure-white);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      overflow: hidden;
+      transition: transform 0.4s var(--transition-smooth), box-shadow 0.4s var(--transition-smooth), border-color 0.2s ease;
+      transform-style: preserve-3d;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card-3d:hover {
+      transform: translateY(-6px) rotateX(2deg) rotateY(-2deg);
+      box-shadow: var(--shadow-card-hover);
+      border-color: var(--text-deep-black);
+    }
+
+    .card-img-wrap {
+      position: relative;
+      width: 100%;
+      height: 160px;
+      overflow: hidden;
+      background: var(--bg-light-gray);
+    }
+
+    .card-img-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.6s var(--transition-smooth);
+    }
+
+    .card-3d:hover .card-img-wrap img {
+      transform: scale(1.05);
+    }
+
+    .card-body {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+
+    .card-tag {
+      font-size: 0.7rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-dark-gray);
+      margin-bottom: 6px;
+    }
+
+    .card-heading {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--text-deep-black);
+      line-height: 1.3;
+    }
+
+    .card-sub {
+      font-size: 0.82rem;
+      color: var(--text-secondary);
+      margin-top: 6px;
+      line-height: 1.4;
+    }
+
+    .card-footer-meta {
+      margin-top: auto;
+      padding-top: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.75rem;
+      font-weight: 700;
+      border-top: 1px solid var(--bg-light-gray);
+      color: var(--text-dark-gray);
+    }
+
+    /* Horizontal Card Layout for Library & Events */
+    .grid-horizontal {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-bottom: 48px;
+    }
+
+    .card-horizontal {
+      display: flex;
+      background: var(--bg-pure-white);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      overflow: hidden;
+      transition: all 0.3s var(--transition-smooth);
+      cursor: pointer;
+    }
+
+    .card-horizontal:hover {
+      border-color: var(--text-deep-black);
+      box-shadow: var(--shadow-subtle);
+      transform: translateX(4px);
+    }
+
+    .card-horizontal .card-img-wrap {
+      width: 180px;
+      height: auto;
+      flex-shrink: 0;
+    }
+
+    /* ==========================================================================
+       8. MODAL & OVERLAY SYSTEM
+       ========================================================================== */
     .modal-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.75);
-      backdrop-filter: blur(8px);
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(6px);
       z-index: 2000;
       display: none;
       justify-content: center;
-      align-items: flex-end;
+      align-items: center;
+      padding: 24px;
     }
 
     .modal-overlay.active {
       display: flex;
     }
 
-    .modal-sheet {
+    .modal-box {
       width: 100%;
-      max-width: 480px;
-      background: var(--surface-color);
+      max-width: 500px;
+      background: var(--bg-pure-white);
       border: 1px solid var(--border-color);
-      border-top-left-radius: 24px;
-      border-top-right-radius: 24px;
-      padding: 24px 20px 40px 20px;
-      max-height: 85vh;
-      overflow-y: auto;
+      border-radius: 16px;
+      padding: 32px;
+      box-shadow: var(--shadow-card-hover);
     }
 
-    /* Gallery Grid in Modal */
-    .hero-gallery-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      margin: 16px 0;
-    }
-
-    .gallery-thumb-card {
-      position: relative;
-      height: 80px;
-      border-radius: 12px;
-      overflow: hidden;
-      border: 2px solid var(--border-color);
-      cursor: pointer;
-    }
-
-    .gallery-thumb-card.selected {
-      border-color: var(--accent-gold);
-      box-shadow: 0 0 10px var(--accent-gold-glow);
-    }
-
-    .gallery-thumb-card img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .gallery-thumb-delete {
-      position: absolute;
-      top: 4px;
-      right: 4px;
-      background: rgba(0,0,0,0.7);
-      color: #ef4444;
-      border: none;
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
-      font-size: 0.65rem;
+    .modal-header {
       display: flex;
+      justify-content: space-between;
       align-items: center;
-      justify-content: center;
-      cursor: pointer;
+      margin-bottom: 20px;
     }
 
-    .gallery-add-tile {
-      height: 80px;
-      border-radius: 12px;
-      border: 2px dashed var(--border-color);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 4px;
-      cursor: pointer;
-      color: var(--text-sub);
-      background: var(--surface-elevated);
-    }
-
-    .gallery-add-tile:hover {
-      border-color: var(--accent-gold);
-      color: var(--accent-gold);
-    }
-
-    /* Segmented Control for Hero Mode */
-    .mode-switch-container {
-      display: flex;
-      background: var(--bg-color);
-      border: 1px solid var(--border-color);
-      border-radius: 14px;
-      padding: 4px;
-      margin-bottom: 16px;
-    }
-
-    .mode-switch-btn {
-      flex: 1;
-      background: transparent;
-      border: none;
-      padding: 10px;
-      border-radius: 10px;
-      font-size: 0.8rem;
+    .modal-header h3 {
+      font-size: 1.2rem;
       font-weight: 800;
-      color: var(--text-sub);
-      cursor: pointer;
     }
 
-    .mode-switch-btn.active {
-      background: var(--surface-elevated);
-      color: var(--text-main);
-      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    .modal-close {
+      cursor: pointer;
+      font-size: 1.1rem;
+      color: var(--text-dark-gray);
+    }
+
+    /* Responsive Mobile Nav */
+    @media (max-width: 768px) {
+      .app-header {
+        padding: 14px 20px;
+      }
+      .nav-links span {
+        display: none;
+      }
+      .card-horizontal {
+        flex-direction: column;
+      }
+      .card-horizontal .card-img-wrap {
+        width: 100%;
+        height: 140px;
+      }
+      .hero-content {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+      }
     }
   </style>
 </head>
 <body>
 
-  <!-- 1. APPEARICH OPENING EXPERIENCE — FORCED WHITE STARTUP -->
-  <div id="cinematic-splash">
-    <div class="splash-logo-container">
-      <img src="images/appearich-logo.png" alt="Appearich" class="splash-logo-img">
+  <!-- ==========================================================================
+       SPLASH SCREEN
+       ========================================================================== -->
+  <div id="splash-screen">
+    <div class="splash-logo-wrap">
+      <img src="https://api.iconify.design/lucide:graduation-cap.svg?color=%23000000" alt="Appearich Logo" class="splash-logo-img">
       <div class="splash-brand-title">Appearich</div>
     </div>
   </div>
 
-  <div class="app-viewport">
-
-    <!-- AUTHENTICATION SCREEN -->
-    <div id="screen-auth" class="screen active">
-      <div class="auth-card">
-        <div class="auth-brand-header">
-          <img src="images/appearich-logo.png" alt="Appearich" class="auth-logo-small">
-          <h1 class="auth-title" id="authTitleText">Welcome Scholar</h1>
-          <p class="auth-subtitle" id="authSubText">Authenticate to access your Cambridge matrix</p>
-        </div>
-
-        <div class="form-group" id="nameGroup" style="display: none;">
-          <label>Full Name</label>
-          <input type="text" id="regName" placeholder="e.g. Alistair Sterling">
-        </div>
-        <div class="form-group">
-          <label>University Email</label>
-          <input type="email" id="authEmail" placeholder="scholar@appearich.ac.uk">
-        </div>
-        <div class="form-group">
-          <label>Security Password</label>
-          <input type="password" id="authPassword" placeholder="••••••••••••">
-        </div>
-        <div class="form-group" id="programGroup" style="display: none;">
-          <label>Degree Program</label>
-          <input type="text" id="regProgram" placeholder="e.g. B.A. Computer Science & Tripos">
-        </div>
-
-        <button class="primary-btn" id="authActionBtn" onclick="handleAuthSubmit()">Initialize Session</button>
-        
-        <div class="auth-switch-text" onclick="toggleAuthMode()">
-          <span id="authSwitchPrompt">New researcher? <span>Create Account</span></span>
-        </div>
+  <!-- ==========================================================================
+       AUTHENTICATION VIEWS
+       ========================================================================== -->
+  <!-- LOGIN VIEW -->
+  <div id="auth-login-screen" class="auth-container active">
+    <div class="auth-card" id="loginCard">
+      <div class="auth-header">
+        <h1 class="auth-title stagger-item stagger-1">Welcome back</h1>
+        <p class="auth-subtitle stagger-item stagger-2">Continue your academic journey with Appearich.</p>
+      </div>
+      <div class="form-group stagger-item stagger-3">
+        <label>Email Address or Student ID</label>
+        <input type="text" id="loginEmail" placeholder="scholar@appearich.edu">
+      </div>
+      <div class="form-group stagger-item stagger-4">
+        <label>Password</label>
+        <input type="password" id="loginPassword" placeholder="••••••••••••">
+        <i class="fa-regular fa-eye password-toggle" onclick="togglePasswordVisibility('loginPassword', this)"></i>
+      </div>
+      <a href="#" class="forgot-link stagger-item stagger-5" onclick="alert('Password reset system accessed.')">Forgot password?</a>
+      <button class="btn-primary-black stagger-item stagger-6" onclick="handleLogin()">Sign In</button>
+      <div class="auth-switch-text stagger-item stagger-7">
+        Don't have an account? <button onclick="switchAuthScreen('signup')">Sign Up</button>
       </div>
     </div>
+  </div>
 
-    <!-- MAIN APP HEADER -->
-    <header class="app-header" id="mainHeader" style="display: none;">
+  <!-- SIGN UP VIEW -->
+  <div id="auth-signup-screen" class="auth-container">
+    <div class="auth-card" id="signupCard">
+      <div class="auth-header">
+        <h1 class="auth-title stagger-item stagger-1">Create Account</h1>
+        <p class="auth-subtitle stagger-item stagger-2">Join the digital campus of the future.</p>
+      </div>
+      <div class="form-group stagger-item stagger-3">
+        <label>Full Name</label>
+        <input type="text" id="regName" placeholder="William Sterling">
+      </div>
+      <div class="form-group stagger-item stagger-4">
+        <label>Student ID</label>
+        <input type="text" id="regId" placeholder="APR-88392">
+      </div>
+      <div class="form-group stagger-item stagger-5">
+        <label>Email Address</label>
+        <input type="email" id="regEmail" placeholder="w.sterling@appearich.edu">
+      </div>
+      <div class="form-group stagger-item stagger-6">
+        <label>School / College</label>
+        <input type="text" id="regCollege" placeholder="School of Computer Science">
+      </div>
+      <div class="form-group stagger-item stagger-7">
+        <label>Academic Level / Year</label>
+        <select id="regLevel">
+          <option>Undergraduate — Year 1</option>
+          <option>Undergraduate — Year 2</option>
+          <option>Undergraduate — Year 3</option>
+          <option>Postgraduate Research</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="regPassword" placeholder="••••••••••••">
+      </div>
+      <button class="btn-primary-black" style="margin-top: 12px;" onclick="handleSignUp()">Create Account</button>
+      <div class="auth-switch-text">
+        Already have an account? <button onclick="switchAuthScreen('login')">Sign In</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       MAIN LMS SYSTEM
+       ========================================================================== -->
+  <div class="app-viewport" id="mainLmsViewport" style="display: none;">
+    
+    <!-- SYSTEM NAVIGATION -->
+    <header class="app-header">
       <div class="header-brand">
-        <img src="images/appearich-logo.png" alt="Appearich" class="header-logo-icon">
+        <img src="https://api.iconify.design/lucide:graduation-cap.svg?color=%23000000" alt="Appearich" class="header-logo">
         <span>Appearich</span>
       </div>
-      <div style="display: flex; gap: 8px;">
-        <button class="icon-btn" onclick="toggleThemeMode()" title="Toggle Theme">
-          <i class="fa-solid fa-moon" id="themeIcon"></i>
-        </button>
-      </div>
+      <nav class="nav-links">
+        <button class="nav-item active" onclick="switchTab('screen-home', this)"><i class="fa-solid fa-house"></i><span>Home</span></button>
+        <button class="nav-item" onclick="switchTab('screen-courses', this)"><i class="fa-solid fa-book-open"></i><span>Courses</span></button>
+        <button class="nav-item" onclick="switchTab('screen-events', this)"><i class="fa-solid fa-calendar-days"></i><span>Events</span></button>
+        <button class="nav-item" onclick="switchTab('screen-library', this)"><i class="fa-solid fa-bookmark"></i><span>Library</span></button>
+        <button class="nav-item" onclick="switchTab('screen-sports', this)"><i class="fa-solid fa-trophy"></i><span>Sports</span></button>
+        <button class="nav-item" onclick="switchTab('screen-community', this)"><i class="fa-solid fa-users"></i><span>Community</span></button>
+        <button class="nav-item" onclick="switchTab('screen-profile', this)"><i class="fa-solid fa-user"></i><span>Profile</span></button>
+      </nav>
     </header>
 
-    <!-- SCREEN 1: HOME (CENTRAL HUB) -->
-    <div id="screen-home" class="screen">
-      <!-- HERO BANNER WITH INTEGRATED LOGO -->
-      <div class="hero-container" id="heroContainer">
-        <img src="" alt="Hero Campus" class="hero-bg-image" id="heroImageElement">
-        <div class="hero-gradient-overlay"></div>
-        
-        <!-- Integrated Float Logo Badge -->
-        <div class="hero-integrated-badge">
-          <img src="images/appearich-logo1" alt="Appearich" class="hero-badge-logo">
-          <span class="hero-badge-text" id="heroBadgeLabel">Smart Matrix</span>
-        </div>
-
-        <div class="hero-content">
-          <div>
-            <h2 class="hero-greeting" id="dynamicGreeting">WELCOME, SCHOLAR</h2>
-            <div class="hero-msg" id="dynamicSubGreeting">Ready for another productive day?</div>
-          </div>
-          <div class="hero-controls-group">
-            <button class="hero-control-btn" onclick="openHeroPreferencesModal()">
-              <i class="fa-solid fa-sliders"></i> Customize Hero
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- ACADEMIC COMMAND SEARCH -->
-      <div class="search-command-bar">
-        <i class="fa-solid fa-magnifying-glass"></i>
-        <input type="text" placeholder="Search courses, lectures, assignments, or resources..." id="globalSearchInput" oninput="handleGlobalSearch(this.value)">
-      </div>
-
-      <!-- DISCOVERY SECTION -->
-      <div class="section-header-title">
-        <i class="fa-solid fa-compass" style="color: var(--accent-gold);"></i> Academic Discovery
-      </div>
-
-      <div class="cards-grid">
-        <div class="discovery-card featured" onclick="triggerDiscoveryModal('Academic Hub', 'Accessing Tripos modules, lecture archives, and assessment schedules.')">
-          <div>
-            <div class="card-icon-wrap"><i class="fa-solid fa-graduation-cap"></i></div>
-            <div class="card-title">Academic Core</div>
-            <div class="card-desc">Courses, assignments, timetables & grades</div>
-          </div>
-          <i class="fa-solid fa-chevron-right" style="color: var(--text-sub);"></i>
-        </div>
-
-        <div class="discovery-card" onclick="triggerDiscoveryModal('Upcoming Events', 'Seminars, supervisions, and examination deadlines.')">
-          <div>
-            <div class="card-icon-wrap"><i class="fa-solid fa-calendar-days"></i></div>
-            <div class="card-title">Events</div>
-            <div class="card-desc">Lectures & deadlines</div>
-          </div>
-        </div>
-
-        <div class="discovery-card" onclick="triggerDiscoveryModal('Library Repository', 'Digital texts, research papers, and archived journals.')">
-          <div>
-            <div class="card-icon-wrap"><i class="fa-solid fa-book-bookmark"></i></div>
-            <div class="card-title">Library</div>
-            <div class="card-desc">Research materials</div>
-          </div>
-        </div>
-
-        <div class="discovery-card" onclick="triggerDiscoveryModal('Student Community', 'College societies, syndicates, and peer collaboration groups.')">
-          <div>
-            <div class="card-icon-wrap"><i class="fa-solid fa-users-rectangle"></i></div>
-            <div class="card-title">Community</div>
-            <div class="card-desc">Clubs & discussions</div>
-          </div>
-        </div>
-
-        <div class="discovery-card" onclick="triggerDiscoveryModal('Athletics & Sports', 'College rowing, tennis fixtures, and training camps.')">
-          <div>
-            <div class="card-icon-wrap"><i class="fa-solid fa-medal"></i></div>
-            <div class="card-title">Sports</div>
-            <div class="card-desc">Teams & fixtures</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- SCREEN 2: AI COMPANION -->
-    <div id="screen-ai" class="screen">
-      <div class="ai-companion-hero">
-        <div class="ai-core-pulse">
-          <i class="fa-solid fa-microchip"></i>
-        </div>
-        <h2 style="font-size: 1.3rem; font-weight: 900; margin-bottom: 6px;">AI Academic Intelligence</h2>
-        <p style="font-size: 0.8rem; color: var(--text-sub); max-width: 280px; margin: 0 auto;">Your neural study partner trained on Cambridge Tripos syllabi and research datasets.</p>
-      </div>
-
-      <div class="section-header-title">
-        <i class="fa-solid fa-wand-magic-sparkles" style="color: var(--accent-gold);"></i> Intelligent Capabilities
-      </div>
-
-      <div class="ai-tools-grid">
-        <div class="ai-tool-card" onclick="triggerAiAction('Summarizing Material')">
-          <div class="card-icon-wrap"><i class="fa-solid fa-file-lines"></i></div>
-          <div class="card-title" style="font-size: 0.88rem;">Summarizer</div>
-          <div class="card-desc">Condense lecture notes</div>
-        </div>
-        <div class="ai-tool-card" onclick="triggerAiAction('Creating Practice Quizzes')">
-          <div class="card-icon-wrap"><i class="fa-solid fa-brain"></i></div>
-          <div class="card-title" style="font-size: 0.88rem;">Quiz Engine</div>
-          <div class="card-desc">Active recall tests</div>
-        </div>
-        <div class="ai-tool-card" onclick="triggerAiAction('Building Dynamic Study Plans')">
-          <div class="card-icon-wrap"><i class="fa-solid fa-timeline"></i></div>
-          <div class="card-title" style="font-size: 0.88rem;">Study Planner</div>
-          <div class="card-desc">Optimized revision schedules</div>
-        </div>
-        <div class="ai-tool-card" onclick="triggerAiAction('Explaining Complex Topics')">
-          <div class="card-icon-wrap"><i class="fa-solid fa-lightbulb"></i></div>
-          <div class="card-title" style="font-size: 0.88rem;">Concept Tutor</div>
-          <div class="card-desc">Break down difficult theories</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- SCREEN 3: ACTIVITY & 3D JOURNEY -->
-    <div id="screen-activity" class="screen">
-      <div class="section-header-title">
-        <i class="fa-solid fa-chart-line" style="color: var(--accent-gold);"></i> Academic Progression
-      </div>
-
-      <div style="background: var(--surface-color); border: 1px solid var(--border-color); border-radius: 20px; padding: 20px; margin-bottom: 24px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-          <span style="font-size: 0.85rem; font-weight: 800;">Semester Milestone Streak</span>
-          <span style="background: var(--accent-gold-glow); color: var(--accent-gold); padding: 4px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 800;">14 Days Active</span>
-        </div>
-        <div style="width: 100%; height: 8px; background: var(--bg-color); border-radius: 4px; overflow: hidden; border: 1px solid var(--border-color);">
-          <div style="width: 78%; height: 100%; background: var(--accent-gold); border-radius: 4px;"></div>
-        </div>
-        <div style="display: flex; justify-content: space-between; font-size: 0.72rem; color: var(--text-sub); margin-top: 8px;">
-          <span>Courses Completed: 12/16</span>
-          <span>78% Index</span>
-        </div>
-      </div>
-
-      <div class="section-header-title">
-        <i class="fa-solid fa-cube" style="color: var(--accent-gold);"></i> 3D Academic Journey
-      </div>
-
-      <div class="journey-timeline">
-        <div class="timeline-node">
-          <div class="timeline-content">
-            <div style="font-size: 0.7rem; color: var(--accent-gold); font-weight: 800; text-transform: uppercase;">Milestone 01</div>
-            <div style="font-size: 0.9rem; font-weight: 800; margin-top: 2px;">Advanced Algorithm Tripos</div>
-            <div style="font-size: 0.75rem; color: var(--text-sub); margin-top: 2px;">Completed lecture modules and practical lab work.</div>
-          </div>
-        </div>
-        <div class="timeline-node">
-          <div class="timeline-content">
-            <div style="font-size: 0.7rem; color: var(--accent-gold); font-weight: 800; text-transform: uppercase;">Milestone 02</div>
-            <div style="font-size: 0.9rem; font-weight: 800; margin-top: 2px;">Quantum Mechanics Seminar</div>
-            <div style="font-size: 0.75rem; color: var(--text-sub); margin-top: 2px;">Passed interactive quiz assessment with distinction.</div>
-          </div>
-        </div>
-        <div class="timeline-node">
-          <div class="timeline-content">
-            <div style="font-size: 0.7rem; color: var(--accent-gold); font-weight: 800; text-transform: uppercase;">Milestone 03 — Current</div>
-            <div style="font-size: 0.9rem; font-weight: 800; margin-top: 2px;">Thesis Dissertation Draft</div>
-            <div style="font-size: 0.75rem; color: var(--text-sub); margin-top: 2px;">Submissions open for supervisor peer review.</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- SCREEN 4: PROFILE -->
-    <div id="screen-profile" class="screen">
-      <div class="profile-card-header">
-        <div class="profile-avatar-lg" id="profileInitial">A</div>
-        <h2 style="font-size: 1.2rem; font-weight: 900;" id="profileDisplayName">Alistair Sterling</h2>
-        <p style="font-size: 0.8rem; color: var(--accent-gold); font-weight: 700; margin-top: 2px;" id="profileDisplayProgram">B.A. Computer Science & Tripos</p>
-        <p style="font-size: 0.75rem; color: var(--text-sub); margin-top: 4px;" id="profileDisplayEmail">alistair@appearich.ac.uk</p>
-      </div>
-
-      <div class="section-header-title">Account Preferences</div>
-      <div class="settings-list">
-        <div class="settings-item" onclick="openHeroPreferencesModal()">
-          <span>Hero Visual System & Modes</span>
-          <i class="fa-solid fa-chevron-right" style="color: var(--text-sub); font-size: 0.75rem;"></i>
-        </div>
-        <div class="settings-item" onclick="alert('Notification settings updated.')">
-          <span>Push Notifications</span>
-          <i class="fa-solid fa-chevron-right" style="color: var(--text-sub); font-size: 0.75rem;"></i>
-        </div>
-        <div class="settings-item" onclick="alert('Privacy configuration secured.')">
-          <span>Privacy & Security</span>
-          <i class="fa-solid fa-chevron-right" style="color: var(--text-sub); font-size: 0.75rem;"></i>
-        </div>
-        <div class="settings-item" onclick="alert('Appearich Academic LMS v3.4.0 — Built for elite collegiate standards.')">
-          <span>About Appearich</span>
-          <i class="fa-solid fa-chevron-right" style="color: var(--text-sub); font-size: 0.75rem;"></i>
-        </div>
-      </div>
-
-      <button class="danger-btn" onclick="handleLogout()">
-        <i class="fa-solid fa-right-from-bracket"></i> Terminate Session
-      </button>
-    </div>
-
-    <!-- PERSISTENT BOTTOM NAVIGATION -->
-    <nav class="bottom-nav" id="mainNavBar" style="display: none;">
-      <button class="nav-item active" onclick="switchTab('screen-home', this)">
-        <i class="fa-solid fa-house"></i>
-        <span>Home</span>
-      </button>
-      <button class="nav-item" onclick="switchTab('screen-ai', this)">
-        <i class="fa-solid fa-robot"></i>
-        <span>AI</span>
-      </button>
-      <button class="nav-item" onclick="switchTab('screen-activity', this)">
-        <i class="fa-solid fa-chart-pie"></i>
-        <span>Activity</span>
-      </button>
-      <button class="nav-item" onclick="switchTab('screen-profile', this)">
-        <i class="fa-solid fa-user"></i>
-        <span>Profile</span>
-      </button>
-    </nav>
-
-  </div>
-
-  <!-- HERO PREFERENCES & GALLERY MODAL -->
-  <div id="heroPreferencesModal" class="modal-overlay">
-    <div class="modal-sheet">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-        <h3 style="font-size: 1.1rem; font-weight: 800;">Hero Visual Control</h3>
-        <i class="fa-solid fa-xmark" style="cursor: pointer; font-size: 1.2rem; color: var(--text-sub);" onclick="closeHeroPreferencesModal()"></i>
-      </div>
-
-      <!-- Mode Switcher (Personal vs Smart) -->
-      <div class="mode-switch-container">
-        <button class="mode-switch-btn" id="btnModePersonal" onclick="setHeroMode('personal')">Personal Mode</button>
-        <button class="mode-switch-btn" id="btnModeSmart" onclick="setHeroMode('smart')">Smart Mode</button>
-      </div>
-
-      <!-- My Hero Gallery Section -->
-      <div class="section-header-title" style="margin-top: 16px;">
-        <i class="fa-solid fa-images" style="color: var(--accent-gold);"></i> My Hero Gallery
-      </div>
-      <p style="font-size: 0.75rem; color: var(--text-sub); margin-bottom: 8px;">Tap any saved image to set it as current Hero or manage collection.</p>
+    <!-- DASHBOARD HOME SCREEN -->
+    <main id="screen-home" class="screen active">
       
-      <div class="hero-gallery-grid" id="heroGalleryGrid">
-        <!-- Rendered via JS -->
-      </div>
-
-      <!-- Hidden file input for uploading custom images -->
-      <input type="file" id="heroImageFileInput" accept="image/*" style="display: none;" onchange="handleImageUpload(event)">
-
-      <!-- Period Specific Preferences Accordion / Section -->
-      <div id="periodPreferencesSection" style="margin-top: 20px;">
-        <div class="section-header-title">
-          <i class="fa-solid fa-calendar-check" style="color: var(--accent-gold);"></i> Period-Specific Assign
-        </div>
-        <p style="font-size: 0.75rem; color: var(--text-sub); margin-bottom: 10px;">Assign specific favorite images to periods in Smart Mode.</p>
-        
-        <div style="display: flex; flex-direction: column; gap: 8px;" id="periodAssignmentList">
-          <!-- Populated by JS -->
+      <!-- HERO SECTION -->
+      <div class="hero-container">
+        <img src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?q=80&w=1200&auto=format&fit=cover" id="dashboardHeroImg" alt="Campus Hero" class="hero-bg-img">
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+          <div class="hero-text">
+            <h1 id="heroWelcomeTitle">Good Morning, Scholar</h1>
+            <p>Ready to continue your academic journey today?</p>
+          </div>
+          <div class="hero-actions">
+            <button class="btn-hero-action" onclick="triggerHeroUpload()"><i class="fa-solid fa-camera"></i> Change Cover</button>
+            <button class="btn-hero-action" onclick="switchTab('screen-courses')"><i class="fa-solid fa-arrow-right"></i> Continue Learning</button>
+          </div>
         </div>
       </div>
+      <input type="file" id="heroFileInput" accept="image/*" style="display: none;" onchange="handleHeroUpload(event)">
 
-      <button class="primary-btn" style="margin-top: 24px;" onclick="closeHeroPreferencesModal()">Save & Apply Preferences</button>
+      <!-- ACADEMIC CORE -->
+      <div class="section-title"><i class="fa-solid fa-layer-group"></i> Academic Core</div>
+      <div class="grid-3d">
+        <div class="card-3d" onclick="switchTab('screen-courses')">
+          <div class="card-img-wrap">
+            <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=600&auto=format&fit=cover" alt="Advanced Algorithms">
+          </div>
+          <div class="card-body">
+            <div class="card-tag">Computer Science</div>
+            <div class="card-heading">Advanced Algorithm Tripos</div>
+            <div class="card-sub">Module CS-401 • Prof. Aris Thorne</div>
+            <div class="card-footer-meta">
+              <span>Progress: 78%</span>
+              <i class="fa-solid fa-chevron-right"></i>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-3d">
+          <div class="card-img-wrap">
+            <img src="https://images.unsplash.com/photo-1635070041078-e363dbe005cb?q=80&w=600&auto=format&fit=cover" alt="Quantum Physics">
+          </div>
+          <div class="card-body">
+            <div class="card-tag">Physics</div>
+            <div class="card-heading">Quantum Field Dynamics</div>
+            <div class="card-sub">Problem Set #4 • Due Thursday</div>
+            <div class="card-footer-meta">
+              <span>Status: Pending</span>
+              <i class="fa-solid fa-clock"></i>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-3d">
+          <div class="card-img-wrap">
+            <img src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=600&auto=format&fit=cover" alt="Neural Networks">
+          </div>
+          <div class="card-body">
+            <div class="card-tag">Artificial Intelligence</div>
+            <div class="card-heading">Neural Architecture Seminar</div>
+            <div class="card-sub">Final Exam Schedule Posted</div>
+            <div class="card-footer-meta">
+              <span>Dec 14 • 10:00 AM</span>
+              <i class="fa-solid fa-calendar-check"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ACADEMIC EVENTS -->
+      <div class="section-title"><i class="fa-solid fa-calendar-day"></i> Academic Events</div>
+      <div class="grid-horizontal">
+        <div class="card-horizontal">
+          <div class="card-img-wrap">
+            <img src="https://images.unsplash.com/photo-1475721027785-f74eccf877e2?q=80&w=600&auto=format&fit=cover" alt="Lecture">
+          </div>
+          <div class="card-body">
+            <div class="card-tag">Symposium</div>
+            <div class="card-heading">International Artificial Intelligence & Ethics Summit</div>
+            <div class="card-sub">Keynote address by Dr. Evelyn Vance on generative model alignment in academic institutions.</div>
+            <div class="card-footer-meta">
+              <span>Lady Mitchell Hall • Oct 28, 14:00</span>
+              <button class="btn-primary-black" style="padding: 6px 14px; font-size: 0.75rem;" onclick="alert('Seat reserved for event.')">Reserve Seat</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- COURSES SCREEN -->
+    <main id="screen-courses" class="screen">
+      <div class="section-title">Enrolled Academic Modules</div>
+      <div class="grid-3d">
+        <div class="card-3d">
+          <div class="card-img-wrap">
+            <img src="https://images.unsplash.com/photo-1509228468518-180dd4864904?q=80&w=600&auto=format&fit=cover" alt="Math">
+          </div>
+          <div class="card-body">
+            <div class="card-tag">Mathematics</div>
+            <div class="card-heading">Pure Analysis & Complex Variables</div>
+            <div class="card-sub">Linear operators, Hilbert spaces, and Cauchy integral theorems.</div>
+          </div>
+        </div>
+        <div class="card-3d">
+          <div class="card-img-wrap">
+            <img src="https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?q=80&w=600&auto=format&fit=cover" alt="Cryptography">
+          </div>
+          <div class="card-body">
+            <div class="card-tag">Computer Science</div>
+            <div class="card-heading">Applied Cryptography & Systems</div>
+            <div class="card-sub">Zero-knowledge proofs, post-quantum ciphers, and protocols.</div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- EVENTS SCREEN -->
+    <main id="screen-events" class="screen">
+      <div class="section-title">University Events & Conferences</div>
+      <div class="grid-horizontal">
+        <div class="card-horizontal">
+          <div class="card-img-wrap">
+            <img src="https://images.unsplash.com/photo-1511578314322-379afb476865?q=80&w=600&auto=format&fit=cover" alt="Conference">
+          </div>
+          <div class="card-body">
+            <div class="card-tag">Career Fair</div>
+            <div class="card-heading">Annual Tech & Research Recruitment Fair</div>
+            <div class="card-sub">Connect with leading laboratories, technology institutions, and venture funds.</div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- LIBRARY SCREEN -->
+    <main id="screen-library" class="screen">
+      <div class="section-title">Digital Library & Resource Matrix</div>
+      <div class="grid-3d">
+        <div class="card-3d">
+          <div class="card-img-wrap">
+            <img src="https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?q=80&w=600&auto=format&fit=cover" alt="Library">
+          </div>
+          <div class="card-body">
+            <div class="card-tag">Archived Journal</div>
+            <div class="card-heading">Cambridge Computational Review</div>
+            <div class="card-sub">Vol. 42 • Edition 8 — Quantum Memory Bounds</div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- SPORTS SCREEN -->
+    <main id="screen-sports" class="screen">
+      <div class="section-title">Collegiate Athletics & Fixtures</div>
+      <div class="grid-3d">
+        <div class="card-3d">
+          <div class="card-img-wrap">
+            <img src="https://images.unsplash.com/photo-1517649763962-0c6232662000?q=80&w=600&auto=format&fit=cover" alt="Rowing">
+          </div>
+          <div class="card-body">
+            <div class="card-tag">Rowing</div>
+            <div class="card-heading">Annual Varsity Regatta Final</div>
+            <div class="card-sub">River Cam Track • Tomorrow, 07:30 AM</div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- COMMUNITY SCREEN -->
+    <main id="screen-community" class="screen">
+      <div class="section-title">Syndicates & Peer Communities</div>
+      <div class="grid-3d">
+        <div class="card-3d">
+          <div class="card-img-wrap">
+            <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=600&auto=format&fit=cover" alt="Collaboration">
+          </div>
+          <div class="card-body">
+            <div class="card-tag">Study Group</div>
+            <div class="card-heading">Theoretical Physics Peer Syndicate</div>
+            <div class="card-sub">24 Members Active • Next Session Tonight</div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- PROFILE SCREEN -->
+    <main id="screen-profile" class="screen">
+      <div class="section-title">Scholar Credentials</div>
+      <div class="card-3d" style="max-width: 500px; padding: 24px;">
+        <h2 id="profileNameDisplay" style="font-size: 1.4rem; font-weight: 800;">William Sterling</h2>
+        <p id="profileIdDisplay" style="color: var(--text-dark-gray); font-weight: 600; margin-top: 4px;">ID: APR-88392</p>
+        <p id="profileCollegeDisplay" style="color: var(--text-secondary); margin-top: 2px;">School of Computer Science</p>
+        <button class="btn-primary-black" style="margin-top: 24px;" onclick="handleLogout()">Terminate Session</button>
+      </div>
+    </main>
+
+  </div>
+
+  <!-- CUSTOM COVER PREVIEW MODAL -->
+  <div class="modal-overlay" id="coverModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>Cover Preview</h3>
+        <i class="fa-solid fa-xmark modal-close" onclick="closeCoverModal()"></i>
+      </div>
+      <img id="coverPreviewImg" src="" alt="Cover Preview" style="width: 100%; height: 200px; object-fit: cover; border-radius: 8px; margin-bottom: 20px;">
+      <button class="btn-primary-black" onclick="applyHeroCover()">Set Academic Cover</button>
     </div>
   </div>
 
-  <!-- DISCOVERY / ACTION MODAL -->
-  <div id="discoveryModal" class="modal-overlay">
-    <div class="modal-sheet">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-        <h3 id="modalDiscoveryTitle" style="font-size: 1.1rem; font-weight: 800;">Module Details</h3>
-        <i class="fa-solid fa-xmark" style="cursor: pointer; font-size: 1.2rem; color: var(--text-sub);" onclick="closeDiscoveryModal()"></i>
-      </div>
-      <p id="modalDiscoveryDesc" style="font-size: 0.85rem; color: var(--text-sub); line-height: 1.5; margin-bottom: 20px;"></p>
-      <button class="primary-btn" onclick="closeDiscoveryModal()">Dismiss Module</button>
-    </div>
-  </div>
-
-  <!-- APPLICATION LOGIC SCRIPT -->
+  <!-- ==========================================================================
+       SYSTEM ARCHITECTURE SCRIPT
+       ========================================================================== -->
   <script>
-    let isRegisterState = false;
-    let currentUserProfile = {
-      name: "Alistair Sterling",
-      email: "scholar@appearich.ac.uk",
-      program: "B.A. Computer Science & Tripos"
-    };
-
-    const DEFAULT_HERO_IMAGES = [
-      { id: 'def_1', url: 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?q=80&w=800&auto=format&fit=cover', label: 'Library' },
-      { id: 'def_2', url: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=800&auto=format&fit=cover', label: 'Collegiate Hall' },
-      { id: 'def_3', url: 'https://images.unsplash.com/photo-1509062522246-3755977927d7?q=80&w=800&auto=format&fit=cover', label: 'Auditorium' },
-      { id: 'def_4', url: 'https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?q=80&w=800&auto=format&fit=cover', label: 'Weekend Social' },
-      { id: 'def_5', url: 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?q=80&w=800&auto=format&fit=cover', label: 'Long Break / Travel' }
-    ];
-
-    let appState = {
-      heroMode: 'smart',
-      currentHeroUrl: '',
-      gallery: [],
-      periodPreferences: {
-        academic: '',
-        weekend: '',
-        holiday: '',
-        shortBreak: '',
-        longBreak: '',
-        default: ''
-      }
+    // State Management
+    let tempUploadedImage = '';
+    let currentStudent = {
+      name: "William Sterling",
+      id: "APR-88392",
+      email: "scholar@appearich.edu",
+      college: "School of Computer Science"
     };
 
     window.addEventListener('DOMContentLoaded', () => {
-      // Force initial default theme strictly to Light/White Mode on first load/startup
-      const savedTheme = localStorage.getItem('appearich_theme_mode');
-      if (savedTheme) {
-        document.documentElement.setAttribute('data-theme', savedTheme);
-        document.getElementById('themeIcon').className = savedTheme === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
-      } else {
-        document.documentElement.setAttribute('data-theme', 'light');
-        localStorage.setItem('appearich_theme_mode', 'light');
-      }
-
-      loadStateFromStorage();
-
-      const savedUser = localStorage.getItem('appearich_student_profile');
-      if (savedUser) {
-        currentUserProfile = JSON.parse(savedUser);
-        launchMainDashboard();
-      }
-
+      // Initialize Splash Screen Sequence
       setTimeout(() => {
-        const splash = document.getElementById('cinematic-splash');
-        if (splash) splash.style.display = 'none';
-      }, 1500);
+        const splash = document.getElementById('splash-screen');
+        splash.style.opacity = '0';
+        splash.style.visibility = 'hidden';
+        triggerAuthAnimations('loginCard');
+      }, 1800);
+
+      // Restore Hero Cover from Storage
+      const savedCover = localStorage.getItem('appearich_hero_cover');
+      if (savedCover) {
+        document.getElementById('dashboardHeroImg').src = savedCover;
+      }
     });
 
-    function loadStateFromStorage() {
-      const storedGallery = localStorage.getItem('appearich_hero_gallery');
-      if (storedGallery) {
-        appState.gallery = JSON.parse(storedGallery);
+    function triggerAuthAnimations(cardId) {
+      const card = document.getElementById(cardId);
+      card.classList.remove('animate-in');
+      void card.offsetWidth; // Force Reflow
+      card.classList.add('animate-in');
+    }
+
+    function switchAuthScreen(type) {
+      document.querySelectorAll('.auth-container').forEach(el => el.classList.remove('active'));
+      if (type === 'signup') {
+        document.getElementById('auth-signup-screen').classList.add('active');
+        triggerAuthAnimations('signupCard');
       } else {
-        appState.gallery = [...DEFAULT_HERO_IMAGES];
-        saveGalleryToStorage();
+        document.getElementById('auth-login-screen').classList.add('active');
+        triggerAuthAnimations('loginCard');
       }
+    }
 
-      const storedMode = localStorage.getItem('appearich_hero_mode');
-      if (storedMode) appState.heroMode = storedMode;
-
-      const storedPrefs = localStorage.getItem('appearich_hero_period_prefs');
-      if (storedPrefs) appState.periodPreferences = JSON.parse(storedPrefs);
-
-      const storedCurrent = localStorage.getItem('appearich_current_hero');
-      if (storedCurrent) {
-        appState.currentHeroUrl = storedCurrent;
+    function togglePasswordVisibility(inputId, icon) {
+      const field = document.getElementById(inputId);
+      if (field.type === 'password') {
+        field.type = 'text';
+        icon.className = 'fa-regular fa-eye-slash password-toggle';
       } else {
-        evaluateSmartHero();
+        field.type = 'password';
+        icon.className = 'fa-regular fa-eye password-toggle';
       }
     }
 
-    function saveGalleryToStorage() {
-      localStorage.setItem('appearich_hero_gallery', JSON.stringify(appState.gallery));
-    }
-
-    function saveStateToStorage() {
-      localStorage.setItem('appearich_hero_mode', appState.heroMode);
-      localStorage.setItem('appearich_hero_period_prefs', JSON.stringify(appState.periodPreferences));
-      localStorage.setItem('appearich_current_hero', appState.currentHeroUrl);
-    }
-
-    function determineCurrentAcademicPeriod() {
-      const now = new Date();
-      const dayOfWeek = now.getDay();
-      const month = now.getMonth();
-
-      if (dayOfWeek === 0 || dayOfWeek === 6) {
-        return 'weekend';
+    function handleLogin() {
+      const email = document.getElementById('loginEmail').value.trim();
+      if (email) {
+        currentStudent.name = email.split('@')[0].replace('.', ' ').toUpperCase();
       }
-      if (month === 11 || month === 7) {
-        return 'holiday';
-      }
-      return 'academic';
+      launchDashboard();
     }
 
-    function evaluateSmartHero() {
-      const period = determineCurrentAcademicPeriod();
-      let selectedUrl = '';
-      let badgeText = 'Smart Matrix';
-      let subGreetingText = 'Ready for another productive day?';
+    function handleSignUp() {
+      const name = document.getElementById('regName').value.trim();
+      const id = document.getElementById('regId').value.trim();
+      const college = document.getElementById('regCollege').value.trim();
 
-      if (appState.heroMode === 'smart') {
-        if (appState.periodPreferences[period] && appState.periodPreferences[period] !== '') {
-          selectedUrl = appState.periodPreferences[period];
-        } else {
-          if (period === 'academic') {
-            selectedUrl = DEFAULT_HERO_IMAGES[0].url;
-            badgeText = 'Academic Period';
-            subGreetingText = 'Focus • Learning • Academic Excellence';
-          } else if (period === 'weekend') {
-            selectedUrl = DEFAULT_HERO_IMAGES[3].url;
-            badgeText = 'Weekend Mode';
-            subGreetingText = 'Take a moment to recharge and explore.';
-          } else if (period === 'holiday') {
-            selectedUrl = DEFAULT_HERO_IMAGES[4].url;
-            badgeText = 'Holiday Period';
-            subGreetingText = 'Enjoy your cultural and festive break.';
-          } else {
-            selectedUrl = DEFAULT_HERO_IMAGES[1].url;
-            badgeText = 'Active Session';
-            subGreetingText = 'Your academic journey continues.';
-          }
-        }
-      } else {
-        selectedUrl = appState.currentHeroUrl || appState.gallery[0].url;
-        badgeText = 'Personal Mode';
-        
-        const hour = new Date().getHours();
-        if (hour < 12) subGreetingText = 'Good morning. Ready for inquiry?';
-        else if (hour < 18) subGreetingText = 'Good afternoon. Maintain your focus.';
-        else subGreetingText = 'Good evening. Evening research session.';
-      }
+      if (name) currentStudent.name = name;
+      if (id) currentStudent.id = id;
+      if (college) currentStudent.college = college;
 
-      setHeroImageWithCinematicTransition(selectedUrl, badgeText, subGreetingText);
+      launchDashboard();
     }
 
-    function setHeroImageWithCinematicTransition(url, badgeText, subMsg) {
-      if (appState.currentHeroUrl === url && document.getElementById('heroImageElement').src) {
-        document.getElementById('heroBadgeLabel').innerText = badgeText;
-        if (subMsg) document.getElementById('dynamicSubGreeting').innerText = subMsg;
-        return;
-      }
-
-      const container = document.getElementById('heroContainer');
-      const imgEl = document.getElementById('heroImageElement');
-
-      container.classList.add('transitioning');
-
-      setTimeout(() => {
-        imgEl.src = url;
-        appState.currentHeroUrl = url;
-        document.getElementById('heroBadgeLabel').innerText = badgeText;
-        if (subMsg) document.getElementById('dynamicSubGreeting').innerText = subMsg;
-        saveStateToStorage();
-
-        setTimeout(() => {
-          container.classList.remove('transitioning');
-        }, 150);
-      }, 350);
-    }
-
-    function setHeroMode(mode) {
-      appState.heroMode = mode;
-      document.getElementById('btnModePersonal').className = `mode-switch-btn ${mode === 'personal' ? 'active' : ''}`;
-      document.getElementById('btnModeSmart').className = `mode-switch-btn ${mode === 'smart' ? 'active' : ''}`;
-      saveStateToStorage();
-      evaluateSmartHero();
-    }
-
-    function toggleAuthMode() {
-      isRegisterState = !isRegisterState;
-      document.getElementById('authTitleText').innerText = isRegisterState ? "Create Scholar ID" : "Welcome Scholar";
-      document.getElementById('authSubText').innerText = isRegisterState ? "Register your profile for Appearich LMS" : "Authenticate to access your Cambridge matrix";
-      document.getElementById('authActionBtn').innerText = isRegisterState ? "Complete Registration" : "Initialize Session";
-      document.getElementById('nameGroup').style.display = isRegisterState ? "block" : "none";
-      document.getElementById('programGroup').style.display = isRegisterState ? "block" : "none";
-      document.getElementById('authSwitchPrompt').innerHTML = isRegisterState ? "Existing scholar? <span>Sign In</span>" : "New researcher? <span>Create Account</span>";
-    }
-
-    function handleAuthSubmit() {
-      const email = document.getElementById('authEmail').value.trim();
-      const pass = document.getElementById('authPassword').value.trim();
-      const nameInput = document.getElementById('regName').value.trim();
-      const programInput = document.getElementById('regProgram').value.trim();
-
-      if (!email || !pass) {
-        alert("Please enter valid academic credentials.");
-        return;
-      }
-
-      if (isRegisterState && nameInput) {
-        currentUserProfile.name = nameInput;
-        currentUserProfile.email = email;
-        if (programInput) currentUserProfile.program = programInput;
-      } else {
-        currentUserProfile.email = email;
-        currentUserProfile.name = email.split('@')[0].toUpperCase();
-      }
-
-      localStorage.setItem('appearich_student_profile', JSON.stringify(currentUserProfile));
-      launchMainDashboard();
-    }
-
-    function launchMainDashboard() {
-      document.getElementById('screen-auth').classList.remove('active');
-      document.getElementById('screen-home').classList.add('active');
-      document.getElementById('mainHeader').style.display = 'flex';
-      document.getElementById('mainNavBar').style.display = 'flex';
-
-      const hour = new Date().getHours();
-      let timeGreeting = "WELCOME";
-      if (hour < 12) timeGreeting = "GOOD MORNING";
-      else if (hour < 18) timeGreeting = "GOOD AFTERNOON";
-      else timeGreeting = "GOOD EVENING";
-
-      document.getElementById('dynamicGreeting').innerText = `${timeGreeting}, ${currentUserProfile.name.toUpperCase()}`;
-      document.getElementById('profileDisplayName').innerText = currentUserProfile.name;
-      document.getElementById('profileDisplayEmail').innerText = currentUserProfile.email;
-      document.getElementById('profileDisplayProgram').innerText = currentUserProfile.program;
-      document.getElementById('profileInitial').innerText = currentUserProfile.name.charAt(0).toUpperCase();
-
-      evaluateSmartHero();
+    function launchDashboard() {
+      document.querySelectorAll('.auth-container').forEach(el => el.classList.remove('active'));
+      document.getElementById('mainLmsViewport').style.display = 'flex';
+      
+      // Update User Interface Details
+      document.getElementById('heroWelcomeTitle').innerText = `Good Morning, ${currentStudent.name}`;
+      document.getElementById('profileNameDisplay').innerText = currentStudent.name;
+      document.getElementById('profileIdDisplay').innerText = `ID: ${currentStudent.id}`;
+      document.getElementById('profileCollegeDisplay').innerText = currentStudent.college;
     }
 
     function handleLogout() {
-      localStorage.removeItem('appearich_student_profile');
-      document.getElementById('mainHeader').style.display = 'none';
-      document.getElementById('mainNavBar').style.display = 'none';
-      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-      document.getElementById('screen-auth').classList.add('active');
+      document.getElementById('mainLmsViewport').style.display = 'none';
+      switchAuthScreen('login');
     }
 
-    function switchTab(screenId, element) {
+    function switchTab(screenId, navElement) {
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
       document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      
       document.getElementById(screenId).classList.add('active');
-      if (element) element.classList.add('active');
+      if (navElement) navElement.classList.add('active');
     }
 
-    function toggleThemeMode() {
-      const htmlEl = document.documentElement;
-      const icon = document.getElementById('themeIcon');
-      if (htmlEl.getAttribute('data-theme') === 'dark') {
-        htmlEl.setAttribute('data-theme', 'light');
-        localStorage.setItem('appearich_theme_mode', 'light');
-        icon.className = 'fa-solid fa-moon';
-      } else {
-        htmlEl.setAttribute('data-theme', 'dark');
-        localStorage.setItem('appearich_theme_mode', 'dark');
-        icon.className = 'fa-solid fa-sun';
-      }
+    function triggerHeroUpload() {
+      document.getElementById('heroFileInput').click();
     }
 
-    function openHeroPreferencesModal() {
-      renderHeroGalleryModal();
-      renderPeriodPreferencesUI();
-      document.getElementById('btnModePersonal').className = `mode-switch-btn ${appState.heroMode === 'personal' ? 'active' : ''}`;
-      document.getElementById('btnModeSmart').className = `mode-switch-btn ${appState.heroMode === 'smart' ? 'active' : ''}`;
-      document.getElementById('heroPreferencesModal').classList.add('active');
-    }
-
-    function closeHeroPreferencesModal() {
-      document.getElementById('heroPreferencesModal').classList.remove('active');
-      evaluateSmartHero();
-    }
-
-    function renderHeroGalleryModal() {
-      const grid = document.getElementById('heroGalleryGrid');
-      let html = '';
-
-      appState.gallery.forEach((imgObj) => {
-        const isSelected = appState.currentHeroUrl === imgObj.url ? 'selected' : '';
-        html += `
-          <div class="gallery-thumb-card ${isSelected}" onclick="selectHeroImage('${imgObj.url}')">
-            <img src="${imgObj.url}" alt="${imgObj.label || 'Hero'}">
-            <button class="gallery-thumb-delete" onclick="event.stopPropagation(); deleteGalleryImage('${imgObj.id}')" title="Delete">
-              <i class="fa-solid fa-xmark"></i>
-            </button>
-          </div>
-        `;
-      });
-
-      html += `
-        <div class="gallery-add-tile" onclick="triggerImageUploadDialog()">
-          <i class="fa-solid fa-plus" style="font-size: 1.2rem;"></i>
-          <span style="font-size: 0.65rem; font-weight: 700;">Add Image</span>
-        </div>
-      `;
-
-      grid.innerHTML = html;
-    }
-
-    function triggerImageUploadDialog() {
-      document.getElementById('heroImageFileInput').click();
-    }
-
-    function handleImageUpload(event) {
+    function handleHeroUpload(event) {
       const file = event.target.files[0];
       if (!file) return;
 
       const reader = new FileReader();
       reader.onload = function(e) {
-        const newImg = {
-          id: 'custom_' + Date.now(),
-          url: e.target.result,
-          label: 'Custom Upload'
-        };
-        appState.gallery.push(newImg);
-        saveGalleryToStorage();
-        renderHeroGalleryModal();
+        tempUploadedImage = e.target.result;
+        document.getElementById('coverPreviewImg').src = tempUploadedImage;
+        document.getElementById('coverModal').classList.add('active');
       };
       reader.readAsDataURL(file);
     }
 
-    function selectHeroImage(url) {
-      appState.heroMode = 'personal';
-      appState.currentHeroUrl = url;
-      document.getElementById('btnModePersonal').className = 'mode-switch-btn active';
-      document.getElementById('btnModeSmart').className = 'mode-switch-btn';
-      saveStateToStorage();
-      renderHeroGalleryModal();
-      evaluateSmartHero();
-    }
-
-    function deleteGalleryImage(id) {
-      if (appState.gallery.length <= 1) {
-        alert("You must retain at least one image in your gallery.");
-        return;
+    function applyHeroCover() {
+      if (tempUploadedImage) {
+        document.getElementById('dashboardHeroImg').src = tempUploadedImage;
+        localStorage.setItem('appearich_hero_cover', tempUploadedImage);
       }
-      appState.gallery = appState.gallery.filter(item => item.id !== id);
-      saveGalleryToStorage();
-      renderHeroGalleryModal();
+      closeCoverModal();
     }
 
-    function renderPeriodPreferencesUI() {
-      const listContainer = document.getElementById('periodPreferencesList');
-      const periods = [
-        { key: 'academic', label: 'Academic Period' },
-        { key: 'weekend', label: 'Weekend Mode' },
-        { key: 'holiday', label: 'Holiday Period' },
-        { key: 'shortBreak', label: 'Short Break' },
-        { key: 'longBreak', label: 'Long Break' }
-      ];
-
-      let html = '';
-      periods.forEach(p => {
-        const currentVal = appState.periodPreferences[p.key] || '';
-        html += `
-          <div style="display: flex; justify-content: space-between; align-items: center; background: var(--surface-elevated); padding: 10px 14px; border-radius: 12px; border: 1px solid var(--border-color);">
-            <span style="font-size: 0.8rem; font-weight: 700;">${p.label}</span>
-            <select style="background: var(--bg-color); color: var(--text-main); border: 1px solid var(--border-color); border-radius: 8px; padding: 6px 10px; font-size: 0.75rem; outline: none;" onchange="updatePeriodPreference('${p.key}', this.value)">
-              <option value="">Default System Image</option>
-              ${appState.gallery.map(img => `<option value="${img.url}" ${currentVal === img.url ? 'selected' : ''}>${img.label || 'Gallery Image'}</option>`).join('')}
-            </select>
-          </div>
-        `;
-      });
-
-      listContainer.innerHTML = html;
-    }
-
-    function updatePeriodPreference(periodKey, url) {
-      appState.periodPreferences[periodKey] = url;
-      saveStateToStorage();
-    }
-
-    function triggerDiscoveryModal(title, desc) {
-      document.getElementById('modalDiscoveryTitle').innerText = title;
-      document.getElementById('modalDiscoveryDesc').innerText = desc;
-      document.getElementById('discoveryModal').classList.add('active');
-    }
-
-    function closeDiscoveryModal() {
-      document.getElementById('discoveryModal').classList.remove('active');
-    }
-
-    function triggerAiAction(actionName) {
-      alert(`Appearich AI Companion initializing protocol: ${actionName}...`);
-    }
-
-    function handleGlobalSearch(query) {
-      if (query.trim().length > 2) {
-        console.log(`Searching academic matrix for: ${query}`);
-      }
+    function closeCoverModal() {
+      document.getElementById('coverModal').classList.remove('active');
     }
   </script>
 </body>
