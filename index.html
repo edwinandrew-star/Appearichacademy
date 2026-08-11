@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>APPEARICH — The Future of Learning</title>
+    <title>APPEARICH — Future Cambridge-Inspired LMS</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -11,7 +11,7 @@
             theme: {
                 extend: {
                     colors: {
-                        electric: '#FFD600',
+                        appearichGold: '#FFD600',
                     }
                 }
             }
@@ -23,7 +23,7 @@
     <!-- Babel for in-browser JSX transformation -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 </head>
-<body class="bg-white text-black font-sans selection:bg-[#FFD600] selection:text-black">
+<body class="bg-neutral-100 text-neutral-900 font-sans selection:bg-[#FFD600] selection:text-black">
     <div id="root"></div>
 
     <script type="text/babel">
@@ -31,18 +31,15 @@
 
         function App() {
             const [isLoggedIn, setIsLoggedIn] = useState(false);
-            const [userName, setUserName] = useState('William');
+            const [userName, setUserName] = useState('Edwin');
             const [currentTab, setCurrentTab] = useState('Home');
-            
-            // Persistent Hero Image State
+            const [activeSubView, setActiveSubView] = useState(null);
+
+            // Persistent Hero Image State inspired by layout reference
             const [heroImage, setHeroImage] = useState('https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&q=80&w=1200');
             const [showHeroMenu, setShowHeroMenu] = useState(false);
             const fileInputRef = useRef(null);
 
-            // Navigation state for sub-pages or detailed views if clicked
-            const [activeSubView, setActiveSubView] = useState(null); // e.g. 'academics', 'library', 'events', 'sports', 'community'
-
-            // Handle Login
             const handleLogin = (name) => {
                 if (name.trim()) setUserName(name.trim());
                 setIsLoggedIn(true);
@@ -54,7 +51,6 @@
                 setActiveSubView(null);
             };
 
-            // Hero Image management
             const handleImageUpload = (e) => {
                 const file = e.target.files[0];
                 if (file) {
@@ -67,44 +63,31 @@
                 }
             };
 
-            const handleRemoveHeroImage = () => {
-                setHeroImage('');
-                setShowHeroMenu(false);
-            };
-
-            const handleRestoreHeroDefault = () => {
-                setHeroImage('https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&q=80&w=1200');
-                setShowHeroMenu(false);
-            };
-
             if (!isLoggedIn) {
                 return <LoginScreen onLogin={handleLogin} />;
             }
 
             return (
-                <div className="max-w-md mx-auto min-h-screen bg-white text-black flex flex-col justify-between shadow-2xl relative pb-24 selection:bg-[#FFD600]">
+                <div className="max-w-md mx-auto min-h-screen bg-white text-neutral-900 flex flex-col justify-between shadow-2xl relative pb-24">
                     
-                    {/* Top Header / Brand */}
-                    <header className="flex justify-between items-center px-6 pt-6 pb-4 border-b border-neutral-100">
-                        <div className="flex items-center space-x-2 font-black text-lg tracking-tighter">
-                            <span className="w-5 h-5 bg-black text-[#FFD600] flex items-center justify-center text-xs rounded-sm">◆</span>
-                            <span>APPEARICH</span>
+                    {/* Top Header layout matching image reference */}
+                    <header className="flex justify-between items-center px-6 pt-5 pb-3">
+                        <div 
+                            onClick={() => setActiveSubView(null)}
+                            className="w-10 h-10 rounded-full border border-neutral-200 flex items-center justify-center cursor-pointer hover:bg-neutral-50 shadow-sm text-sm font-bold"
+                        >
+                            ←
                         </div>
-                        <div className="flex items-center space-x-3">
-                            <div className="text-right">
-                                <div className="text-[10px] font-mono text-neutral-400">CAMBRIDGE AI</div>
-                                <div className="text-xs font-bold text-neutral-800">{userName}</div>
-                            </div>
-                            <div 
-                                onClick={() => setCurrentTab('Profile')}
-                                className="w-9 h-9 rounded-full bg-black text-[#FFD600] font-black flex items-center justify-center text-sm cursor-pointer overflow-hidden border border-black shadow-sm"
-                            >
-                                {heroImage ? <img src={heroImage} className="w-full h-full object-cover" /> : userName[0]}
-                            </div>
+                        <div className="flex items-center space-x-2 font-black text-lg tracking-tight">
+                            <span className="w-6 h-6 bg-black text-[#FFD600] rounded-md flex items-center justify-center text-xs shadow-sm font-mono">◆</span>
+                            <span className="font-extrabold text-black">Appearich</span>
+                        </div>
+                        <div className="w-10 h-10 rounded-full border border-neutral-200 flex items-center justify-center cursor-pointer hover:bg-neutral-50 shadow-sm text-sm">
+                            🌙
                         </div>
                     </header>
 
-                    {/* Main Content Area Based on Bottom Nav / Subviews */}
+                    {/* Main Content Area */}
                     <main className="flex-1 overflow-y-auto">
                         {currentTab === 'Home' && !activeSubView && (
                             <HomeScreen 
@@ -114,8 +97,7 @@
                                 setShowHeroMenu={setShowHeroMenu}
                                 fileInputRef={fileInputRef}
                                 handleImageUpload={handleImageUpload}
-                                handleRemoveHeroImage={handleRemoveHeroImage}
-                                handleRestoreHeroDefault={handleRestoreHeroDefault}
+                                setHeroImage={setHeroImage}
                                 setActiveSubView={setActiveSubView}
                             />
                         )}
@@ -126,35 +108,29 @@
                         {currentTab === 'Home' && activeSubView === 'library' && <LibraryView onBack={() => setActiveSubView(null)} />}
                         {currentTab === 'Home' && activeSubView === 'community' && <CommunityView onBack={() => setActiveSubView(null)} />}
 
-                        {currentTab === 'AI' && <AICampanionView userName={userName} />}
-                        {currentTab === 'Activity' && <ActivityJourneyView />}
+                        {currentTab === 'AI Guide' && <AICampanionView userName={userName} />}
+                        {currentTab === 'Bookings' && <ActivityJourneyView />}
                         {currentTab === 'Profile' && <ProfileView userName={userName} heroImage={heroImage} onLogout={handleLogout} />}
                     </main>
 
-                    {/* Hidden file input for hero customization */}
-                    <input 
-                        type="file" 
-                        ref={fileInputRef} 
-                        onChange={handleImageUpload} 
-                        accept="image/*" 
-                        className="hidden" 
-                    />
+                    {/* Hidden file input */}
+                    <input type="file" ref={fileInputRef} onChange={handleImageUpload} accept="image/*" className="hidden" />
 
-                    {/* Persistent Bottom Navigation Bar */}
+                    {/* Bottom Navigation matching image reference EXACTLY: Home, AI Guide, Bookings, Profile */}
                     <nav className="absolute bottom-0 left-0 right-0 bg-white border-t border-neutral-200 px-6 py-3 flex justify-between items-center z-30 shadow-lg">
                         {[
                             { name: 'Home', icon: '🏠' },
-                            { name: 'AI', icon: '✦' },
-                            { name: 'Activity', icon: '📊' },
+                            { name: 'AI Guide', icon: '🤖' },
+                            { name: 'Bookings', icon: '💼' },
                             { name: 'Profile', icon: '👤' }
                         ].map((tab) => (
                             <button 
                                 key={tab.name}
                                 onClick={() => { setCurrentTab(tab.name); setActiveSubView(null); }}
-                                className={`flex flex-col items-center space-y-1 transition-all ${currentTab === tab.name ? 'text-black font-black scale-105' : 'text-neutral-400 hover:text-black'}`}
+                                className={`flex flex-col items-center space-y-1 transition-all ${currentTab === tab.name ? 'text-[#FFD600] font-black' : 'text-neutral-400 hover:text-neutral-700'}`}
                             >
-                                <span className={`text-lg p-1 rounded-xl ${currentTab === tab.name ? 'bg-[#FFD600] text-black px-3' : ''}`}>{tab.icon}</span>
-                                <span className="text-[10px] tracking-wider uppercase">{tab.name}</span>
+                                <span className={`text-xl ${currentTab === tab.name ? 'scale-110' : ''}`}>{tab.icon}</span>
+                                <span className="text-[10px] tracking-tight">{tab.name}</span>
                             </button>
                         ))}
                     </nav>
@@ -163,9 +139,9 @@
             );
         }
 
-        // 1. LOGIN SCREEN COMPONENT
+        // LOGIN SCREEN
         function LoginScreen({ onLogin }) {
-            const [nameInput, setNameInput] = useState('William');
+            const [nameInput, setNameInput] = useState('Edwin');
 
             return (
                 <div className="max-w-md mx-auto min-h-screen bg-black text-white flex flex-col justify-between p-8 relative overflow-hidden">
@@ -190,7 +166,7 @@
                                 type="text"
                                 value={nameInput}
                                 onChange={(e) => setNameInput(e.target.value)}
-                                placeholder="e.g. William"
+                                placeholder="e.g. Edwin"
                                 className="w-full bg-neutral-900 border border-neutral-800 rounded-2xl px-4 py-4 text-white font-bold text-base focus:outline-none focus:border-[#FFD600] transition-colors"
                             />
                         </div>
@@ -210,33 +186,32 @@
             );
         }
 
-        // 2. HOME SCREEN COMPONENT
+        // HOME SCREEN FOLLOWING EXACT STRUCTURE OF IMAGE REFERENCE
         function HomeScreen({ 
             userName, 
             heroImage, 
             showHeroMenu, 
             setShowHeroMenu, 
             fileInputRef, 
-            handleRemoveHeroImage, 
-            handleRestoreHeroDefault,
+            setHeroImage,
             setActiveSubView 
         }) {
             const [searchQuery, setSearchQuery] = useState('');
             const [isSearchExpanded, setIsSearchExpanded] = useState(false);
 
             return (
-                <div className="px-6 py-4 space-y-6 animate-fadeIn">
+                <div className="px-5 py-4 space-y-6 animate-fadeIn">
                     
-                    {/* Heroic Personal Image Environment */}
-                    <div className="relative rounded-3xl overflow-hidden bg-neutral-900 text-white shadow-xl h-60 flex flex-col justify-end group">
+                    {/* Heroic Personal Image Environment with Cover Control Menu */}
+                    <div className="relative rounded-3xl overflow-hidden bg-neutral-900 text-white shadow-xl h-52 flex flex-col justify-end group">
                         {heroImage ? (
                             <img src={heroImage} className="absolute inset-0 w-full h-full object-cover opacity-75 group-hover:scale-105 transition-transform duration-700" />
                         ) : (
                             <div className="absolute inset-0 bg-gradient-to-br from-neutral-900 to-neutral-800"></div>
                         )}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent"></div>
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent"></div>
                         
-                        {/* Change Cover Management Menu Button */}
+                        {/* Change Cover Menu Button */}
                         <div className="absolute top-4 right-4 z-20">
                             <button 
                                 onClick={() => setShowHeroMenu(!showHeroMenu)}
@@ -245,7 +220,6 @@
                                 <span>⚙ Change Cover</span>
                             </button>
 
-                            {/* Dropdown Menu */}
                             {showHeroMenu && (
                                 <div className="absolute right-0 mt-2 w-48 bg-black border border-neutral-800 rounded-2xl shadow-2xl py-2 z-30 text-xs font-medium space-y-1">
                                     <button 
@@ -255,13 +229,13 @@
                                         <span>📁 Upload / Replace image</span>
                                     </button>
                                     <button 
-                                        onClick={handleRemoveHeroImage}
+                                        onClick={() => { setHeroImage(''); setShowHeroMenu(false); }}
                                         className="w-full text-left px-4 py-2 hover:bg-neutral-900 text-red-400 flex items-center space-x-2"
                                     >
                                         <span>✕ Remove image</span>
                                     </button>
                                     <button 
-                                        onClick={handleRestoreHeroDefault}
+                                        onClick={() => { setHeroImage('https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&q=80&w=1200'); setShowHeroMenu(false); }}
                                         className="w-full text-left px-4 py-2 hover:bg-neutral-900 text-[#FFD600] flex items-center space-x-2"
                                     >
                                         <span>↺ Restore default hero</span>
@@ -270,135 +244,98 @@
                             )}
                         </div>
 
-                        {/* Greeting Overlay */}
+                        {/* Greeting matching layout reference */}
                         <div className="relative z-10 p-6 space-y-1">
-                            <div className="inline-block bg-[#FFD600] text-black font-mono text-[10px] px-2 py-0.5 font-bold uppercase tracking-widest">
-                                [ ACTIVE SESSION ]
-                            </div>
-                            <h1 className="text-2xl font-black tracking-tight text-white">
-                                WELCOME, {userName.toUpperCase()}
-                            </h1>
-                            <p className="text-xs text-neutral-300 font-medium">
-                                Ready to continue your Cambridge academic journey?
+                            <h1 className="text-2xl font-black tracking-tight text-white">Welcome, {userName}!</h1>
+                            <p className="text-xs text-[#FFD600] font-semibold tracking-wide">
+                                Appear Rich — Premium Delivery, Delivered with Love.
                             </p>
                         </div>
                     </div>
 
-                    {/* Futuristic Academic Search Bar */}
-                    <div className="relative">
-                        <div 
-                            onClick={() => setIsSearchExpanded(true)}
-                            className={`flex items-center bg-neutral-50 border-2 transition-all rounded-2xl px-4 py-3 space-x-3 cursor-pointer ${isSearchExpanded ? 'border-black bg-white shadow-lg' : 'border-neutral-200'}`}
-                        >
-                            <span className="text-neutral-400">🔍</span>
-                            <input 
-                                type="text"
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                placeholder="Search your academic world..."
-                                className="bg-transparent text-xs font-medium flex-1 focus:outline-none text-black placeholder:text-neutral-400"
-                            />
-                            {searchQuery && (
-                                <button onClick={(e) => { e.stopPropagation(); setSearchQuery(''); }} className="text-xs text-neutral-400 hover:text-black">✕</button>
-                            )}
+                    {/* WE OFFER THIS Section matching layout reference */}
+                    <div className="space-y-3">
+                        <div className="flex items-center space-x-2 text-xs font-black tracking-wider text-neutral-800 uppercase">
+                            <span>📚</span>
+                            <span>WE OFFER THIS</span>
+                        </div>
+                        
+                        <div className="grid grid-cols-2 gap-4">
+                            {/* Hot Meals Card matching reference */}
+                            <div 
+                                onClick={() => setActiveSubView('academics')}
+                                className="relative rounded-3xl overflow-hidden h-40 bg-neutral-900 text-white p-4 flex flex-col justify-end shadow-md cursor-pointer group"
+                            >
+                                <div className="absolute inset-0 bg-cover bg-center opacity-70 group-hover:scale-105 transition-transform duration-500" style={{ backgroundImage: `url('https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&q=80&w=600')` }}></div>
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent"></div>
+                                <div className="relative z-10">
+                                    <h3 className="font-black text-lg text-white">Hot Meals</h3>
+                                    <p className="text-[10px] text-[#FFD600] font-semibold mt-0.5">Fastest Sourced Food</p>
+                                </div>
+                            </div>
+
+                            {/* Perfumes Card matching reference */}
+                            <div 
+                                onClick={() => setActiveSubView('library')}
+                                className="relative rounded-3xl overflow-hidden h-40 bg-neutral-900 text-white p-4 flex flex-col justify-end shadow-md cursor-pointer group"
+                            >
+                                <div className="absolute inset-0 bg-cover bg-center opacity-70 group-hover:scale-105 transition-transform duration-500" style={{ backgroundImage: `url('https://images.unsplash.com/photo-1523293182086-7651a899d37f?auto=format&fit=crop&q=80&w=600')` }}></div>
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent"></div>
+                                <div className="relative z-10">
+                                    <h3 className="font-black text-lg text-white">Perfumes</h3>
+                                    <p className="text-[10px] text-[#FFD600] font-semibold mt-0.5">Luxury Fragrances</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    {/* Academic Command Center Navigation Cards */}
-                    <div className="space-y-4">
-                        <div className="flex justify-between items-center">
-                            <h3 className="text-xs font-mono font-bold tracking-wider text-neutral-400 uppercase">[ ACADEMIC COMMAND CENTER ]</h3>
-                            <span className="text-[10px] font-mono text-neutral-400">EXPLORE MODULES</span>
+                    {/* Need Anything Specific? Card matching layout reference */}
+                    <div className="bg-white border border-neutral-200/80 rounded-3xl p-5 shadow-sm space-y-3">
+                        <div className="flex items-center space-x-2 text-xs font-black text-neutral-900">
+                            <span>❓</span>
+                            <span>Need Anything Specific?</span>
                         </div>
-
-                        <div className="grid grid-cols-2 gap-4">
-                            
-                            {/* Academics Card */}
-                            <div 
-                                onClick={() => setActiveSubView('academics')}
-                                className="bg-neutral-900 text-white rounded-3xl p-5 shadow-md flex flex-col justify-between h-36 cursor-pointer group hover:bg-black transition-all border border-neutral-800"
-                            >
-                                <div className="flex justify-between items-start">
-                                    <span className="text-xs font-mono text-[#FFD600]">[ 01 ]</span>
-                                    <span className="text-lg group-hover:scale-110 transition-transform">🎓</span>
-                                </div>
-                                <div>
-                                    <h4 className="font-black text-base text-white">Academics</h4>
-                                    <p className="text-[10px] text-neutral-400 mt-0.5">Courses, grades & timetable</p>
-                                </div>
-                            </div>
-
-                            {/* Events Card */}
-                            <div 
-                                onClick={() => setActiveSubView('events')}
-                                className="bg-[#FFD600] text-black rounded-3xl p-5 shadow-md flex flex-col justify-between h-36 cursor-pointer group hover:bg-yellow-400 transition-all border border-yellow-500"
-                            >
-                                <div className="flex justify-between items-start">
-                                    <span className="text-xs font-mono font-bold text-black/60">[ 02 ]</span>
-                                    <span className="text-lg group-hover:scale-110 transition-transform">📅</span>
-                                </div>
-                                <div>
-                                    <h4 className="font-black text-base text-black">Upcoming Events</h4>
-                                    <p className="text-[10px] text-black/70 mt-0.5">Lectures & deadlines</p>
-                                </div>
-                            </div>
-
-                            {/* Sports Card */}
-                            <div 
-                                onClick={() => setActiveSubView('sports')}
-                                className="bg-neutral-50 border-2 border-black rounded-3xl p-5 shadow-md flex flex-col justify-between h-36 cursor-pointer group hover:bg-black hover:text-white transition-all"
-                            >
-                                <div className="flex justify-between items-start">
-                                    <span className="text-xs font-mono text-neutral-400 group-hover:text-[#FFD600]">[ 03 ]</span>
-                                    <span className="text-lg group-hover:scale-110 transition-transform">⚽</span>
-                                </div>
-                                <div>
-                                    <h4 className="font-black text-base">University Sports</h4>
-                                    <p className="text-[10px] text-neutral-500 group-hover:text-neutral-400 mt-0.5">Matches & training</p>
-                                </div>
-                            </div>
-
-                            {/* Library Card */}
-                            <div 
-                                onClick={() => setActiveSubView('library')}
-                                className="bg-neutral-50 border-2 border-black rounded-3xl p-5 shadow-md flex flex-col justify-between h-36 cursor-pointer group hover:bg-black hover:text-white transition-all"
-                            >
-                                <div className="flex justify-between items-start">
-                                    <span className="text-xs font-mono text-neutral-400 group-hover:text-[#FFD600]">[ 04 ]</span>
-                                    <span className="text-lg group-hover:scale-110 transition-transform">📚</span>
-                                </div>
-                                <div>
-                                    <h4 className="font-black text-base">Digital Library</h4>
-                                    <p className="text-[10px] text-neutral-500 group-hover:text-neutral-400 mt-0.5">Research & notes</p>
-                                </div>
-                            </div>
-
+                        <p className="text-xs text-neutral-500 leading-relaxed font-medium">
+                            Describe your needs, custom order details, or ask any question directly.
+                        </p>
+                        <div className="flex items-center border border-neutral-200 rounded-2xl bg-neutral-50 px-3 py-1.5 space-x-2 focus-within:border-neutral-400">
+                            <input 
+                                type="text" 
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                placeholder="Type your request here..."
+                                className="bg-transparent text-xs flex-1 focus:outline-none text-neutral-800 placeholder:text-neutral-400 py-2"
+                            />
+                            <button className="bg-[#FFD600] text-black font-black text-xs px-5 py-2.5 rounded-xl hover:bg-amber-400 transition-all shadow-sm">
+                                Ask
+                            </button>
                         </div>
+                    </div>
 
-                        {/* Full-width Community Card */}
-                        <div 
-                            onClick={() => setActiveSubView('community')}
-                            className="bg-black text-white rounded-3xl p-5 shadow-md flex items-center justify-between cursor-pointer group hover:bg-neutral-900 transition-all border border-neutral-800"
+                    {/* Quick Reorder Card matching layout reference */}
+                    <div className="bg-white border border-neutral-200/80 rounded-3xl p-4 shadow-sm flex items-center justify-between">
+                        <div className="flex items-center space-x-3.5">
+                            <div className="w-11 h-11 rounded-2xl bg-[#FFD600]/20 text-neutral-900 font-black flex items-center justify-center text-base shrink-0">
+                                🔄
+                            </div>
+                            <div>
+                                <h4 className="font-black text-sm text-neutral-900">Quick Reorder</h4>
+                                <p className="text-[11px] text-neutral-500 mt-0.5 font-medium">Repeat your last saved order instantly</p>
+                            </div>
+                        </div>
+                        <button 
+                            onClick={() => setActiveSubView('events')}
+                            className="border border-[#FFD600] px-5 py-2 rounded-2xl text-xs font-black text-neutral-900 hover:bg-[#FFD600] transition-all"
                         >
-                            <div className="flex items-center space-x-4">
-                                <div className="w-10 h-10 rounded-2xl bg-[#FFD600] text-black font-black flex items-center justify-center text-sm">
-                                    👥
-                                </div>
-                                <div>
-                                    <h4 className="font-black text-sm text-white">University Community</h4>
-                                    <p className="text-[10px] text-neutral-400 mt-0.5">Student groups, societies & discussions</p>
-                                </div>
-                            </div>
-                            <span className="text-[#FFD600] font-bold text-sm group-hover:translate-x-1 transition-transform">→</span>
-                        </div>
-
+                            Reorder
+                        </button>
                     </div>
 
                 </div>
             );
         }
 
-        // 3. AI COMPANION VIEW
+        // AI COMPANION VIEW
         function AICampanionView({ userName }) {
             const [messages, setMessages] = useState([
                 { sender: 'ai', text: `Hello ${userName}. I'm your Cambridge AI Academic Mentor. You've improved your mathematics performance by 18% this month. I recommend revisiting integration before Friday's lecture.` }
@@ -425,7 +362,7 @@
                         <div className="flex items-center justify-between border-b border-neutral-100 pb-3">
                             <div className="flex items-center space-x-2">
                                 <div className="w-3 h-3 rounded-full bg-[#FFD600] animate-pulse"></div>
-                                <h2 className="font-black text-sm tracking-tight">APPEARICH AI MENTOR</h2>
+                                <h2 className="font-black text-sm tracking-tight">APPEARICH AI GUIDE</h2>
                             </div>
                             <span className="text-[10px] font-mono bg-neutral-100 px-2 py-0.5 rounded-full">SOCRATIC ENGINE</span>
                         </div>
@@ -443,7 +380,7 @@
                         </div>
 
                         {/* Chat Messages */}
-                        <div className="space-y-3 overflow-y-auto max-h-60 pr-1">
+                        <div className="space-y-3 overflow-y-auto max-h-52 pr-1">
                             {messages.map((m, i) => (
                                 <div key={i} className={`flex ${m.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
                                     <div className={`max-w-[85%] rounded-2xl p-4 text-xs font-medium leading-relaxed ${m.sender === 'user' ? 'bg-[#FFD600] text-black font-bold' : 'bg-neutral-100 text-black border border-neutral-200'}`}>
@@ -463,7 +400,7 @@
                                 value={input}
                                 onChange={(e) => setInput(e.target.value)}
                                 onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-                                placeholder="Ask AI anything about your courses..."
+                                placeholder="Ask AI anything about your orders or studies..."
                                 className="bg-transparent text-xs flex-1 focus:outline-none text-black placeholder:text-neutral-400"
                             />
                             <button 
@@ -478,89 +415,39 @@
             );
         }
 
-        // 4. ACTIVITY / JOURNEY VIEW
+        // BOOKINGS / ACTIVITY JOURNEY VIEW
         function ActivityJourneyView() {
             return (
                 <div className="p-6 space-y-6">
                     <div className="space-y-1">
-                        <div className="text-[10px] font-mono text-neutral-400 uppercase tracking-widest">[ ACADEMIC INTELLIGENCE ]</div>
-                        <h2 className="text-xl font-black tracking-tight">Your Learning Journey</h2>
+                        <div className="text-[10px] font-mono text-neutral-400 uppercase tracking-widest">[ BOOKINGS & ACTIVITY ]</div>
+                        <h2 className="text-xl font-black tracking-tight">Your Active Bookings</h2>
                     </div>
 
-                    {/* Stats Grid */}
-                    <div className="grid grid-cols-3 gap-3">
-                        <div className="bg-neutral-50 border border-neutral-200 rounded-2xl p-3 text-center">
-                            <div className="text-[10px] font-mono text-neutral-400">COURSES</div>
-                            <div className="text-lg font-black text-black mt-1">4 / 6</div>
-                        </div>
-                        <div className="bg-neutral-50 border border-neutral-200 rounded-2xl p-3 text-center">
-                            <div className="text-[10px] font-mono text-neutral-400">STUDY TIME</div>
-                            <div className="text-lg font-black text-black mt-1">42 hrs</div>
-                        </div>
-                        <div className="bg-neutral-50 border border-neutral-200 rounded-2xl p-3 text-center">
-                            <div className="text-[10px] font-mono text-neutral-400">STREAK</div>
-                            <div className="text-lg font-black text-[#FFD600] bg-black rounded-lg mt-1">12 d</div>
-                        </div>
-                    </div>
-
-                    {/* Smart Progress Insights */}
                     <div className="space-y-3">
-                        <h3 className="text-xs font-mono font-bold text-neutral-400 uppercase">[ SMART PROGRESS INSIGHTS ]</h3>
-                        
-                        <div className="bg-neutral-900 text-white rounded-3xl p-5 space-y-4 shadow-md">
+                        <div className="border border-neutral-200 rounded-2xl p-4 bg-neutral-50 space-y-2">
                             <div className="flex justify-between items-center">
-                                <span className="text-[10px] font-mono text-[#FFD600]">[ YOU'RE DOING WELL ]</span>
-                                <span className="text-xs font-bold text-green-400">92%</span>
+                                <span className="text-[10px] font-mono bg-[#FFD600] text-black px-2 py-0.5 font-bold">CONFIRMED</span>
+                                <span className="text-xs font-bold">Order #9924</span>
                             </div>
-                            <div>
-                                <h4 className="font-black text-sm">Advanced Mathematics</h4>
-                                <div className="w-full bg-neutral-800 h-2 rounded-full mt-2 overflow-hidden">
-                                    <div className="bg-[#FFD600] h-full w-[92%]"></div>
-                                </div>
-                            </div>
+                            <h4 className="font-black text-sm">Luxury Fragrance Box & Hot Meal Delivery</h4>
+                            <p className="text-[10px] text-neutral-500">Scheduled for Today • 04:30 PM</p>
                         </div>
 
-                        <div className="bg-neutral-50 border border-neutral-200 rounded-3xl p-5 space-y-4">
+                        <div className="border border-neutral-200 rounded-2xl p-4 bg-neutral-50 space-y-2 opacity-75">
                             <div className="flex justify-between items-center">
-                                <span className="text-[10px] font-mono text-amber-600 font-bold">[ NEEDS ATTENTION ]</span>
-                                <span className="text-xs font-bold text-amber-600">58%</span>
+                                <span className="text-[10px] font-mono bg-neutral-200 text-neutral-700 px-2 py-0.5 font-bold">COMPLETED</span>
+                                <span className="text-xs font-bold">Order #8810</span>
                             </div>
-                            <div>
-                                <h4 className="font-black text-sm">Physics Laboratory Mechanics</h4>
-                                <div className="w-full bg-neutral-200 h-2 rounded-full mt-2 overflow-hidden">
-                                    <div className="bg-black h-full w-[58%]"></div>
-                                </div>
-                            </div>
+                            <h4 className="font-black text-sm">Advanced Cambridge Course Materials</h4>
+                            <p className="text-[10px] text-neutral-500">Delivered on August 8th</p>
                         </div>
                     </div>
-
-                    {/* Milestone Timeline */}
-                    <div className="space-y-3">
-                        <h3 className="text-xs font-mono font-bold text-neutral-400 uppercase">[ PATHWAY MILESTONES ]</h3>
-                        <div className="space-y-2 border-l-2 border-black pl-4 ml-2">
-                            <div className="relative">
-                                <div className="absolute -left-[21px] top-1 w-2.5 h-2.5 rounded-full bg-[#FFD600] border-2 border-black"></div>
-                                <h4 className="font-black text-xs">Course Enrolled & Verified</h4>
-                                <p className="text-[10px] text-neutral-400">Completed on August 1st</p>
-                            </div>
-                            <div className="relative pt-2">
-                                <div className="absolute -left-[21px] top-3 w-2.5 h-2.5 rounded-full bg-black"></div>
-                                <h4 className="font-black text-xs">First Lecture Series Mastered</h4>
-                                <p className="text-[10px] text-neutral-400">Completed 5 assignments</p>
-                            </div>
-                            <div className="relative pt-2">
-                                <div className="absolute -left-[21px] top-3 w-2.5 h-2.5 rounded-full bg-neutral-300"></div>
-                                <h4 className="font-black text-xs text-neutral-400">Final Examination Preparation</h4>
-                                <p className="text-[10px] text-neutral-400">Upcoming milestone</p>
-                            </div>
-                        </div>
-                    </div>
-
                 </div>
             );
         }
 
-        // 5. PROFILE VIEW
+        // PROFILE VIEW
         function ProfileView({ userName, heroImage, onLogout }) {
             return (
                 <div className="p-6 space-y-6">
@@ -572,7 +459,7 @@
                             <h2 className="font-black text-lg tracking-tight">{userName}</h2>
                             <p className="text-xs text-neutral-500">Cambridge Student ID: #CAM-88293</p>
                             <span className="inline-block mt-1 bg-[#FFD600] text-black font-mono text-[9px] px-2 py-0.5 font-bold uppercase">
-                                B.A. Hons Computer Science & Physics
+                                Premium Member & Scholar
                             </span>
                         </div>
                     </div>
@@ -609,20 +496,20 @@
             );
         }
 
-        // Subviews for Command Center Cards
+        // Subviews for detailed cards
         function AcademicsView({ onBack }) {
             return (
                 <div className="p-6 space-y-4 animate-fadeIn">
-                    <button onClick={onBack} className="text-xs font-mono font-bold text-neutral-500 hover:text-black">← BACK TO DASHBOARD</button>
-                    <h2 className="text-xl font-black">Academics Environment</h2>
+                    <button onClick={onBack} className="text-xs font-mono font-bold text-neutral-500 hover:text-black">← BACK TO HOME</button>
+                    <h2 className="text-xl font-black">Hot Meals & Culinary Selection</h2>
                     <div className="space-y-3">
-                        {['Advanced Calculus & Linear Algebra', 'Quantum Mechanics & Wave Theory', 'Algorithm Complexity & Data Structures', 'Cambridge Academic Research Methodology'].map((c, i) => (
+                        {['Artisanal Burger & Truffle Fries', 'Sourced Organic Salad Bowl', 'Chef Special Gourmet Pasta'].map((c, i) => (
                             <div key={i} className="border border-neutral-200 rounded-2xl p-4 bg-neutral-50 space-y-1">
-                                <span className="text-[10px] font-mono text-neutral-400">[ COURSE 0{i+1} ]</span>
+                                <span className="text-[10px] font-mono text-neutral-400">[ ITEM 0{i+1} ]</span>
                                 <h4 className="font-bold text-sm">{c}</h4>
                                 <div className="flex justify-between text-[10px] text-neutral-500 pt-2">
-                                    <span>Lectures: 24 completed</span>
-                                    <span className="font-bold text-black">Status: Active</span>
+                                    <span>Fastest Sourceding</span>
+                                    <span className="font-bold text-black">Available</span>
                                 </div>
                             </div>
                         ))}
@@ -634,52 +521,34 @@
         function EventsView({ onBack }) {
             return (
                 <div className="p-6 space-y-4 animate-fadeIn">
-                    <button onClick={onBack} className="text-xs font-mono font-bold text-neutral-500 hover:text-black">← BACK TO DASHBOARD</button>
-                    <h2 className="text-xl font-black">Upcoming University Events</h2>
+                    <button onClick={onBack} className="text-xs font-mono font-bold text-neutral-500 hover:text-black">← BACK TO HOME</button>
+                    <h2 className="text-xl font-black">Quick Reorder History</h2>
                     <div className="space-y-3">
                         <div className="bg-[#FFD600] text-black border border-yellow-500 rounded-2xl p-4 space-y-1">
-                            <span className="text-[10px] font-mono font-bold">14 AUG • 10:00 AM</span>
-                            <h4 className="font-black text-sm">Advanced Mathematics Lecture</h4>
-                            <p className="text-[10px] text-black/80">Science Building, Hall 3</p>
-                        </div>
-                        <div className="bg-neutral-50 border border-neutral-200 rounded-2xl p-4 space-y-1">
-                            <span className="text-[10px] font-mono text-neutral-500">16 AUG • 02:00 PM</span>
-                            <h4 className="font-black text-sm">Cambridge AI Colloquium Seminar</h4>
-                            <p className="text-[10px] text-neutral-500">Computer Laboratory, Turing Room</p>
+                            <span className="text-[10px] font-mono font-bold">LAST SAVED ORDER</span>
+                            <h4 className="font-black text-sm">Gourmet Burger Combo & Signature Perfume</h4>
+                            <p className="text-[10px] text-black/80">Delivered 3 days ago</p>
                         </div>
                     </div>
                 </div>
             );
         }
 
-        function SportsView({ onBack }) {
-            return (
-                <div className="p-6 space-y-4 animate-fadeIn">
-                    <button onClick={onBack} className="text-xs font-mono font-bold text-neutral-500 hover:text-black">← BACK TO DASHBOARD</button>
-                    <h2 className="text-xl font-black">University Sports</h2>
-                    <div className="space-y-3">
-                        <div className="border border-neutral-200 rounded-2xl p-4 bg-neutral-50 space-y-1">
-                            <span className="text-[10px] font-mono text-neutral-400">FOOTBALL • TRAINING SESSION</span>
-                            <h4 className="font-bold text-sm">Varsity Pitch A — Thursday 4 PM</h4>
-                        </div>
-                    </div>
-                </div>
-            );
-        }
-
+        function SportsView({ onBack }) { return <div className="p-6"><button onClick={onBack} className="text-xs font-mono font-bold text-neutral-500">← BACK</button></div>; }
+        
         function LibraryView({ onBack }) {
             return (
                 <div className="p-6 space-y-4 animate-fadeIn">
-                    <button onClick={onBack} className="text-xs font-mono font-bold text-neutral-500 hover:text-black">← BACK TO DASHBOARD</button>
-                    <h2 className="text-xl font-black">Digital Knowledge Vault</h2>
+                    <button onClick={onBack} className="text-xs font-mono font-bold text-neutral-500 hover:text-black">← BACK TO HOME</button>
+                    <h2 className="text-xl font-black">Luxury Fragrances & Perfumes</h2>
                     <div className="space-y-3">
-                        {['Cambridge Physics Compendium 2025', 'MIT OpenCourseWare Notes: Artificial Intelligence', 'Stanford Linear Algebra Lecture Handouts'].map((lib, i) => (
+                        {['Appearich Signature Noir', 'Golden Amber Essence', 'Cambridge Botanical Elegance'].map((lib, i) => (
                             <div key={i} className="border border-neutral-200 rounded-2xl p-4 bg-neutral-50 flex justify-between items-center">
                                 <div>
-                                    <span className="text-[10px] font-mono text-neutral-400">[ VAULT RESOURCE ]</span>
+                                    <span className="text-[10px] font-mono text-neutral-400">[ FRAGRANCE VAULT ]</span>
                                     <h4 className="font-bold text-sm mt-0.5">{lib}</h4>
                                 </div>
-                                <span className="text-xs font-bold text-[#FFD600] bg-black px-3 py-1 rounded-xl">Read</span>
+                                <span className="text-xs font-bold text-black bg-[#FFD600] px-3 py-1 rounded-xl">Select</span>
                             </div>
                         ))}
                     </div>
@@ -687,21 +556,7 @@
             );
         }
 
-        function CommunityView({ onBack }) {
-            return (
-                <div className="p-6 space-y-4 animate-fadeIn">
-                    <button onClick={onBack} className="text-xs font-mono font-bold text-neutral-500 hover:text-black">← BACK TO DASHBOARD</button>
-                    <h2 className="text-xl font-black">University Community</h2>
-                    <div className="space-y-3">
-                        <div className="border border-neutral-200 rounded-2xl p-4 bg-neutral-50 space-y-1">
-                            <span className="text-[10px] font-mono text-neutral-400">ACTIVE DISCUSSION GROUP</span>
-                            <h4 className="font-bold text-sm">Cambridge Quantum Computing Society</h4>
-                            <p className="text-[10px] text-neutral-500">142 active members online discussing algorithms</p>
-                        </div>
-                    </div>
-                </div>
-            );
-        }
+        function CommunityView({ onBack }) { return <div className="p-6"><button onClick={onBack} className="text-xs font-mono font-bold text-neutral-500">← BACK</button></div>; }
 
         ReactDOM.createRoot(document.getElementById('root')).render(<App />);
     </script>
