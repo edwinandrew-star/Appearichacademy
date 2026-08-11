@@ -410,7 +410,7 @@
     }
 
     /* ========================================================= */
-    /* 1. REFINED ACADEMIC CORE (PREMIUM UI IDENTITY)            */
+    /* ACADEMIC CORE (ELEVATED CARD DESIGN)                      */
     /* ========================================================= */
     .academic-core-container {
       margin-bottom: 28px;
@@ -422,11 +422,11 @@
       overflow-x: auto;
       padding: 4px 4px 16px 4px;
       scroll-snap-type: x mandatory;
-      scrollbar-width: none; /* Firefox */
-      -ms-overflow-style: none; /* IE/Edge */
+      scrollbar-width: none;
+      -ms-overflow-style: none;
     }
     .academic-scroll-wrapper::-webkit-scrollbar {
-      display: none; /* Chrome/Safari */
+      display: none;
     }
 
     .academic-card {
@@ -451,7 +451,7 @@
       border-color: var(--accent-gold-border);
       box-shadow: 0 14px 28px -6px var(--accent-gold-glow);
     }
-    /* Subtle 3D background watermark layer */
+    /* Subtle background glow element */
     .academic-card::before {
       content: '';
       position: absolute;
@@ -468,6 +468,7 @@
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
+      z-index: 2;
     }
     .academic-icon-box {
       width: 42px;
@@ -495,6 +496,7 @@
     }
     .academic-card-mid {
       margin-top: 10px;
+      z-index: 2;
     }
     .academic-card-title {
       font-size: 1rem;
@@ -508,10 +510,10 @@
       margin-top: 3px;
     }
     
-    /* Academic Mini Progress Visualizers */
     .academic-card-bottom {
       margin-top: auto;
       width: 100%;
+      z-index: 2;
     }
     .academic-progress-info {
       display: flex;
@@ -535,8 +537,7 @@
     }
 
     /* ========================================================= */
-    /* 3 & 4. COMPACT 2x2 PHOTOGRAPHIC GRID                      */
-    /* Minimal, medium-sized cards (Not giant hero banners)      */
+    /* COMPACT 2x2 PHOTOGRAPHIC GRID                            */
     /* ========================================================= */
     .photo-grid-2x2 {
       display: grid;
@@ -549,7 +550,7 @@
 
     .photo-card {
       position: relative;
-      height: 120px; /* Refined compact height */
+      height: 120px;
       border-radius: 18px;
       overflow: hidden;
       cursor: pointer;
@@ -560,7 +561,7 @@
       transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    /* 6. DYNAMIC POP-IN ANIMATION: LEFT <-> RIGHT */
+    /* DYNAMIC ANIMATION STATES */
     .photo-card.slide-left {
       transform: translateX(-40px) scale(0.95);
     }
@@ -584,7 +585,6 @@
       filter: brightness(0.55) contrast(1.1);
     }
 
-    /* 5. PHOTO TITLES (DIRECTLY INSIDE IMAGE) */
     .photo-card-overlay {
       position: absolute;
       inset: 0;
@@ -934,9 +934,7 @@
         <input type="text" placeholder="Search courses, lectures, assignments, or resources..." id="globalSearchInput" oninput="handleGlobalSearch(this.value)">
       </div>
 
-      <!-- ========================================================= -->
-      <!-- 1 & 2. ACADEMIC CORE — HORIZONTAL PRESERVED & ELEVATED     -->
-      <!-- ========================================================= -->
+      <!-- ACADEMIC CORE -->
       <div class="academic-core-container">
         <div class="section-header-title">
           <span><i class="fa-solid fa-graduation-cap" style="color: var(--accent-gold);"></i> Academic Core</span>
@@ -1052,15 +1050,8 @@
 
         </div>
       </div>
-      <!-- ========================================================= -->
-      <!-- END OF ACADEMIC CORE                                      -->
-      <!-- ========================================================= -->
 
-
-      <!-- ========================================================= -->
-      <!-- 3, 4, 5 & 6. COMPACT 2x2 PHOTOGRAPHIC GRID                -->
-      <!-- Minimal photo cards + LEFT -> RIGHT dynamic animation      -->
-      <!-- ========================================================= -->
+      <!-- COMPACT 2x2 PHOTOGRAPHIC GRID -->
       <div class="photo-grid-2x2" id="photoGridContainer">
         
         <!-- ROW 1: EVENTS (LEFT) | COMMUNITY (RIGHT) -->
@@ -1080,7 +1071,8 @@
 
         <!-- ROW 2: SPORTS (LEFT) | LIBRARY (RIGHT) -->
         <div class="photo-card slide-left" onclick="openSectionModal('SPORTS')">
-          <img src="https://images.unsplash.com/photo-1517649763962-0c623266ddc0?q=80&w=600&auto=format&fit=cover" alt="Sports">
+          <!-- RELIABLE SPORTS ASSET URL DIRECTLY REPLACED -->
+          <img src="https://images.unsplash.com/photo-1461896836934-ffe607ba8211?q=80&w=600&auto=format&fit=cover" alt="Sports">
           <div class="photo-card-overlay">
             <div class="photo-card-title">SPORTS</div>
           </div>
@@ -1273,7 +1265,7 @@
           "Sports Activities & Events"
         ],
         photos: [
-          "https://images.unsplash.com/photo-1517649763962-0c623266ddc0?q=80&w=400&auto=format&fit=cover"
+          "https://images.unsplash.com/photo-1461896836934-ffe607ba8211?q=80&w=400&auto=format&fit=cover"
         ]
       },
       LIBRARY: {
@@ -1291,7 +1283,6 @@
     };
 
     window.addEventListener('DOMContentLoaded', () => {
-      // Force initial startup theme
       const savedTheme = localStorage.getItem('appearich_theme_mode');
       if (savedTheme) {
         document.documentElement.setAttribute('data-theme', savedTheme);
@@ -1301,7 +1292,6 @@
         localStorage.setItem('appearich_theme_mode', 'light');
       }
 
-      // Load section media store from storage if available
       const storedMedia = localStorage.getItem('appearich_section_stores');
       if (storedMedia) sectionStores = JSON.parse(storedMedia);
 
@@ -1322,7 +1312,6 @@
       setupScrollTriggerObserver();
     });
 
-    /* SCROLL TRIGGERED DYNAMIC LEFT ↔ RIGHT ANIMATIONS */
     function setupScrollTriggerObserver() {
       const observerOptions = {
         root: null,
@@ -1342,7 +1331,6 @@
       photoCards.forEach(card => observer.observe(card));
     }
 
-    /* AUTHENTICATION FLOW */
     function toggleAuthMode() {
       isRegisterState = !isRegisterState;
       document.getElementById('authTitleText').innerText = isRegisterState ? "Create Scholar ID" : "Welcome Scholar";
@@ -1426,7 +1414,6 @@
       }
     }
 
-    /* HERO UPLOAD LOGIC */
     function triggerHeroUploadDialog() {
       document.getElementById('heroFileInput').click();
     }
@@ -1443,7 +1430,6 @@
       reader.readAsDataURL(file);
     }
 
-    /* SECTION MODAL & MEDIA STORAGE SYSTEM */
     function openSectionModal(sectionKey) {
       currentSectionKey = sectionKey;
       const data = sectionStores[sectionKey];
