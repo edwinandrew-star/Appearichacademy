@@ -23,416 +23,137 @@
     <!-- Babel for in-browser JSX transformation -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 </head>
-<body class="bg-white text-black font-sans selection:bg-[#FFD600] selection:text-black">
+<body class="bg-neutral-100 text-black font-sans selection:bg-[#FFD600] selection:text-black">
     <div id="root"></div>
 
     <script type="text/babel">
         const { useState, useEffect } = React;
 
         function App() {
-            const [currentView, setCurrentView] = useState('landing');
+            const [currentTab, setCurrentTab] = useState('Home');
             const [studentName] = useState('William');
-            const [coreRotation, setCoreRotation] = useState(0);
-
-            useEffect(() => {
-                const interval = setInterval(() => {
-                    setCoreRotation((prev) => (prev + 1) % 360);
-                }, 50);
-                return () => clearInterval(interval);
-            }, []);
+            const [aiInput, setAiInput] = useState('');
 
             return (
-                <div className="min-h-screen bg-white text-black font-sans">
-                    {currentView === 'landing' && <LandingPage onEnter={() => setCurrentView('campus')} />}
-                    {currentView === 'campus' && <CampusDashboard studentName={studentName} coreRotation={coreRotation} onViewChange={setCurrentView} />}
-                    {currentView === 'tutor' && <AITutorRoom onBack={() => setCurrentView('campus')} />}
-                    {currentView === 'exam' && <ExamHall onBack={() => setCurrentView('campus')} />}
-                    {currentView === 'lab' && <Lab3D onBack={() => setCurrentView('campus')} />}
-                    {currentView === 'library' && <KnowledgeVault onBack={() => setCurrentView('campus')} />}
-                    {currentView === 'arena' && <Arena onBack={() => setCurrentView('campus')} />}
-                    {currentView === 'observatory' && <Observatory onBack={() => setCurrentView('campus')} />}
-                    {currentView === 'commons' && <Commons onBack={() => setCurrentView('campus')} />}
-                    {currentView === 'studio' && <Studio onBack={() => setCurrentView('campus')} />}
-                </div>
-            );
-        }
-
-        // 1. LANDING PAGE
-        function LandingPage({ onEnter }) {
-            return (
-                <div className="relative min-h-screen flex flex-col justify-between p-8 md:p-16 bg-white overflow-hidden">
-                    <nav className="flex justify-between items-center z-10">
-                        <div className="text-2xl font-black tracking-tighter">
-                            APPEARICH<span className="text-[#FFD600]">.</span>
+                <div className="max-w-md mx-auto min-h-screen bg-white text-black flex flex-col justify-between shadow-2xl relative pb-20">
+                    
+                    {/* Top Bar */}
+                    <header className="flex justify-between items-center px-6 pt-6 pb-4">
+                        <div className="w-10 h-10 rounded-full border border-neutral-200 flex items-center justify-center cursor-pointer hover:bg-neutral-50">
+                            ←
                         </div>
-                        <button onClick={onEnter} className="bg-black text-white px-6 py-3 font-bold text-sm tracking-wider hover:bg-[#FFD600] hover:text-black transition-all duration-300 shadow-xl">
-                            ENTER APPEARICH →
-                        </button>
-                    </nav>
-
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center my-auto z-10">
-                        <div className="space-y-6">
-                            <div className="inline-block bg-black text-[#FFD600] px-3 py-1 text-xs font-mono tracking-widest uppercase">
-                                [ DIGITAL CAMPUS V2.6 ]
-                            </div>
-                            <h1 className="text-6xl md:text-8xl font-black tracking-tighter leading-none">
-                                LEARNING<br />JUST GOT<br />
-                                <span className="text-[#FFD600] bg-black px-2">REIMAGINED.</span>
-                            </h1>
-                            <p className="text-xl text-neutral-600 max-w-lg font-medium">
-                                A new digital learning universe combining Cambridge academic depth, MIT open access, and Stanford innovation.
-                            </p>
-                            <div className="flex flex-wrap gap-4 pt-4">
-                                <button onClick={onEnter} className="bg-[#FFD600] text-black font-extrabold px-8 py-4 text-base hover:bg-black hover:text-[#FFD600] transition-all duration-300 shadow-lg">
-                                    ENTER APPEARICH →
-                                </button>
-                                <button onClick={onEnter} className="border-2 border-black text-black font-extrabold px-8 py-4 text-base hover:bg-black hover:text-white transition-all duration-300">
-                                    EXPLORE THE EXPERIENCE
-                                </button>
-                            </div>
+                        <div className="flex items-center space-x-2 font-black text-lg tracking-tight">
+                            <span className="w-5 h-5 bg-black text-[#FFD600] flex items-center justify-center text-xs">◆</span>
+                            <span>Appearich</span>
                         </div>
-
-                        <div className="relative flex justify-center items-center h-96">
-                            <div className="absolute w-72 h-72 rounded-full bg-black flex items-center justify-center shadow-2xl animate-pulse">
-                                <div className="absolute inset-2 rounded-full border border-neutral-800 flex items-center justify-center">
-                                    <div className="w-48 h-48 rounded-full border border-[#FFD600]/40 flex items-center justify-center">
-                                        <div className="w-24 h-24 rounded-full bg-[#FFD600] blur-md opacity-80"></div>
-                                    </div>
-                                </div>
-                                <div className="text-center z-20 text-white font-mono text-xs tracking-widest">
-                                    [ THE CORE ]<br />
-                                    <span className="text-[#FFD600] text-lg font-bold">KNOWLEDGE IN MOTION</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="flex justify-between items-center text-xs font-mono text-neutral-400 z-10 pt-8 border-t border-neutral-100">
-                        <div>CAMBRIDGE IGCSE / A-LEVEL ECOSYSTEM</div>
-                        <div>LEARN. EXPLORE. LEVEL UP.</div>
-                    </div>
-                </div>
-            );
-        }
-
-        // 2. CAMPUS DASHBOARD
-        function CampusDashboard({ studentName, onViewChange }) {
-            return (
-                <div className="min-h-screen bg-white text-black p-6 md:p-12">
-                    <header className="flex justify-between items-center pb-8 border-b border-black">
-                        <div>
-                            <span className="text-xs font-mono bg-[#FFD600] text-black px-2 py-0.5 font-bold">[ ACTIVE SESSION ]</span>
-                            <h2 className="text-3xl font-black tracking-tight mt-1">GOOD MORNING, {studentName.toUpperCase()}.</h2>
-                        </div>
-                        <div className="flex items-center space-x-4">
-                            <div className="text-right hidden sm:block">
-                                <div className="text-xs font-mono text-neutral-500">PHYSICS MASTERY</div>
-                                <div className="font-black text-[#FFD600] bg-black px-2 py-0.5 text-sm">+12% THIS WEEK</div>
-                            </div>
-                            <div className="w-12 h-12 bg-black text-[#FFD600] font-black flex items-center justify-center text-lg">
-                                {studentName[0]}
-                            </div>
+                        <div className="w-10 h-10 rounded-full border border-neutral-200 flex items-center justify-center cursor-pointer hover:bg-neutral-50">
+                            🌙
                         </div>
                     </header>
 
-                    <section className="grid grid-cols-1 md:grid-cols-3 gap-6 my-8">
-                        <div className="bg-black text-white p-6 border-l-4 border-[#FFD600] shadow-xl">
-                            <div className="text-xs font-mono text-[#FFD600] mb-2">[ WHAT'S NEXT ]</div>
-                            <h3 className="text-xl font-bold">Physics — Waves & Optics</h3>
-                            <p className="text-sm text-neutral-400 mt-1">Continue where you stopped.</p>
-                            <button onClick={() => onViewChange('tutor')} className="mt-4 bg-[#FFD600] text-black font-bold px-4 py-2 text-xs hover:bg-white transition-all">
-                                RESUME →
+                    {/* Main Content Area */}
+                    <main className="px-6 flex-1 space-y-6 pb-6 overflow-y-auto">
+                        
+                        {/* Hero Welcome Card */}
+                        <div className="relative rounded-3xl overflow-hidden bg-neutral-900 text-white p-6 shadow-lg h-48 flex flex-col justify-end">
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent z-0"></div>
+                            <div className="absolute top-4 right-4 bg-[#FFD600] text-black font-mono text-[10px] px-2 py-0.5 font-bold z-10">
+                                [ DIGITAL CAMPUS ]
+                            </div>
+                            <div className="relative z-10 space-y-1">
+                                <h1 className="text-2xl font-black tracking-tight">Welcome, {studentName}!</h1>
+                                <p className="text-xs text-neutral-300 font-medium">
+                                    Appearich — Cambridge Learning, Delivered with Academic Excellence.
+                                </p>
+                            </div>
+                        </div>
+
+                        {/* We Offer This Section */}
+                        <div className="space-y-3">
+                            <div className="flex items-center space-x-2 text-xs font-black tracking-wider uppercase">
+                                <span>📚</span>
+                                <span>WE OFFER THIS</span>
+                            </div>
+                            
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="relative rounded-2xl overflow-hidden h-36 bg-neutral-900 text-white p-4 flex flex-col justify-end shadow-md cursor-pointer group">
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 to-transparent z-0"></div>
+                                    <div className="relative z-10">
+                                        <h3 className="font-black text-base group-hover:text-[#FFD600] transition-colors">Digital Labs</h3>
+                                        <p className="text-[10px] text-neutral-300 mt-0.5">3D Physics & Bio Simulations</p>
+                                    </div>
+                                </div>
+
+                                <div className="relative rounded-2xl overflow-hidden h-36 bg-neutral-900 text-white p-4 flex flex-col justify-end shadow-md cursor-pointer group">
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 to-transparent z-0"></div>
+                                    <div className="relative z-10">
+                                        <h3 className="font-black text-base group-hover:text-[#FFD600] transition-colors">Knowledge Vault</h3>
+                                        <p className="text-[10px] text-neutral-300 mt-0.5">Cambridge Notes & Past Papers</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Need Anything Specific? (AI Prompt Card) */}
+                        <div className="bg-white border border-neutral-200 rounded-3xl p-5 shadow-sm space-y-3">
+                            <div className="flex items-center space-x-2 text-xs font-bold">
+                                <span>❓</span>
+                                <span>Need Anything Specific?</span>
+                            </div>
+                            <p className="text-xs text-neutral-500 leading-relaxed">
+                                Describe your study goals, request custom practice questions, or ask the AI tutor anything directly.
+                            </p>
+                            <div className="flex items-center border border-neutral-200 rounded-2xl bg-neutral-50 px-3 py-2 space-x-2">
+                                <input 
+                                    type="text" 
+                                    value={aiInput}
+                                    onChange={(e) => setAiInput(e.target.value)}
+                                    placeholder="Type your request here..."
+                                    className="bg-transparent text-xs flex-1 focus:outline-none text-black"
+                                />
+                                <button className="bg-[#FFD600] text-black font-black text-xs px-4 py-2 rounded-xl hover:bg-black hover:text-white transition-all">
+                                    Ask
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Quick Reorder / Quick Resume Card */}
+                        <div className="bg-white border border-neutral-200 rounded-3xl p-5 shadow-sm flex items-center justify-between">
+                            <div className="flex items-center space-x-3">
+                                <div className="w-10 h-10 rounded-2xl bg-[#FFD600]/20 text-black font-black flex items-center justify-center text-sm">
+                                    ⚡
+                                </div>
+                                <div>
+                                    <h4 className="font-black text-sm">Quick Resume</h4>
+                                    <p className="text-[10px] text-neutral-500 mt-0.5">Repeat your last active study session instantly</p>
+                                </div>
+                            </div>
+                            <button className="border border-neutral-300 px-4 py-2 rounded-2xl text-xs font-bold hover:border-black hover:bg-black hover:text-white transition-all">
+                                Resume
                             </button>
                         </div>
 
-                        <div className="bg-neutral-50 border-2 border-black p-6 shadow-xl">
-                            <div className="text-xs font-mono text-neutral-500 mb-2">[ YOU'RE CLOSE ]</div>
-                            <h3 className="text-xl font-black">Mathematics Mastery</h3>
-                            <div className="w-full bg-neutral-200 h-3 mt-3 overflow-hidden">
-                                <div className="bg-[#FFD600] h-full w-[91%]"></div>
-                            </div>
-                            <div className="text-right text-xs font-bold mt-1">91% COMPLETE</div>
-                        </div>
-
-                        <div className="bg-[#FFD600] text-black p-6 border-2 border-black shadow-xl">
-                            <div className="text-xs font-mono font-bold mb-2">[ DON'T FORGET ]</div>
-                            <h3 className="text-xl font-black">Chemistry Assignment</h3>
-                            <p className="text-sm mt-1 font-medium">Vector Problem Set & Lab Report.</p>
-                            <div className="mt-4 font-black text-xs uppercase tracking-wider bg-black text-[#FFD600] px-3 py-1 inline-block">
-                                DUE TOMORROW
-                            </div>
-                        </div>
-                    </section>
-
-                    <section className="my-12">
-                        <div className="flex justify-between items-end mb-6">
-                            <h3 className="text-2xl font-black tracking-tight">ENTER THE DIGITAL CAMPUS</h3>
-                            <span className="text-xs font-mono text-neutral-500">SELECT A DESTINATION</span>
-                        </div>
-
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                            {[
-                                { title: 'THE LIBRARY', desc: 'Knowledge Vault & Notes', view: 'library' },
-                                { title: 'THE LAB', desc: '3D Interactive Physics & Bio', view: 'lab' },
-                                { title: 'TUTORIAL ROOM', desc: 'Appearich AI Socratic Tutor', view: 'tutor' },
-                                { title: 'THE EXAM HALL', desc: 'Cambridge Mock Simulations', view: 'exam' },
-                                { title: 'THE ARENA', desc: 'Challenges & Speed Rounds', view: 'arena' },
-                                { title: 'THE OBSERVATORY', desc: 'Learning Analytics & Galaxy', view: 'observatory' },
-                                { title: 'THE COMMONS', desc: 'Student Community & Groups', view: 'commons' },
-                                { title: 'THE STUDIO', desc: 'Personal Workspace & Notes', view: 'studio' },
-                            ].map((building, idx) => (
-                                <div 
-                                    key={idx}
-                                    onClick={() => onViewChange(building.view)}
-                                    className="group border-2 border-black p-6 bg-white hover:bg-black hover:text-white transition-all duration-300 cursor-pointer shadow-lg relative overflow-hidden"
-                                >
-                                    <div className="absolute top-0 right-0 w-2 h-2 bg-[#FFD600] opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                                    <div className="text-xs font-mono text-neutral-400 group-hover:text-[#FFD600] mb-2">[ 0{idx + 1} ]</div>
-                                    <h4 className="text-lg font-black">{building.title}</h4>
-                                    <p className="text-xs text-neutral-600 group-hover:text-neutral-300 mt-2">{building.desc}</p>
-                                    <div className="mt-6 text-xs font-bold text-[#FFD600] opacity-0 group-hover:opacity-100 transition-opacity">
-                                        ENTER BUILDING →
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </section>
-                </div>
-            );
-        }
-
-        // 3. AI TUTORIAL ROOM
-        function AITutorRoom({ onBack }) {
-            const [messages, setMessages] = useState([
-                { sender: 'ai', text: "Welcome to the Tutorial Room, William. I'm Appearich AI. What concept are we dissecting today?" }
-            ]);
-            const [input, setInput] = useState('');
-
-            const handleSend = () => {
-                if (!input.trim()) return;
-                const userMsg = input;
-                setMessages((prev) => [...prev, { sender: 'user', text: userMsg }]);
-                setInput('');
-
-                setTimeout(() => {
-                    setMessages((prev) => [
-                        ...prev,
-                        { sender: 'ai', text: `Analyzing "${userMsg}"... Let's break this down Cambridge-style. Imagine you are plotting a curve of velocity over time—how would you calculate the instantaneous rate of change at precisely t = 2s?` }
-                    ]);
-                }, 800);
-            };
-
-            return (
-                <div className="min-h-screen bg-black text-white p-6 md:p-12 flex flex-col justify-between">
-                    <header className="flex justify-between items-center pb-6 border-b border-neutral-800">
-                        <div className="flex items-center space-x-4">
-                            <button onClick={onBack} className="border border-[#FFD600] text-[#FFD600] px-3 py-1 text-xs font-mono hover:bg-[#FFD600] hover:text-black transition-all">← EXIT TUTORIAL</button>
-                            <h2 className="text-xl font-black tracking-tight text-[#FFD600]">APPEARICH AI TUTOR</h2>
-                        </div>
-                        <div className="text-xs font-mono text-neutral-400">[ SOCRATIC MODE ACTIVE ]</div>
-                    </header>
-                    <div className="flex-1 my-6 space-y-4 overflow-y-auto max-w-4xl mx-auto w-full pr-4">
-                        {messages.map((msg, i) => (
-                            <div key={i} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
-                                <div className={`max-w-xl p-4 text-sm font-medium ${msg.sender === 'user' ? 'bg-[#FFD600] text-black' : 'bg-neutral-900 border border-neutral-800 text-white'}`}>
-                                    <div className="text-[10px] font-mono opacity-50 mb-1">{msg.sender === 'user' ? 'WILLIAM' : 'APPEARICH AI'}</div>
-                                    {msg.text}
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                    <div className="max-w-4xl mx-auto w-full pt-4 border-t border-neutral-800 flex gap-4">
-                        <input type="text" value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleSend()} placeholder="Ask a question or explain your reasoning..." className="flex-1 bg-neutral-900 border border-neutral-800 px-4 py-3 text-sm text-white focus:outline-none focus:border-[#FFD600]" />
-                        <button onClick={handleSend} className="bg-[#FFD600] text-black font-bold px-6 py-3 text-sm hover:bg-white transition-all">SEND →</button>
-                    </div>
-                </div>
-            );
-        }
-
-        // 4. EXAM HALL
-        function ExamHall({ onBack }) {
-            return (
-                <div className="min-h-screen bg-black text-white p-6 md:p-12 flex flex-col justify-between">
-                    <header className="flex justify-between items-center pb-6 border-b border-neutral-800">
-                        <div>
-                            <span className="text-xs font-mono text-[#FFD600]">[ CAMBRIDGE IGCSE MATHEMATICS ]</span>
-                            <h2 className="text-xl font-black mt-1">QUESTION 17 / 40</h2>
-                        </div>
-                        <div className="text-right">
-                            <div className="text-xs font-mono text-neutral-500">TIME REMAINING</div>
-                            <div className="text-xl font-black font-mono text-[#FFD600]">01:42:18</div>
-                        </div>
-                    </header>
-                    <main className="max-w-3xl mx-auto w-full my-auto space-y-6">
-                        <div className="bg-neutral-900 border border-neutral-800 p-8 shadow-2xl">
-                            <p className="text-lg font-medium leading-relaxed">
-                                Find the gradient of the curve <span className="font-mono text-[#FFD600]">y = 4x³ - 5x + 2</span> at the point <span className="font-mono">(1, 1)</span>.
-                            </p>
-                            <div className="mt-8 space-y-3">
-                                {['A) 7', 'B) 12', 'C) 17', 'D) 4'].map((option, idx) => (
-                                    <div key={idx} className="border border-neutral-800 p-4 hover:border-[#FFD600] cursor-pointer transition-all flex items-center justify-between">
-                                        <span className="font-mono font-bold">{option}</span>
-                                        <div className="w-4 h-4 rounded-full border border-neutral-700"></div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
                     </main>
-                    <footer className="flex justify-between items-center pt-6 border-t border-neutral-800">
-                        <button onClick={onBack} className="border border-neutral-700 text-neutral-400 px-6 py-2 text-xs font-mono hover:text-white transition-all">ABORT EXAM</button>
-                        <div className="flex gap-4">
-                            <button className="border border-[#FFD600] text-[#FFD600] px-6 py-2 text-xs font-mono hover:bg-[#FFD600] hover:text-black transition-all">MARK FOR REVIEW</button>
-                            <button onClick={onBack} className="bg-[#FFD600] text-black font-bold px-8 py-2 text-xs hover:bg-white transition-all">NEXT →</button>
-                        </div>
-                    </footer>
-                </div>
-            );
-        }
 
-        // 5. 3D LAB
-        function Lab3D({ onBack }) {
-            const [activeModel, setActiveModel] = useState('heart');
-            return (
-                <div className="min-h-screen bg-black text-white p-6 md:p-12 flex flex-col justify-between">
-                    <header className="flex justify-between items-center pb-6 border-b border-neutral-800">
-                        <div className="flex items-center space-x-4">
-                            <button onClick={onBack} className="border border-[#FFD600] text-[#FFD600] px-3 py-1 text-xs font-mono hover:bg-[#FFD600] hover:text-black transition-all">← EXIT LAB</button>
-                            <h2 className="text-xl font-black tracking-tight text-[#FFD600]">APPEARICH 3D SIMULATION LAB</h2>
-                        </div>
-                        <div className="text-xs font-mono text-neutral-400">[ INTERACTIVE SIMULATION ACTIVE ]</div>
-                    </header>
-                    <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 my-auto py-8">
-                        <div className="space-y-3">
-                            <div className="text-xs font-mono text-neutral-500 mb-4">[ SELECT SPECIMEN ]</div>
-                            {['heart', 'brain', 'dna', 'atom'].map((mod) => (
-                                <button key={mod} onClick={() => setActiveModel(mod)} className={`w-full text-left px-4 py-3 font-mono text-xs uppercase tracking-wider border transition-all ${activeModel === mod ? 'bg-[#FFD600] text-black border-[#FFD600] font-bold' : 'border-neutral-800 text-neutral-400 hover:border-neutral-600'}`}>
-                                    {mod} MODEL
-                                </button>
-                            ))}
-                        </div>
-                        <div className="lg:col-span-3 bg-neutral-900 border border-neutral-800 h-96 flex flex-col items-center justify-center relative overflow-hidden shadow-2xl">
-                            <div className="w-40 h-40 rounded-full bg-[#FFD600]/20 border-2 border-[#FFD600] flex items-center justify-center animate-pulse shadow-[0_0_50px_rgba(255,214,0,0.3)]">
-                                <div className="text-center font-mono text-xs text-[#FFD600] font-bold">[ 3D OBJECT ]<br/>{activeModel.toUpperCase()}</div>
-                            </div>
-                            <div className="absolute bottom-4 text-xs font-mono text-neutral-400">Drag to rotate • Pinch to zoom • Tap nodes for telemetry</div>
-                        </div>
-                    </div>
-                    <footer className="pt-6 border-t border-neutral-800 flex justify-between items-center text-xs font-mono text-neutral-500">
-                        <div>STATUS: REAL-TIME RENDERING</div>
-                        <button onClick={() => alert('AI Quiz Generated from Model!')} className="bg-[#FFD600] text-black px-4 py-2 font-bold hover:bg-white transition-all">QUIZ ME ON THIS MODEL →</button>
-                    </footer>
-                </div>
-            );
-        }
-
-        // 6. KNOWLEDGE VAULT (LIBRARY)
-        function KnowledgeVault({ onBack }) {
-            const [query, setQuery] = useState('');
-            return (
-                <div className="min-h-screen bg-white text-black p-6 md:p-12">
-                    <header className="flex justify-between items-center pb-6 border-b border-black">
-                        <div className="flex items-center space-x-4">
-                            <button onClick={onBack} className="border border-black px-3 py-1 text-xs font-mono hover:bg-black hover:text-white transition-all">← EXIT LIBRARY</button>
-                            <h2 className="text-xl font-black tracking-tight">THE KNOWLEDGE VAULT</h2>
-                        </div>
-                        <div className="text-xs font-mono bg-[#FFD600] px-2 py-1 font-bold">[ SEARCH & DISCOVER ]</div>
-                    </header>
-                    <div className="max-w-3xl mx-auto my-12 space-y-6">
-                        <input type="text" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search Newton's Laws, Vectors, Integration..." className="w-full border-2 border-black p-4 text-lg font-bold focus:outline-none bg-neutral-50" />
-                        <div className="space-y-4">
-                            {['Cambridge A-Level Mechanics Revision Notes', 'Past Paper Question Bank: Vector Calculus (2020-2025)', 'Interactive Simulation: Electromagnetic Induction'].map((item, idx) => (
-                                <div key={idx} className="border-2 border-black p-6 hover:bg-black hover:text-white transition-all cursor-pointer group flex justify-between items-center">
-                                    <div>
-                                        <span className="text-xs font-mono text-neutral-500 group-hover:text-[#FFD600]">[ RESOURCE 0{idx+1} ]</span>
-                                        <h4 className="font-bold text-lg mt-1">{item}</h4>
-                                    </div>
-                                    <span className="text-xs font-bold text-[#FFD600]">VIEW →</span>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </div>
-            );
-        }
-
-        // 7. ARENA
-        function Arena({ onBack }) {
-            return (
-                <div className="min-h-screen bg-black text-white p-6 md:p-12 flex flex-col justify-between">
-                    <header className="flex justify-between items-center pb-6 border-b border-neutral-800">
-                        <button onClick={onBack} className="border border-[#FFD600] text-[#FFD600] px-3 py-1 text-xs font-mono hover:bg-[#FFD600] hover:text-black transition-all">← EXIT ARENA</button>
-                        <h2 className="text-xl font-black text-[#FFD600]">APPEARICH ARENA</h2>
-                    </header>
-                    <div className="max-w-4xl mx-auto w-full grid grid-cols-1 md:grid-cols-2 gap-6 my-auto">
-                        <div className="border border-neutral-800 p-8 hover:border-[#FFD600] cursor-pointer group">
-                            <span className="text-xs font-mono text-[#FFD600]">[ SPEED ROUND ]</span>
-                            <h3 className="text-2xl font-black mt-2">5 Questions. 60 Seconds.</h3>
-                            <p className="text-sm text-neutral-400 mt-2">Test your rapid-fire problem-solving skills.</p>
-                            <button className="mt-6 bg-[#FFD600] text-black font-bold px-4 py-2 text-xs">START ROUND →</button>
-                        </div>
-                        <div className="border border-neutral-800 p-8 hover:border-[#FFD600] cursor-pointer group">
-                            <span className="text-xs font-mono text-[#FFD600]">[ BOSS QUESTION ]</span>
-                            <h3 className="text-2xl font-black mt-2">One Elite Cambridge Problem.</h3>
-                            <p className="text-sm text-neutral-400 mt-2">Deep-dive multidisciplinary challenge.</p>
-                            <button className="mt-6 bg-[#FFD600] text-black font-bold px-4 py-2 text-xs">ACCEPT CHALLENGE →</button>
-                        </div>
-                    </div>
-                    <footer className="pt-6 border-t border-neutral-800 text-xs font-mono text-neutral-500 text-center">COMPETITIVE LEARNING ENVIRONMENT</footer>
-                </div>
-            );
-        }
-
-        // 8. OBSERVATORY
-        function Observatory({ onBack }) {
-            return (
-                <div className="min-h-screen bg-white text-black p-6 md:p-12">
-                    <header className="flex justify-between items-center pb-6 border-b border-black">
-                        <button onClick={onBack} className="border border-black px-3 py-1 text-xs font-mono hover:bg-black hover:text-white transition-all">← EXIT OBSERVATORY</button>
-                        <h2 className="text-xl font-black">YOUR OBSERVATORY</h2>
-                    </header>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-6 my-8">
-                        {[{ label: 'KNOWLEDGE', val: '87%' }, { label: 'CONSISTENCY', val: '92%' }, { label: 'CONFIDENCE', val: '78%' }, { label: 'READINESS', val: '84%' }].map((stat, i) => (
-                            <div key={i} className="border-2 border-black p-6 bg-neutral-50">
-                                <div className="text-xs font-mono text-neutral-500">{stat.label}</div>
-                                <div className="text-4xl font-black mt-2 text-[#FFD600] bg-black px-2 inline-block">{stat.val}</div>
-                            </div>
+                    {/* Bottom Mobile Navigation Bar */}
+                    <nav className="absolute bottom-0 left-0 right-0 bg-white border-t border-neutral-200 px-6 py-3 flex justify-between items-center z-20">
+                        {[
+                            { name: 'Home', icon: '🏠' },
+                            { name: 'AI Guide', icon: '🤖' },
+                            { name: 'Bookings', icon: '💼' },
+                            { name: 'Profile', icon: '👤' }
+                        ].map((tab) => (
+                            <button 
+                                key={tab.name}
+                                onClick={() => setCurrentTab(tab.name)}
+                                className={`flex flex-col items-center space-y-1 transition-colors ${currentTab === tab.name ? 'text-[#FFD600] font-bold' : 'text-neutral-400 hover:text-black'}`}
+                            >
+                                <span className="text-lg">{tab.icon}</span>
+                                <span className="text-[10px]">{tab.name}</span>
+                            </button>
                         ))}
-                    </div>
-                </div>
-            );
-        }
+                    </nav>
 
-        // 9. COMMONS
-        function Commons({ onBack }) {
-            return (
-                <div className="min-h-screen bg-white text-black p-6 md:p-12">
-                    <header className="flex justify-between items-center pb-6 border-b border-black">
-                        <button onClick={onBack} className="border border-black px-3 py-1 text-xs font-mono hover:bg-black hover:text-white transition-all">← EXIT COMMONS</button>
-                        <h2 className="text-xl font-black">THE COMMONS</h2>
-                    </header>
-                    <div className="max-w-3xl mx-auto my-12 space-y-4">
-                        <div className="border-2 border-black p-6">
-                            <span className="text-xs font-mono text-neutral-500">[ STUDY GROUP DISCUSSIONS ]</span>
-                            <h4 className="font-bold text-lg mt-1">Cambridge Physics Problem Set #4 Discussion</h4>
-                            <p className="text-sm text-neutral-600 mt-2">14 peers actively collaborating on vector calculations.</p>
-                        </div>
-                    </div>
-                </div>
-            );
-        }
-
-        // 10. STUDIO
-        function Studio({ onBack }) {
-            return (
-                <div className="min-h-screen bg-white text-black p-6 md:p-12">
-                    <header className="flex justify-between items-center pb-6 border-b border-black">
-                        <button onClick={onBack} className="border border-black px-3 py-1 text-xs font-mono hover:bg-black hover:text-white transition-all">← EXIT STUDIO</button>
-                        <h2 className="text-xl font-black">THE STUDIO (NOTES & FLASHCARDS)</h2>
-                    </header>
-                    <div className="max-w-3xl mx-auto my-12">
-                        <textarea placeholder="Write your personal study notes, link formulas, or generate flashcards instantly..." className="w-full h-64 border-2 border-black p-4 font-mono text-sm focus:outline-none bg-neutral-50"></textarea>
-                        <button onClick={() => alert('Notes converted to Flashcards!')} className="mt-4 bg-black text-[#FFD600] px-6 py-3 font-bold text-xs hover:bg-[#FFD600] hover:text-black transition-all">CONVERT TO FLASHCARDS →</button>
-                    </div>
                 </div>
             );
         }
