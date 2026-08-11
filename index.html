@@ -57,39 +57,36 @@
       overflow-x: hidden;
     }
 
-    /* 1. APPEARICH OPENING EXPERIENCE — FORCED PURE WHITE STARTUP */
+    /* ========================================================= */
+    /* 1. SPLASH SCREEN — LOGO ONLY (PURE WHITE)                 */
+    /* ========================================================= */
     #cinematic-splash {
       position: fixed;
       inset: 0;
       background: #ffffff !important;
       z-index: 99999;
       display: flex;
-      flex-direction: column;
       align-items: center;
       justify-content: center;
       transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.6s;
     }
     .splash-logo-container {
       display: flex;
-      flex-direction: column;
       align-items: center;
+      justify-content: center;
+      background: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
       animation: logoCinematicEntrance 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
     .splash-logo-img {
-      width: 80px;
-      height: 80px;
+      width: 90px;
+      height: 90px;
       object-fit: contain;
       background: transparent !important;
       border: none !important;
       box-shadow: none !important;
-      margin-bottom: 16px;
-    }
-    .splash-brand-title {
-      font-size: 1.2rem;
-      font-weight: 800;
-      letter-spacing: 5px;
-      color: #09090b;
-      text-transform: uppercase;
+      outline: none !important;
     }
     @keyframes logoCinematicEntrance {
       0% { opacity: 0; transform: scale(0.92) translateY(6px); filter: blur(8px); }
@@ -123,20 +120,23 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
-    /* PURE WHITE AUTHENTICATION & SEQUENTIAL ANIMATION */
+    /* ========================================================= */
+    /* 2. AUTHENTICATION — TRUE FULL-WHITE SEAMLESS PAGE         */
+    /* ========================================================= */
     #screen-auth {
       justify-content: center;
       align-items: center;
       min-height: 100vh;
-      padding: 24px;
+      padding: 28px 24px;
       background: #ffffff !important;
     }
     .auth-card {
       width: 100%;
       background: #ffffff !important;
       border: none !important;
-      padding: 12px;
+      padding: 0 !important;
       box-shadow: none !important;
+      border-radius: 0 !important;
     }
     .auth-brand-header {
       text-align: left;
@@ -154,6 +154,8 @@
       color: #71717a;
       margin-top: 6px;
     }
+    
+    /* Sequential Left-to-Right Entrance Animations */
     .form-group {
       margin-bottom: 20px;
       opacity: 0;
@@ -163,6 +165,27 @@
     .form-group:nth-child(2) { animation-delay: 0.22s; }
     .form-group:nth-child(3) { animation-delay: 0.29s; }
     .form-group:nth-child(4) { animation-delay: 0.36s; }
+    .auth-row-options {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      font-size: 0.82rem;
+      color: #71717a;
+      opacity: 0;
+      animation: authSeqIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.4s forwards;
+    }
+    .auth-row-options label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+    }
+    .auth-row-options a {
+      color: var(--accent-gold);
+      text-decoration: none;
+      font-weight: 700;
+    }
 
     @keyframes authSeqIn {
       from { opacity: 0; transform: translateX(-24px); }
@@ -203,9 +226,9 @@
       font-weight: 800;
       font-size: 0.95rem;
       cursor: pointer;
-      margin-top: 12px;
+      margin-top: 8px;
       opacity: 0;
-      animation: authSeqIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.42s forwards;
+      animation: authSeqIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.45s forwards;
       box-shadow: 0 6px 16px var(--accent-gold-glow);
     }
     [data-theme="light"] .primary-btn {
@@ -218,7 +241,7 @@
       margin-top: 24px;
       cursor: pointer;
       opacity: 0;
-      animation: authSeqIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.48s forwards;
+      animation: authSeqIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.5s forwards;
     }
     .auth-switch-text span {
       color: var(--accent-gold);
@@ -410,7 +433,7 @@
     }
 
     /* ========================================================= */
-    /* ACADEMIC CORE (ELEVATED CARD DESIGN)                      */
+    /* ACADEMIC CORE (UNCHANGED)                                 */
     /* ========================================================= */
     .academic-core-container {
       margin-bottom: 28px;
@@ -451,7 +474,6 @@
       border-color: var(--accent-gold-border);
       box-shadow: 0 14px 28px -6px var(--accent-gold-glow);
     }
-    /* Subtle background glow element */
     .academic-card::before {
       content: '';
       position: absolute;
@@ -537,7 +559,7 @@
     }
 
     /* ========================================================= */
-    /* COMPACT 2x2 PHOTOGRAPHIC GRID                            */
+    /* 3. PHOTO CARDS GRID (EXACT FILE PATHS & ANIMATION)       */
     /* ========================================================= */
     .photo-grid-2x2 {
       display: grid;
@@ -561,7 +583,7 @@
       transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    /* DYNAMIC ANIMATION STATES */
+    /* Dynamic LEFT -> RIGHT -> LEFT -> RIGHT Animation States */
     .photo-card.slide-left {
       transform: translateX(-40px) scale(0.95);
     }
@@ -842,22 +864,21 @@
 </head>
 <body>
 
-  <!-- 1. APPEARICH OPENING EXPERIENCE — FORCED WHITE STARTUP -->
+  <!-- 1. SPLASH SCREEN — LOGO ONLY ON PURE WHITE BACKGROUND -->
   <div id="cinematic-splash">
     <div class="splash-logo-container">
       <img src="images/appearich-logo.png" alt="Appearich" class="splash-logo-img">
-      <div class="splash-brand-title">Appearich</div>
     </div>
   </div>
 
   <div class="app-viewport">
     
-    <!-- AUTHENTICATION SCREEN (PURE WHITE STYLE) -->
+    <!-- 2. AUTHENTICATION SCREEN — TRUE FULL-WHITE PAGE -->
     <div id="screen-auth" class="screen active">
       <div class="auth-card">
         <div class="auth-brand-header">
-          <h1 class="auth-title" id="authTitleText">Welcome Scholar</h1>
-          <p class="auth-subtitle" id="authSubText">Authenticate to access your Cambridge matrix</p>
+          <h1 class="auth-title" id="authTitleText">Welcome back</h1>
+          <p class="auth-subtitle" id="authSubText">Enter your credentials to access your account</p>
         </div>
         
         <div class="form-group" id="nameGroup" style="display: none;">
@@ -866,12 +887,12 @@
         </div>
         
         <div class="form-group">
-          <label>University Email</label>
+          <label>Email / Student ID</label>
           <input type="email" id="authEmail" placeholder="scholar@appearich.ac.uk">
         </div>
         
         <div class="form-group">
-          <label>Security Password</label>
+          <label>Password</label>
           <input type="password" id="authPassword" placeholder="••••••••••••">
         </div>
         
@@ -879,11 +900,16 @@
           <label>Degree Program</label>
           <input type="text" id="regProgram" placeholder="e.g. B.A. Computer Science & Tripos">
         </div>
+
+        <div class="auth-row-options" id="authOptionsRow">
+          <label><input type="checkbox" checked style="accent-color: var(--accent-gold);"> Remember me</label>
+          <a href="#" onclick="alert('Password reset link sent to your university email.'); return false;">Forgot password?</a>
+        </div>
         
-        <button class="primary-btn" id="authActionBtn" onclick="handleAuthSubmit()">Initialize Session</button>
+        <button class="primary-btn" id="authActionBtn" onclick="handleAuthSubmit()">Login</button>
         
         <div class="auth-switch-text" onclick="toggleAuthMode()">
-          <span id="authSwitchPrompt">New researcher? <span>Create Account</span></span>
+          <span id="authSwitchPrompt">Don't have an account? <span>Sign Up</span></span>
         </div>
       </div>
     </div>
@@ -934,7 +960,7 @@
         <input type="text" placeholder="Search courses, lectures, assignments, or resources..." id="globalSearchInput" oninput="handleGlobalSearch(this.value)">
       </div>
 
-      <!-- ACADEMIC CORE -->
+      <!-- ACADEMIC CORE (PRESERVED & UNCHANGED) -->
       <div class="academic-core-container">
         <div class="section-header-title">
           <span><i class="fa-solid fa-graduation-cap" style="color: var(--accent-gold);"></i> Academic Core</span>
@@ -1051,19 +1077,19 @@
         </div>
       </div>
 
-      <!-- COMPACT 2x2 PHOTOGRAPHIC GRID -->
+      <!-- COMPACT 2x2 PHOTOGRAPHIC GRID (EXACT FILE PATH MAPPING) -->
       <div class="photo-grid-2x2" id="photoGridContainer">
         
         <!-- ROW 1: EVENTS (LEFT) | COMMUNITY (RIGHT) -->
         <div class="photo-card slide-left" onclick="openSectionModal('EVENTS')">
-          <img src="https://images.unsplash.com/photo-1511578314322-379afb476865?q=80&w=600&auto=format&fit=cover" alt="Events">
+          <img src="images/events.jpg" alt="Events">
           <div class="photo-card-overlay">
             <div class="photo-card-title">EVENTS</div>
           </div>
         </div>
 
         <div class="photo-card slide-right" onclick="openSectionModal('COMMUNITY')">
-          <img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?q=80&w=600&auto=format&fit=cover" alt="Community">
+          <img src="images/community.jpg" alt="Community">
           <div class="photo-card-overlay">
             <div class="photo-card-title">COMMUNITY</div>
           </div>
@@ -1071,15 +1097,14 @@
 
         <!-- ROW 2: SPORTS (LEFT) | LIBRARY (RIGHT) -->
         <div class="photo-card slide-left" onclick="openSectionModal('SPORTS')">
-          <!-- RELIABLE SPORTS ASSET URL DIRECTLY REPLACED -->
-          <img src="https://images.unsplash.com/photo-1461896836934-ffe607ba8211?q=80&w=600&auto=format&fit=cover" alt="Sports">
+          <img src="images/sport.jpg" alt="Sports">
           <div class="photo-card-overlay">
             <div class="photo-card-title">SPORTS</div>
           </div>
         </div>
 
         <div class="photo-card slide-right" onclick="openSectionModal('LIBRARY')">
-          <img src="https://images.unsplash.com/photo-1481627834876-b7833e8f5570?q=80&w=600&auto=format&fit=cover" alt="Library">
+          <img src="images/library.jpg" alt="Library">
           <div class="photo-card-overlay">
             <div class="photo-card-title">LIBRARY</div>
           </div>
@@ -1239,8 +1264,7 @@
           "Community Interaction"
         ],
         photos: [
-          "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?q=80&w=400&auto=format&fit=cover",
-          "https://images.unsplash.com/photo-1523580494863-6f3031224c94?q=80&w=400&auto=format&fit=cover"
+          "images/community.jpg"
         ]
       },
       EVENTS: {
@@ -1253,7 +1277,7 @@
           "Guest Lectures & Student Events"
         ],
         photos: [
-          "https://images.unsplash.com/photo-1511578314322-379afb476865?q=80&w=400&auto=format&fit=cover"
+          "images/events.jpg"
         ]
       },
       SPORTS: {
@@ -1265,7 +1289,7 @@
           "Sports Activities & Events"
         ],
         photos: [
-          "https://images.unsplash.com/photo-1461896836934-ffe607ba8211?q=80&w=400&auto=format&fit=cover"
+          "images/sport.jpg"
         ]
       },
       LIBRARY: {
@@ -1277,7 +1301,7 @@
           "Academic References & Citations"
         ],
         photos: [
-          "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?q=80&w=400&auto=format&fit=cover"
+          "images/library.jpg"
         ]
       }
     };
@@ -1333,12 +1357,13 @@
 
     function toggleAuthMode() {
       isRegisterState = !isRegisterState;
-      document.getElementById('authTitleText').innerText = isRegisterState ? "Create Scholar ID" : "Welcome Scholar";
-      document.getElementById('authSubText').innerText = isRegisterState ? "Register your profile for Appearich LMS" : "Authenticate to access your Cambridge matrix";
-      document.getElementById('authActionBtn').innerText = isRegisterState ? "Complete Registration" : "Initialize Session";
+      document.getElementById('authTitleText').innerText = isRegisterState ? "Create Account" : "Welcome back";
+      document.getElementById('authSubText').innerText = isRegisterState ? "Fill in your details to create a new profile" : "Enter your credentials to access your account";
+      document.getElementById('authActionBtn').innerText = isRegisterState ? "Sign Up" : "Login";
       document.getElementById('nameGroup').style.display = isRegisterState ? "block" : "none";
       document.getElementById('programGroup').style.display = isRegisterState ? "block" : "none";
-      document.getElementById('authSwitchPrompt').innerHTML = isRegisterState ? "Existing scholar? <span>Sign In</span>" : "New researcher? <span>Create Account</span>";
+      document.getElementById('authOptionsRow').style.display = isRegisterState ? "none" : "flex";
+      document.getElementById('authSwitchPrompt').innerHTML = isRegisterState ? "Already have an account? <span>Login</span>" : "Don't have an account? <span>Sign Up</span>";
     }
 
     function handleAuthSubmit() {
