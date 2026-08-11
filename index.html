@@ -56,63 +56,51 @@
       overflow-x: hidden;
     }
 
-    /* CINEMATIC OPENING EXPERIENCE */
+    /* 1. APPEARICH OPENING EXPERIENCE */
     #cinematic-splash {
       position: fixed;
       inset: 0;
-      background: #000000;
+      background: #ffffff;
       z-index: 99999;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.8s;
+      transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.6s;
+    }
+
+    [data-theme="dark"] #cinematic-splash {
+      background: #000000;
     }
 
     .splash-logo-container {
       display: flex;
       flex-direction: column;
       align-items: center;
-      animation: cinematicReveal 1.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      animation: logoCinematicEntrance 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
 
-    .splash-emblem {
-      width: 80px;
-      height: 80px;
-      border-radius: 20px;
-      background: linear-gradient(135deg, #fbbf24, #b45309);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 2rem;
-      font-weight: 900;
-      color: #000000;
-      box-shadow: 0 0 50px rgba(251, 191, 36, 0.4);
-      margin-bottom: 20px;
+    .splash-logo-img {
+      width: 72px;
+      height: 72px;
+      object-fit: contain;
+      filter: drop-shadow(0 0 25px rgba(251, 191, 36, 0.35));
+      margin-bottom: 16px;
     }
 
-    .splash-title {
-      font-size: 1.8rem;
+    .splash-brand-title {
+      font-size: 1.1rem;
       font-weight: 800;
-      letter-spacing: 6px;
-      color: #ffffff;
+      letter-spacing: 5px;
+      color: var(--text-main);
       text-transform: uppercase;
     }
 
-    .splash-subtitle {
-      font-size: 0.75rem;
-      font-weight: 600;
-      letter-spacing: 3px;
-      color: #fbbf24;
-      text-transform: uppercase;
-      margin-top: 8px;
-    }
-
-    @keyframes cinematicReveal {
-      0% { opacity: 0; transform: scale(0.9) translateY(10px); filter: blur(10px); }
+    @keyframes logoCinematicEntrance {
+      0% { opacity: 0; transform: scale(0.92) translateY(6px); filter: blur(8px); }
       50% { opacity: 1; transform: scale(1) translateY(0); filter: blur(0); }
       80% { opacity: 1; transform: scale(1); filter: blur(0); }
-      100% { opacity: 0; transform: scale(1.05); filter: blur(5px); visibility: hidden; }
+      100% { opacity: 0; transform: scale(1.04); filter: blur(4px); visibility: hidden; }
     }
 
     /* APP CONTAINER & SCREENS */
@@ -143,7 +131,7 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
-    /* AUTHENTICATION EXPERIENCE */
+    /* AUTHENTICATION SCREEN */
     #screen-auth {
       justify-content: center;
       align-items: center;
@@ -166,16 +154,9 @@
     }
 
     .auth-logo-small {
-      width: 48px;
-      height: 48px;
-      border-radius: 12px;
-      background: linear-gradient(135deg, #fbbf24, #b45309);
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.2rem;
-      font-weight: 900;
-      color: #000000;
+      width: 42px;
+      height: 42px;
+      object-fit: contain;
       margin-bottom: 12px;
     }
 
@@ -273,23 +254,16 @@
     }
 
     .header-logo-icon {
-      width: 32px;
-      height: 32px;
-      border-radius: 8px;
-      background: linear-gradient(135deg, #fbbf24, #b45309);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.9rem;
-      font-weight: 900;
-      color: #000;
+      width: 28px;
+      height: 28px;
+      object-fit: contain;
     }
 
     .icon-btn {
       width: 38px;
       height: 38px;
       border-radius: 50%;
-      background: var(--surface-surface, var(--surface-color));
+      background: var(--surface-color);
       border: 1px solid var(--border-color);
       color: var(--text-main);
       display: flex;
@@ -299,11 +273,11 @@
       font-size: 0.9rem;
     }
 
-    /* HOME SCREEN & HERO */
+    /* 2. LOGO ON HOME SCREEN & HERO SYSTEM */
     .hero-container {
       position: relative;
       width: 100%;
-      height: 220px;
+      height: 240px;
       border-radius: 20px;
       overflow: hidden;
       margin-bottom: 20px;
@@ -317,18 +291,60 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
-      filter: brightness(0.65);
-      transition: transform 0.5s ease;
+      filter: brightness(0.68);
+      transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), filter 0.6s ease;
+    }
+
+    .hero-container.transitioning .hero-bg-image {
+      filter: blur(8px) brightness(0.4);
+      transform: scale(1.05);
     }
 
     .hero-container:hover .hero-bg-image {
-      transform: scale(1.03);
+      transform: scale(1.02);
     }
 
     .hero-gradient-overlay {
       position: absolute;
       inset: 0;
-      background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.2) 70%, transparent 100%);
+      background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.25) 70%, transparent 100%);
+    }
+
+    /* Integrated Logo Badge inside Hero */
+    .hero-integrated-badge {
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(18, 18, 20, 0.75);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      padding: 6px 12px;
+      border-radius: 30px;
+      z-index: 3;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+      animation: floatBadge 4s ease-in-out infinite alternate;
+    }
+
+    @keyframes floatBadge {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(-3px); }
+    }
+
+    .hero-badge-logo {
+      width: 18px;
+      height: 18px;
+      object-fit: contain;
+    }
+
+    .hero-badge-text {
+      font-size: 0.7rem;
+      font-weight: 800;
+      letter-spacing: 1px;
+      color: #ffffff;
+      text-transform: uppercase;
     }
 
     .hero-content {
@@ -344,7 +360,7 @@
     }
 
     .hero-greeting {
-      font-size: 1.4rem;
+      font-size: 1.35rem;
       font-weight: 900;
       color: #ffffff;
       line-height: 1.2;
@@ -360,19 +376,31 @@
       letter-spacing: 0.5px;
     }
 
+    .hero-controls-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      align-items: flex-end;
+    }
+
     .hero-control-btn {
-      background: rgba(0, 0, 0, 0.6);
+      background: rgba(0, 0, 0, 0.65);
       backdrop-filter: blur(8px);
       border: 1px solid rgba(255, 255, 255, 0.2);
       color: #ffffff;
       padding: 6px 12px;
       border-radius: 20px;
-      font-size: 0.7rem;
+      font-size: 0.68rem;
       font-weight: 700;
       cursor: pointer;
       display: flex;
       align-items: center;
       gap: 6px;
+      white-space: nowrap;
+    }
+
+    .hero-control-btn:hover {
+      border-color: var(--accent-gold);
     }
 
     /* COMMAND SEARCH BAR */
@@ -678,7 +706,7 @@
       gap: 8px;
     }
 
-    /* MODAL OVERLAYS */
+    /* MODAL OVERLAYS & GALLERIES */
     .modal-overlay {
       position: fixed;
       inset: 0;
@@ -702,19 +730,110 @@
       border-top-left-radius: 24px;
       border-top-right-radius: 24px;
       padding: 24px 20px 40px 20px;
-      max-height: 80vh;
+      max-height: 85vh;
       overflow-y: auto;
+    }
+
+    /* Gallery Grid in Modal */
+    .hero-gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin: 16px 0;
+    }
+
+    .gallery-thumb-card {
+      position: relative;
+      height: 80px;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 2px solid var(--border-color);
+      cursor: pointer;
+    }
+
+    .gallery-thumb-card.selected {
+      border-color: var(--accent-gold);
+      box-shadow: 0 0 10px var(--accent-gold-glow);
+    }
+
+    .gallery-thumb-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .gallery-thumb-delete {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      background: rgba(0,0,0,0.7);
+      color: #ef4444;
+      border: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      font-size: 0.65rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .gallery-add-tile {
+      height: 80px;
+      border-radius: 12px;
+      border: 2px dashed var(--border-color);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      cursor: pointer;
+      color: var(--text-sub);
+      background: var(--surface-elevated);
+    }
+
+    .gallery-add-tile:hover {
+      border-color: var(--accent-gold);
+      color: var(--accent-gold);
+    }
+
+    /* Segmented Control for Hero Mode */
+    .mode-switch-container {
+      display: flex;
+      background: var(--bg-color);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 4px;
+      margin-bottom: 16px;
+    }
+
+    .mode-switch-btn {
+      flex: 1;
+      background: transparent;
+      border: none;
+      padding: 10px;
+      border-radius: 10px;
+      font-size: 0.8rem;
+      font-weight: 800;
+      color: var(--text-sub);
+      cursor: pointer;
+    }
+
+    .mode-switch-btn.active {
+      background: var(--surface-elevated);
+      color: var(--text-main);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
     }
   </style>
 </head>
 <body>
 
-  <!-- CINEMATIC OPENING SEQUENCE -->
+  <!-- 1. APPEARICH OPENING EXPERIENCE -->
   <div id="cinematic-splash">
     <div class="splash-logo-container">
-      <div class="splash-emblem">A</div>
-      <div class="splash-title">Appearich</div>
-      <div class="splash-subtitle">Cambridge Academic Matrix</div>
+      <img src="images/appearich-logo1" alt="Appearich" class="splash-logo-img">
+      <div class="splash-brand-title">Appearich</div>
     </div>
   </div>
 
@@ -724,7 +843,7 @@
     <div id="screen-auth" class="screen active">
       <div class="auth-card">
         <div class="auth-brand-header">
-          <div class="auth-logo-small">A</div>
+          <img src="images/appearich-logo1" alt="Appearich" class="auth-logo-small">
           <h1 class="auth-title" id="authTitleText">Welcome Scholar</h1>
           <p class="auth-subtitle" id="authSubText">Authenticate to access your Cambridge matrix</p>
         </div>
@@ -757,7 +876,7 @@
     <!-- MAIN APP HEADER -->
     <header class="app-header" id="mainHeader" style="display: none;">
       <div class="header-brand">
-        <div class="header-logo-icon">A</div>
+        <img src="images/appearich-logo1" alt="Appearich" class="header-logo-icon">
         <span>Appearich</span>
       </div>
       <div style="display: flex; gap: 8px;">
@@ -769,18 +888,27 @@
 
     <!-- SCREEN 1: HOME (CENTRAL HUB) -->
     <div id="screen-home" class="screen">
-      <!-- HERO BANNER -->
+      <!-- HERO BANNER WITH INTEGRATED LOGO -->
       <div class="hero-container" id="heroContainer">
-        <img src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?q=80&w=800&auto=format&fit=cover" alt="Hero Campus" class="hero-bg-image" id="heroImageElement">
+        <img src="" alt="Hero Campus" class="hero-bg-image" id="heroImageElement">
         <div class="hero-gradient-overlay"></div>
+        
+        <!-- Integrated Float Logo Badge -->
+        <div class="hero-integrated-badge">
+          <img src="images/appearich-logo1" alt="Appearich" class="hero-badge-logo">
+          <span class="hero-badge-text" id="heroBadgeLabel">Smart Matrix</span>
+        </div>
+
         <div class="hero-content">
           <div>
             <h2 class="hero-greeting" id="dynamicGreeting">WELCOME, SCHOLAR</h2>
-            <div class="hero-msg">Tripos Term — Easter Session</div>
+            <div class="hero-msg" id="dynamicSubGreeting">Ready for another productive day?</div>
           </div>
-          <button class="hero-control-btn" onclick="openHeroModal()">
-            <i class="fa-solid fa-sliders"></i> Edit Hero
-          </button>
+          <div class="hero-controls-group">
+            <button class="hero-control-btn" onclick="openHeroPreferencesModal()">
+              <i class="fa-solid fa-sliders"></i> Customize Hero
+            </button>
+          </div>
         </div>
       </div>
 
@@ -883,7 +1011,6 @@
         <i class="fa-solid fa-chart-line" style="color: var(--accent-gold);"></i> Academic Progression
       </div>
 
-      <!-- PROGRESS SUMMARY CARD -->
       <div style="background: var(--surface-color); border: 1px solid var(--border-color); border-radius: 20px; padding: 20px; margin-bottom: 24px;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
           <span style="font-size: 0.85rem; font-weight: 800;">Semester Milestone Streak</span>
@@ -938,6 +1065,10 @@
 
       <div class="section-header-title">Account Preferences</div>
       <div class="settings-list">
+        <div class="settings-item" onclick="openHeroPreferencesModal()">
+          <span>Hero Visual System & Modes</span>
+          <i class="fa-solid fa-chevron-right" style="color: var(--text-sub); font-size: 0.75rem;"></i>
+        </div>
         <div class="settings-item" onclick="alert('Notification settings updated.')">
           <span>Push Notifications</span>
           <i class="fa-solid fa-chevron-right" style="color: var(--text-sub); font-size: 0.75rem;"></i>
@@ -979,29 +1110,46 @@
 
   </div>
 
-  <!-- HERO IMAGE CONTROL MODAL -->
-  <div id="heroModal" class="modal-overlay">
+  <!-- HERO PREFERENCES & GALLERY MODAL -->
+  <div id="heroPreferencesModal" class="modal-overlay">
     <div class="modal-sheet">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
         <h3 style="font-size: 1.1rem; font-weight: 800;">Hero Visual Control</h3>
-        <i class="fa-solid fa-xmark" style="cursor: pointer; font-size: 1.2rem; color: var(--text-sub);" onclick="closeHeroModal()"></i>
+        <i class="fa-solid fa-xmark" style="cursor: pointer; font-size: 1.2rem; color: var(--text-sub);" onclick="closeHeroPreferencesModal()"></i>
       </div>
-      <p style="font-size: 0.8rem; color: var(--text-sub); margin-bottom: 16px;">Select or customize your personalized academic dashboard banner.</p>
+
+      <!-- Mode Switcher (Personal vs Smart) -->
+      <div class="mode-switch-container">
+        <button class="mode-switch-btn" id="btnModePersonal" onclick="setHeroMode('personal')">Personal Mode</button>
+        <button class="mode-switch-btn" id="btnModeSmart" onclick="setHeroMode('smart')">Smart Mode</button>
+      </div>
+
+      <!-- My Hero Gallery Section -->
+      <div class="section-header-title" style="margin-top: 16px;">
+        <i class="fa-solid fa-images" style="color: var(--accent-gold);"></i> My Hero Gallery
+      </div>
+      <p style="font-size: 0.75rem; color: var(--text-sub); margin-bottom: 8px;">Tap any saved image to set it as current Hero or manage collection.</p>
       
-      <div style="display: flex; flex-direction: column; gap: 10px;">
-        <button class="primary-btn" onclick="updateHeroImage('https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=800&auto=format&fit=cover')">
-          Set Classic Collegiate Hall
-        </button>
-        <button class="primary-btn" onclick="updateHeroImage('https://images.unsplash.com/photo-1541339907198-e08756dedf3f?q=80&w=800&auto=format&fit=cover')" style="background: var(--surface-elevated); color: var(--text-main); border: 1px solid var(--border-color);">
-          Set Modern Research Library
-        </button>
-        <button class="primary-btn" onclick="updateHeroImage('https://images.unsplash.com/photo-1509062522246-3755977927d7?q=80&w=800&auto=format&fit=cover')" style="background: var(--surface-elevated); color: var(--text-main); border: 1px solid var(--border-color);">
-          Set Lecture Auditorium
-        </button>
-        <button class="primary-btn" onclick="resetDefaultHero()" style="background: transparent; border: 1px dashed var(--border-color); color: var(--text-sub);">
-          Restore Default Image
-        </button>
+      <div class="hero-gallery-grid" id="heroGalleryGrid">
+        <!-- Rendered via JS -->
       </div>
+
+      <!-- Hidden file input for uploading custom images -->
+      <input type="file" id="heroImageFileInput" accept="image/*" style="display: none;" onchange="handleImageUpload(event)">
+
+      <!-- Period Specific Preferences Accordion / Section -->
+      <div id="periodPreferencesSection" style="margin-top: 20px;">
+        <div class="section-header-title">
+          <i class="fa-solid fa-calendar-check" style="color: var(--accent-gold);"></i> Period-Specific Assign
+        </div>
+        <p style="font-size: 0.75rem; color: var(--text-sub); margin-bottom: 10px;">Assign specific favorite images to periods in Smart Mode.</p>
+        
+        <div style="display: flex; flex-direction: column; gap: 8px;" id="periodAssignmentList">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <button class="primary-btn" style="margin-top: 24px;" onclick="closeHeroPreferencesModal()">Save & Apply Preferences</button>
     </div>
   </div>
 
@@ -1026,7 +1174,32 @@
       program: "B.A. Computer Science & Tripos"
     };
 
+    // Default defaults for gallery and periods
+    const DEFAULT_HERO_IMAGES = [
+      { id: 'def_1', url: 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?q=80&w=800&auto=format&fit=cover', label: 'Library' },
+      { id: 'def_2', url: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=800&auto=format&fit=cover', label: 'Collegiate Hall' },
+      { id: 'def_3', url: 'https://images.unsplash.com/photo-1509062522246-3755977927d7?q=80&w=800&auto=format&fit=cover', label: 'Auditorium' },
+      { id: 'def_4', url: 'https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?q=80&w=800&auto=format&fit=cover', label: 'Weekend Social' },
+      { id: 'def_5', url: 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?q=80&w=800&auto=format&fit=cover', label: 'Long Break / Travel' }
+    ];
+
+    let appState = {
+      heroMode: 'smart', // 'personal' or 'smart'
+      currentHeroUrl: '',
+      gallery: [],
+      periodPreferences: {
+        academic: '',
+        weekend: '',
+        holiday: '',
+        shortBreak: '',
+        longBreak: '',
+        default: ''
+      }
+    };
+
     window.addEventListener('DOMContentLoaded', () => {
+      loadStateFromStorage();
+
       // Check for saved session
       const savedUser = localStorage.getItem('appearich_student_profile');
       if (savedUser) {
@@ -1038,14 +1211,142 @@
       setTimeout(() => {
         const splash = document.getElementById('cinematic-splash');
         if (splash) splash.style.display = 'none';
-      }, 1800);
-
-      // Load saved hero image if available
-      const savedHero = localStorage.getItem('appearich_hero_img');
-      if (savedHero) {
-        document.getElementById('heroImageElement').src = savedHero;
-      }
+      }, 1500);
     });
+
+    function loadStateFromStorage() {
+      const storedGallery = localStorage.getItem('appearich_hero_gallery');
+      if (storedGallery) {
+        appState.gallery = JSON.parse(storedGallery);
+      } else {
+        appState.gallery = [...DEFAULT_HERO_IMAGES];
+        saveGalleryToStorage();
+      }
+
+      const storedMode = localStorage.getItem('appearich_hero_mode');
+      if (storedMode) appState.heroMode = storedMode;
+
+      const storedPrefs = localStorage.getItem('appearich_hero_period_prefs');
+      if (storedPrefs) appState.periodPreferences = JSON.parse(storedPrefs);
+
+      const storedCurrent = localStorage.getItem('appearich_current_hero');
+      if (storedCurrent) {
+        appState.currentHeroUrl = storedCurrent;
+      } else {
+        evaluateSmartHero();
+      }
+    }
+
+    function saveGalleryToStorage() {
+      localStorage.setItem('appearich_hero_gallery', JSON.stringify(appState.gallery));
+    }
+
+    function saveStateToStorage() {
+      localStorage.setItem('appearich_hero_mode', appState.heroMode);
+      localStorage.setItem('appearich_hero_period_prefs', JSON.stringify(appState.periodPreferences));
+      localStorage.setItem('appearich_current_hero', appState.currentHeroUrl);
+    }
+
+    /* 5-11. INTELLIGENT HERO EVALUATION ENGINE */
+    function determineCurrentAcademicPeriod() {
+      // In production, this connects to the real university calendar API.
+      // Simulating context based on current date & time (mock architecture for backend readiness).
+      const now = new Date();
+      const dayOfWeek = now.getDay(); // 0 = Sun, 6 = Sat
+      const month = now.getMonth(); // 0 = Jan ... 11 = Dec
+
+      // Weekend check
+      if (dayOfWeek === 0 || dayOfWeek === 6) {
+        return 'weekend';
+      }
+
+      // Holiday check (e.g., December festive period or August summer break)
+      if (month === 11 || month === 7) {
+        return 'holiday';
+      }
+
+      // Default to academic active period
+      return 'academic';
+    }
+
+    function evaluateSmartHero() {
+      const period = determineCurrentAcademicPeriod();
+      let selectedUrl = '';
+      let badgeText = 'Smart Matrix';
+      let subGreetingText = 'Ready for another productive day?';
+
+      if (appState.heroMode === 'smart') {
+        // Priority: Period-specific preference -> Period default fallback
+        if (appState.periodPreferences[period] && appState.periodPreferences[period] !== '') {
+          selectedUrl = appState.periodPreferences[period];
+        } else {
+          // Fallback mapping based on period
+          if (period === 'academic') {
+            selectedUrl = DEFAULT_HERO_IMAGES[0].url;
+            badgeText = 'Academic Period';
+            subGreetingText = 'Focus • Learning • Academic Excellence';
+          } else if (period === 'weekend') {
+            selectedUrl = DEFAULT_HERO_IMAGES[3].url;
+            badgeText = 'Weekend Mode';
+            subGreetingText = 'Take a moment to recharge and explore.';
+          } else if (period === 'holiday') {
+            selectedUrl = DEFAULT_HERO_IMAGES[4].url;
+            badgeText = 'Holiday Period';
+            subGreetingText = 'Enjoy your cultural and festive break.';
+          } else {
+            selectedUrl = DEFAULT_HERO_IMAGES[1].url;
+            badgeText = 'Active Session';
+            subGreetingText = 'Your academic journey continues.';
+          }
+        }
+      } else {
+        // Personal Mode current
+        selectedUrl = appState.currentHeroUrl || appState.gallery[0].url;
+        badgeText = 'Personal Mode';
+        
+        // Time-aware greeting & message
+        const hour = new Date().getHours();
+        if (hour < 12) subGreetingText = 'Good morning. Ready for inquiry?';
+        else if (hour < 18) subGreetingText = 'Good afternoon. Maintain your focus.';
+        else subGreetingText = 'Good evening. Evening research session.';
+      }
+
+      setHeroImageWithCinematicTransition(selectedUrl, badgeText, subGreetingText);
+    }
+
+    function setHeroImageWithCinematicTransition(url, badgeText, subMsg) {
+      if (appState.currentHeroUrl === url && document.getElementById('heroImageElement').src) {
+        document.getElementById('heroBadgeLabel').innerText = badgeText;
+        if (subMsg) document.getElementById('dynamicSubGreeting').innerText = subMsg;
+        return;
+      }
+
+      const container = document.getElementById('heroContainer');
+      const imgEl = document.getElementById('heroImageElement');
+
+      // 15. Cinematic Transition: Soft blur & fade
+      container.classList.add('transitioning');
+
+      setTimeout(() => {
+        imgEl.src = url;
+        appState.currentHeroUrl = url;
+        document.getElementById('heroBadgeLabel').innerText = badgeText;
+        if (subMsg) document.getElementById('dynamicSubGreeting').innerText = subMsg;
+        saveStateToStorage();
+
+        setTimeout(() => {
+          container.classList.remove('transitioning');
+        }, 150);
+      }, 350);
+    }
+
+    function setHeroMode(mode) {
+      appState.heroMode = mode;
+      document.getElementById('btnModePersonal').className = `mode-switch-btn ${mode === 'personal' ? 'active' : ''}`;
+      document.getElementById('btnModeSmart').className = `mode-switch-btn ${mode === 'smart' ? 'active' : ''}`;
+      saveStateToStorage();
+      evaluateSmartHero();
+    }
 
     function toggleAuthMode() {
       isRegisterState = !isRegisterState;
@@ -1087,12 +1388,20 @@
       document.getElementById('mainHeader').style.display = 'flex';
       document.getElementById('mainNavBar').style.display = 'flex';
 
-      // Update dynamic greeting & profile UI
-      document.getElementById('dynamicGreeting').innerText = `WELCOME, ${currentUserProfile.name.toUpperCase()}`;
+      // 13 & 14. Time-aware personalized greeting
+      const hour = new Date().getHours();
+      let timeGreeting = "WELCOME";
+      if (hour < 12) timeGreeting = "GOOD MORNING";
+      else if (hour < 18) timeGreeting = "GOOD AFTERNOON";
+      else timeGreeting = "GOOD EVENING";
+
+      document.getElementById('dynamicGreeting').innerText = `${timeGreeting}, ${currentUserProfile.name.toUpperCase()}`;
       document.getElementById('profileDisplayName').innerText = currentUserProfile.name;
       document.getElementById('profileDisplayEmail').innerText = currentUserProfile.email;
       document.getElementById('profileDisplayProgram').innerText = currentUserProfile.program;
       document.getElementById('profileInitial').innerText = currentUserProfile.name.charAt(0).toUpperCase();
+
+      evaluateSmartHero();
     }
 
     function handleLogout() {
@@ -1122,23 +1431,119 @@
       }
     }
 
-    function openHeroModal() {
-      document.getElementById('heroModal').classList.add('active');
+    /* 4 & 12. HERO PREFERENCES & GALLERY MODAL MANAGEMENT */
+    function openHeroPreferencesModal() {
+      renderHeroGalleryModal();
+      renderPeriodPreferencesUI();
+      document.getElementById('btnModePersonal').className = `mode-switch-btn ${appState.heroMode === 'personal' ? 'active' : ''}`;
+      document.getElementById('btnModeSmart').className = `mode-switch-btn ${appState.heroMode === 'smart' ? 'active' : ''}`;
+      document.getElementById('heroPreferencesModal').classList.add('active');
     }
 
-    function closeHeroModal() {
-      document.getElementById('heroModal').classList.remove('active');
+    function closeHeroPreferencesModal() {
+      document.getElementById('heroPreferencesModal').classList.remove('active');
+      evaluateSmartHero();
     }
 
-    function updateHeroImage(url) {
-      document.getElementById('heroImageElement').src = url;
-      localStorage.setItem('appearich_hero_img', url);
-      closeHeroModal();
+    function renderHeroGalleryModal() {
+      const grid = document.getElementById('heroGalleryGrid');
+      let html = '';
+
+      appState.gallery.forEach((imgObj) => {
+        const isSelected = appState.currentHeroUrl === imgObj.url ? 'selected' : '';
+        html += `
+          <div class="gallery-thumb-card ${isSelected}" onclick="selectHeroImage('${imgObj.url}')">
+            <img src="${imgObj.url}" alt="${imgObj.label || 'Hero'}">
+            <button class="gallery-thumb-delete" onclick="event.stopPropagation(); deleteGalleryImage('${imgObj.id}')" title="Delete">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+        `;
+      });
+
+      // Add tile
+      html += `
+        <div class="gallery-add-tile" onclick="triggerImageUploadDialog()">
+          <i class="fa-solid fa-plus" style="font-size: 1.2rem;"></i>
+          <span style="font-size: 0.65rem; font-weight: 700;">Add Image</span>
+        </div>
+      `;
+
+      grid.innerHTML = html;
     }
 
-    function resetDefaultHero() {
-      const defaultUrl = "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?q=80&w=800&auto=format&fit=cover";
-      updateHeroImage(defaultUrl);
+    function triggerImageUploadDialog() {
+      document.getElementById('heroImageFileInput').click();
+    }
+
+    function handleImageUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const newImg = {
+          id: 'custom_' + Date.now(),
+          url: e.target.result,
+          label: 'Custom Upload'
+        };
+        appState.gallery.push(newImg);
+        saveGalleryToStorage();
+        renderHeroGalleryModal();
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function selectHeroImage(url) {
+      appState.heroMode = 'personal';
+      appState.currentHeroUrl = url;
+      document.getElementById('btnModePersonal').className = 'mode-switch-btn active';
+      document.getElementById('btnModeSmart').className = 'mode-switch-btn';
+      saveStateToStorage();
+      renderHeroGalleryModal();
+      evaluateSmartHero();
+    }
+
+    function deleteGalleryImage(id) {
+      if (appState.gallery.length <= 1) {
+        alert("You must retain at least one image in your gallery.");
+        return;
+      }
+      appState.gallery = appState.gallery.filter(item => item.id !== id);
+      saveGalleryToStorage();
+      renderHeroGalleryModal();
+    }
+
+    function renderPeriodPreferencesUI() {
+      const listContainer = document.getElementById('periodPreferencesList');
+      const periods = [
+        { key: 'academic', label: 'Academic Period' },
+        { key: 'weekend', label: 'Weekend Mode' },
+        { key: 'holiday', label: 'Holiday Period' },
+        { key: 'shortBreak', label: 'Short Break' },
+        { key: 'longBreak', label: 'Long Break' }
+      ];
+
+      let html = '';
+      periods.forEach(p => {
+        const currentVal = appState.periodPreferences[p.key] || '';
+        html += `
+          <div style="display: flex; justify-content: space-between; align-items: center; background: var(--surface-elevated); padding: 10px 14px; border-radius: 12px; border: 1px solid var(--border-color);">
+            <span style="font-size: 0.8rem; font-weight: 700;">${p.label}</span>
+            <select style="background: var(--bg-color); color: var(--text-main); border: 1px solid var(--border-color); border-radius: 8px; padding: 6px 10px; font-size: 0.75rem; outline: none;" onchange="updatePeriodPreference('${p.key}', this.value)">
+              <option value="">Default System Image</option>
+              ${appState.gallery.map(img => `<option value="${img.url}" ${currentVal === img.url ? 'selected' : ''}>${img.label || 'Gallery Image'}</option>`).join('')}
+            </select>
+          </div>
+        `;
+      });
+
+      listContainer.innerHTML = html;
+    }
+
+    function updatePeriodPreference(periodKey, url) {
+      appState.periodPreferences[periodKey] = url;
+      saveStateToStorage();
     }
 
     function triggerDiscoveryModal(title, desc) {
@@ -1157,7 +1562,6 @@
 
     function handleGlobalSearch(query) {
       if (query.trim().length > 2) {
-        // Simulated responsive search feedback across modules
         console.log(`Searching academic matrix for: ${query}`);
       }
     }
