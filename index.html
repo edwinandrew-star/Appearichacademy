@@ -1,674 +1,1166 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en" data-theme="dark">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>APPEARICH — Future Cambridge-Inspired LMS</title>
-    <!-- Google Fonts for superior editorial typography -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
-                        mono: ['"Space Grotesk"', 'monospace'],
-                    },
-                    colors: {
-                        appearichGold: '#FFD700',
-                    }
-                }
-            }
-        }
-    </script>
-    <!-- React & ReactDOM CDN -->
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <!-- Babel for in-browser JSX transformation -->
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Appearich — Next-Gen Academic Ecosystem</title>
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <style>
+    :root {
+      --bg-color: #050505;
+      --surface-color: #121214;
+      --surface-elevated: #1a1a1e;
+      --border-color: #27272a;
+      --text-main: #f4f4f5;
+      --text-sub: #a1a1aa;
+      --accent-gold: #fbbf24;
+      --accent-gold-glow: rgba(251, 191, 36, 0.18);
+      --accent-gold-border: rgba(251, 191, 36, 0.4);
+      --nav-bg: rgba(18, 18, 20, 0.85);
+      --shadow-lg: 0 20px 40px -15px rgba(0, 0, 0, 0.7);
+    }
+
+    [data-theme="light"] {
+      --bg-color: #f8fafc;
+      --surface-color: #ffffff;
+      --surface-elevated: #f1f5f9;
+      --border-color: #e2e8f0;
+      --text-main: #09090b;
+      --text-sub: #71717a;
+      --accent-gold: #d97706;
+      --accent-gold-glow: rgba(217, 119, 6, 0.12);
+      --accent-gold-border: rgba(217, 119, 6, 0.3);
+      --nav-bg: rgba(255, 255, 255, 0.85);
+      --shadow-lg: 0 20px 30px -10px rgba(0, 0, 0, 0.05);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+      transition: background-color 0.3s cubic-bezier(0.16, 1, 0.3, 1), color 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow-x: hidden;
+    }
+
+    /* CINEMATIC OPENING EXPERIENCE */
+    #cinematic-splash {
+      position: fixed;
+      inset: 0;
+      background: #000000;
+      z-index: 99999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.8s;
+    }
+
+    .splash-logo-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      animation: cinematicReveal 1.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .splash-emblem {
+      width: 80px;
+      height: 80px;
+      border-radius: 20px;
+      background: linear-gradient(135deg, #fbbf24, #b45309);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      font-weight: 900;
+      color: #000000;
+      box-shadow: 0 0 50px rgba(251, 191, 36, 0.4);
+      margin-bottom: 20px;
+    }
+
+    .splash-title {
+      font-size: 1.8rem;
+      font-weight: 800;
+      letter-spacing: 6px;
+      color: #ffffff;
+      text-transform: uppercase;
+    }
+
+    .splash-subtitle {
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 3px;
+      color: #fbbf24;
+      text-transform: uppercase;
+      margin-top: 8px;
+    }
+
+    @keyframes cinematicReveal {
+      0% { opacity: 0; transform: scale(0.9) translateY(10px); filter: blur(10px); }
+      50% { opacity: 1; transform: scale(1) translateY(0); filter: blur(0); }
+      80% { opacity: 1; transform: scale(1); filter: blur(0); }
+      100% { opacity: 0; transform: scale(1.05); filter: blur(5px); visibility: hidden; }
+    }
+
+    /* APP CONTAINER & SCREENS */
+    .app-viewport {
+      width: 100%;
+      max-width: 480px;
+      min-height: 100vh;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      padding-bottom: 90px;
+    }
+
+    .screen {
+      display: none;
+      flex-direction: column;
+      width: 100%;
+      padding: 20px 16px;
+      animation: screenFadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .screen.active {
+      display: flex;
+    }
+
+    @keyframes screenFadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* AUTHENTICATION EXPERIENCE */
+    #screen-auth {
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 24px;
+    }
+
+    .auth-card {
+      width: 100%;
+      background: var(--surface-color);
+      border: 1px solid var(--border-color);
+      border-radius: 24px;
+      padding: 32px 24px;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .auth-brand-header {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    .auth-logo-small {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #fbbf24, #b45309);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      font-weight: 900;
+      color: #000000;
+      margin-bottom: 12px;
+    }
+
+    .auth-title {
+      font-size: 1.5rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: var(--text-main);
+    }
+
+    .auth-subtitle {
+      font-size: 0.82rem;
+      color: var(--text-sub);
+      margin-top: 4px;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-sub);
+      margin-bottom: 6px;
+    }
+
+    .form-group input {
+      width: 100%;
+      background: var(--bg-color);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 12px 16px;
+      color: var(--text-main);
+      font-size: 0.9rem;
+      outline: none;
+    }
+
+    .form-group input:focus {
+      border-color: var(--accent-gold);
+      box-shadow: 0 0 0 3px var(--accent-gold-glow);
+    }
+
+    .primary-btn {
+      width: 100%;
+      background: var(--accent-gold);
+      color: #000000;
+      border: none;
+      padding: 14px;
+      border-radius: 12px;
+      font-weight: 800;
+      font-size: 0.9rem;
+      cursor: pointer;
+      margin-top: 8px;
+      box-shadow: 0 4px 12px var(--accent-gold-glow);
+    }
+
+    .auth-switch-text {
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--text-sub);
+      margin-top: 20px;
+      cursor: pointer;
+    }
+
+    .auth-switch-text span {
+      color: var(--accent-gold);
+      font-weight: 700;
+    }
+
+    /* TOP HEADER */
+    .app-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px;
+      background: var(--nav-bg);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .header-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+      font-size: 1.1rem;
+      letter-spacing: 0.5px;
+    }
+
+    .header-logo-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #fbbf24, #b45309);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      font-weight: 900;
+      color: #000;
+    }
+
+    .icon-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: var(--surface-surface, var(--surface-color));
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+
+    /* HOME SCREEN & HERO */
+    .hero-container {
+      position: relative;
+      width: 100%;
+      height: 220px;
+      border-radius: 20px;
+      overflow: hidden;
+      margin-bottom: 20px;
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .hero-bg-image {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: brightness(0.65);
+      transition: transform 0.5s ease;
+    }
+
+    .hero-container:hover .hero-bg-image {
+      transform: scale(1.03);
+    }
+
+    .hero-gradient-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.2) 70%, transparent 100%);
+    }
+
+    .hero-content {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 20px;
+      z-index: 2;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+
+    .hero-greeting {
+      font-size: 1.4rem;
+      font-weight: 900;
+      color: #ffffff;
+      line-height: 1.2;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    }
+
+    .hero-msg {
+      font-size: 0.78rem;
+      color: #fbbf24;
+      font-weight: 700;
+      margin-top: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .hero-control-btn {
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #ffffff;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* COMMAND SEARCH BAR */
+    .search-command-bar {
+      position: relative;
+      margin-bottom: 24px;
+    }
+
+    .search-command-bar input {
+      width: 100%;
+      background: var(--surface-color);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 14px 16px 14px 44px;
+      color: var(--text-main);
+      font-size: 0.88rem;
+      outline: none;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+    }
+
+    .search-command-bar input:focus {
+      border-color: var(--accent-gold);
+      box-shadow: 0 0 0 3px var(--accent-gold-glow);
+    }
+
+    .search-command-bar i {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-sub);
+      font-size: 0.95rem;
+    }
+
+    /* DISCOVERY SECTION CARDS */
+    .section-header-title {
+      font-size: 0.8rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: var(--text-sub);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .cards-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .discovery-card {
+      background: var(--surface-color);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 18px;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 140px;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .discovery-card.featured {
+      grid-column: span 2;
+      height: 110px;
+      flex-direction: row;
+      align-items: center;
+    }
+
+    .discovery-card:hover {
+      border-color: var(--accent-gold-border);
+      transform: translateY(-2px);
+    }
+
+    .card-icon-wrap {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: var(--accent-gold-glow);
+      color: var(--accent-gold);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+    }
+
+    .card-title {
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: var(--text-main);
+      margin-top: 8px;
+    }
+
+    .card-desc {
+      font-size: 0.72rem;
+      color: var(--text-sub);
+      margin-top: 2px;
+    }
+
+    /* BOTTOM NAVIGATION */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 480px;
+      height: 72px;
+      background: var(--nav-bg);
+      backdrop-filter: blur(16px);
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      z-index: 1000;
+      padding: 0 10px;
+    }
+
+    .nav-item {
+      background: none;
+      border: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      color: var(--text-sub);
+      font-size: 0.7rem;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 8px 12px;
+      border-radius: 12px;
+    }
+
+    .nav-item i {
+      font-size: 1.2rem;
+    }
+
+    .nav-item.active {
+      color: var(--accent-gold);
+      background: var(--accent-gold-glow);
+    }
+
+    /* AI SECTION */
+    .ai-companion-hero {
+      background: var(--surface-color);
+      border: 1px solid var(--border-color);
+      border-radius: 24px;
+      padding: 24px;
+      text-align: center;
+      margin-bottom: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .ai-core-pulse {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      background: var(--accent-gold-glow);
+      border: 2px solid var(--accent-gold);
+      margin: 0 auto 16px auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent-gold);
+      font-size: 1.6rem;
+      box-shadow: 0 0 30px var(--accent-gold-glow);
+      animation: corePulse 2s infinite alternate;
+    }
+
+    @keyframes corePulse {
+      from { transform: scale(0.95); box-shadow: 0 0 15px var(--accent-gold-glow); }
+      to { transform: scale(1.05); box-shadow: 0 0 35px var(--accent-gold-glow); }
+    }
+
+    .ai-tools-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .ai-tool-card {
+      background: var(--surface-color);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 16px;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .ai-tool-card:hover {
+      border-color: var(--accent-gold);
+    }
+
+    /* ACTIVITY JOURNEY SECTION */
+    .journey-timeline {
+      position: relative;
+      padding-left: 24px;
+      margin-top: 10px;
+    }
+
+    .journey-timeline::before {
+      content: '';
+      position: absolute;
+      left: 7px;
+      top: 6px;
+      bottom: 6px;
+      width: 2px;
+      background: var(--border-color);
+    }
+
+    .timeline-node {
+      position: relative;
+      margin-bottom: 20px;
+    }
+
+    .timeline-node::before {
+      content: '';
+      position: absolute;
+      left: -20px;
+      top: 4px;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--accent-gold);
+      box-shadow: 0 0 8px var(--accent-gold);
+    }
+
+    .timeline-content {
+      background: var(--surface-color);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 14px;
+    }
+
+    /* PROFILE SCREEN */
+    .profile-card-header {
+      background: var(--surface-color);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 24px;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .profile-avatar-lg {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #fbbf24, #b45309);
+      color: #000000;
+      font-size: 1.8rem;
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 12px auto;
+    }
+
+    .settings-list {
+      background: var(--surface-color);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+
+    .settings-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border-color);
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .settings-item:last-child {
+      border-bottom: none;
+    }
+
+    .danger-btn {
+      width: 100%;
+      background: transparent;
+      border: 1.5px solid #ef4444;
+      color: #ef4444;
+      padding: 12px;
+      border-radius: 14px;
+      font-weight: 800;
+      font-size: 0.85rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    /* MODAL OVERLAYS */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(8px);
+      z-index: 2000;
+      display: none;
+      justify-content: center;
+      align-items: flex-end;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-sheet {
+      width: 100%;
+      max-width: 480px;
+      background: var(--surface-color);
+      border: 1px solid var(--border-color);
+      border-top-left-radius: 24px;
+      border-top-right-radius: 24px;
+      padding: 24px 20px 40px 20px;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+  </style>
 </head>
-<body class="bg-neutral-950 text-neutral-100 font-sans selection:bg-[#FFD700] selection:text-black antialiased">
-    <div id="root"></div>
+<body>
 
-    <script type="text/babel">
-        const { useState, useEffect, useRef } = React;
+  <!-- CINEMATIC OPENING SEQUENCE -->
+  <div id="cinematic-splash">
+    <div class="splash-logo-container">
+      <div class="splash-emblem">A</div>
+      <div class="splash-title">Appearich</div>
+      <div class="splash-subtitle">Cambridge Academic Matrix</div>
+    </div>
+  </div>
 
-        function App() {
-            const [isLoggedIn, setIsLoggedIn] = useState(false);
-            const [userName, setUserName] = useState('William');
-            const [currentTab, setCurrentTab] = useState('Home');
-            const [activeSubView, setActiveSubView] = useState(null);
-            const [darkMode, setDarkMode] = useState(true);
+  <div class="app-viewport">
 
-            // Persistent Hero Image State with multiple updates/deletes support & creative editorial imagery
-            const [heroImage, setHeroImage] = useState('https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&q=80&w=1200');
-            const [isBwMode, setIsBwMode] = useState(false);
-            const [showHeroMenu, setShowHeroMenu] = useState(false);
-            const fileInputRef = useRef(null);
+    <!-- AUTHENTICATION SCREEN -->
+    <div id="screen-auth" class="screen active">
+      <div class="auth-card">
+        <div class="auth-brand-header">
+          <div class="auth-logo-small">A</div>
+          <h1 class="auth-title" id="authTitleText">Welcome Scholar</h1>
+          <p class="auth-subtitle" id="authSubText">Authenticate to access your Cambridge matrix</p>
+        </div>
 
-            useEffect(() => {
-                if (darkMode) {
-                    document.documentElement.classList.add('dark');
-                } else {
-                    document.documentElement.classList.remove('dark');
-                }
-            }, [darkMode]);
+        <div class="form-group" id="nameGroup" style="display: none;">
+          <label>Full Name</label>
+          <input type="text" id="regName" placeholder="e.g. Alistair Sterling">
+        </div>
+        <div class="form-group">
+          <label>University Email</label>
+          <input type="email" id="authEmail" placeholder="scholar@appearich.ac.uk">
+        </div>
+        <div class="form-group">
+          <label>Security Password</label>
+          <input type="password" id="authPassword" placeholder="••••••••••••">
+        </div>
+        <div class="form-group" id="programGroup" style="display: none;">
+          <label>Degree Program</label>
+          <input type="text" id="regProgram" placeholder="e.g. B.A. Computer Science & Tripos">
+        </div>
 
-            const handleLogin = (name) => {
-                if (name.trim()) setUserName(name.trim());
-                setIsLoggedIn(true);
-            };
-
-            const handleLogout = () => {
-                setIsLoggedIn(false);
-                setCurrentTab('Home');
-                setActiveSubView(null);
-            };
-
-            const handleImageUpload = (e) => {
-                const file = e.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onloadend = () => {
-                        setHeroImage(reader.result);
-                        setShowHeroMenu(false);
-                    };
-                    reader.readAsDataURL(file);
-                }
-            };
-
-            if (!isLoggedIn) {
-                return <LoginScreen onLogin={handleLogin} />;
-            }
-
-            return (
-                <div className="max-w-md mx-auto min-h-screen bg-white dark:bg-neutral-950 text-neutral-900 dark:text-neutral-100 flex flex-col justify-between shadow-2xl relative pb-28 transition-colors duration-300">
-                    
-                    {/* Top Header */}
-                    <header className="flex justify-between items-center px-6 pt-5 pb-3 border-b border-neutral-100 dark:border-neutral-900 bg-white/80 dark:bg-neutral-950/80 backdrop-blur-md sticky top-0 z-40">
-                        <div 
-                            onClick={() => setActiveSubView(null)}
-                            className="w-10 h-10 rounded-full border border-neutral-200 dark:border-neutral-800 flex items-center justify-center cursor-pointer hover:bg-neutral-100 dark:hover:bg-neutral-900 shadow-sm text-sm font-bold transition-all"
-                        >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>
-                        </div>
-                        <div className="flex items-center space-x-2 font-black text-lg tracking-tight">
-                            <span className="w-6 h-6 bg-black dark:bg-[#FFD700] text-[#FFD700] dark:text-black rounded-lg flex items-center justify-center text-xs shadow-sm font-mono font-bold">A</span>
-                            <span className="font-extrabold tracking-wider font-mono">APPEARICH</span>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                            <button 
-                                onClick={() => setIsBwMode(!isBwMode)}
-                                className={`px-2.5 h-9 rounded-full border border-neutral-200 dark:border-neutral-800 flex items-center justify-center text-[10px] font-mono font-bold transition-colors ${isBwMode ? 'bg-neutral-900 text-white border-black' : 'hover:bg-neutral-100 dark:hover:bg-neutral-900'}`}
-                                title="Toggle B&W Mode"
-                            >
-                                MONO
-                            </button>
-                            <button 
-                                onClick={() => setDarkMode(!darkMode)}
-                                className="w-9 h-9 rounded-full border border-neutral-200 dark:border-neutral-800 flex items-center justify-center text-xs hover:bg-neutral-100 dark:hover:bg-neutral-900 transition-colors"
-                            >
-                                {darkMode ? 'LIGHT' : 'DARK'}
-                            </button>
-                        </div>
-                    </header>
-
-                    {/* Main Content Area */}
-                    <main className="flex-1 overflow-y-auto">
-                        {currentTab === 'Home' && !activeSubView && (
-                            <HomeScreen 
-                                userName={userName} 
-                                heroImage={heroImage} 
-                                isBwMode={isBwMode}
-                                showHeroMenu={showHeroMenu}
-                                setShowHeroMenu={setShowHeroMenu}
-                                fileInputRef={fileInputRef}
-                                handleImageUpload={handleImageUpload}
-                                setHeroImage={setHeroImage}
-                                setActiveSubView={setActiveSubView}
-                            />
-                        )}
-
-                        {currentTab === 'Home' && activeSubView === 'academics' && <AcademicsView onBack={() => setActiveSubView(null)} />}
-                        {currentTab === 'Home' && activeSubView === 'events' && <EventsView onBack={() => setActiveSubView(null)} />}
-                        {currentTab === 'Home' && activeSubView === 'sports' && <SportsView onBack={() => setActiveSubView(null)} />}
-                        {currentTab === 'Home' && activeSubView === 'library' && <LibraryView onBack={() => setActiveSubView(null)} />}
-                        {currentTab === 'Home' && activeSubView === 'community' && <CommunityView onBack={() => setActiveSubView(null)} />}
-
-                        {currentTab === 'AI' && <AICampanionView userName={userName} />}
-                        {currentTab === 'Activity' && <ActivityJourneyView />}
-                        {currentTab === 'Profile' && <ProfileView userName={userName} heroImage={heroImage} onLogout={handleLogout} />}
-                    </main>
-
-                    {/* Hidden file input for hero management */}
-                    <input type="file" ref={fileInputRef} onChange={handleImageUpload} accept="image/*" className="hidden" />
-
-                    {/* Creative Bottom Navigation Bar (No Emojis) */}
-                    <nav className="absolute bottom-0 left-0 right-0 bg-white/90 dark:bg-neutral-950/90 backdrop-blur-lg border-t border-neutral-200 dark:border-neutral-900 px-4 py-3 flex justify-around items-center z-30 shadow-2xl">
-                        {[
-                            { name: 'Home', label: 'CAMPUS' },
-                            { name: 'AI', label: 'MENTOR' },
-                            { name: 'Activity', label: 'JOURNEY' },
-                            { name: 'Profile', label: 'DOSSIER' }
-                        ].map((tab) => (
-                            <button 
-                                key={tab.name}
-                                onClick={() => { setCurrentTab(tab.name); setActiveSubView(null); }}
-                                className={`flex flex-col items-center space-y-1 transition-all py-1 px-3 rounded-xl ${currentTab === tab.name ? 'bg-[#FFD700] text-black font-black shadow-md scale-105' : 'text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200'}`}
-                            >
-                                <span className="text-[10px] tracking-widest font-mono">{tab.label}</span>
-                            </button>
-                        ))}
-                    </nav>
-
-                </div>
-            );
-        }
-
-        // LOGIN SCREEN
-        function LoginScreen({ onLogin }) {
-            const [nameInput, setNameInput] = useState('William');
-
-            return (
-                <div className="max-w-md mx-auto min-h-screen bg-black text-white flex flex-col justify-between p-8 relative overflow-hidden font-sans">
-                    <div className="absolute -top-32 -right-32 w-96 h-96 rounded-full bg-[#FFD700]/10 blur-3xl pointer-events-none"></div>
-                    
-                    <div className="space-y-3 pt-12 z-10">
-                        <div className="inline-block bg-[#FFD700] text-black font-mono text-[10px] px-2.5 py-1 font-extrabold rounded">
-                            CAMBRIDGE DIGITAL OS v3.0
-                        </div>
-                        <h1 className="text-5xl font-black tracking-tighter leading-none text-white font-mono">
-                            APPEARICH<span className="text-[#FFD700]">.</span>
-                        </h1>
-                        <p className="text-xs text-neutral-400 font-medium pt-1">
-                            The Future of University Learning. Immersive intelligence, 3D architecture, and academic prestige.
-                        </p>
-                    </div>
-
-                    <div className="space-y-6 z-10 my-auto">
-                        <div className="space-y-2">
-                            <label className="text-[10px] font-mono text-neutral-400 uppercase tracking-widest">Enter Student Name</label>
-                            <input 
-                                type="text"
-                                value={nameInput}
-                                onChange={(e) => setNameInput(e.target.value)}
-                                placeholder="e.g. William"
-                                className="w-full bg-neutral-900 border border-neutral-800 rounded-2xl px-5 py-4 text-white font-bold text-base focus:outline-none focus:border-[#FFD700] transition-colors"
-                            />
-                        </div>
-                        <button 
-                            onClick={() => onLogin(nameInput)}
-                            className="w-full bg-[#FFD700] text-black font-black py-4 rounded-2xl tracking-wider text-xs hover:bg-white transition-all shadow-xl shadow-[#FFD700]/10 flex items-center justify-center space-x-2 font-mono uppercase"
-                        >
-                            <span>Enter Campus Environment</span>
-                            <span>→</span>
-                        </button>
-                    </div>
-
-                    <div className="text-center text-[9px] font-mono text-neutral-600 z-10 uppercase tracking-widest">
-                        Secured by Cambridge Academic Protocol
-                    </div>
-                </div>
-            );
-        }
-
-        // HOME SCREEN
-        function HomeScreen({ 
-            userName, 
-            heroImage, 
-            isBwMode,
-            showHeroMenu, 
-            setShowHeroMenu, 
-            fileInputRef, 
-            setHeroImage,
-            setActiveSubView 
-        }) {
-            const [searchQuery, setSearchQuery] = useState('');
-            const [isSearchFocused, setIsSearchFocused] = useState(false);
-
-            return (
-                <div className="px-5 py-4 space-y-6 animate-fadeIn">
-                    
-                    {/* Heroic Personal Image Environment with Creative Cover Menu */}
-                    <div className="relative rounded-3xl overflow-hidden bg-neutral-900 text-white shadow-2xl h-60 flex flex-col justify-end group border border-neutral-800">
-                        {heroImage ? (
-                            <img 
-                                src={heroImage} 
-                                className={`absolute inset-0 w-full h-full object-cover transition-all duration-700 group-hover:scale-105 ${isBwMode ? 'grayscale contrast-125' : 'opacity-85'}`} 
-                            />
-                        ) : (
-                            <div className="absolute inset-0 bg-gradient-to-br from-neutral-900 to-neutral-800"></div>
-                        )}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent"></div>
-                        
-                        {/* Change Cover Management Menu */}
-                        <div className="absolute top-4 right-4 z-20">
-                            <button 
-                                onClick={() => setShowHeroMenu(!showHeroMenu)}
-                                className="bg-black/80 backdrop-blur-md border border-white/20 text-white text-[10px] font-mono px-3.5 py-2 rounded-full hover:bg-black transition-all flex items-center space-x-1.5 shadow-xl uppercase font-semibold"
-                            >
-                                <span>Manage Visual</span>
-                            </button>
-
-                            {showHeroMenu && (
-                                <div className="absolute right-0 mt-2 w-52 bg-neutral-900 border border-neutral-800 rounded-2xl shadow-2xl py-2 z-30 text-xs font-medium space-y-1">
-                                    <button 
-                                        onClick={() => { fileInputRef.current.click(); setShowHeroMenu(false); }}
-                                        className="w-full text-left px-4 py-2.5 hover:bg-neutral-800 text-white flex items-center space-x-2 transition-colors font-mono text-[11px]"
-                                    >
-                                        <span>Upload / Replace Image</span>
-                                    </button>
-                                    <button 
-                                        onClick={() => { setHeroImage(''); setShowHeroMenu(false); }}
-                                        className="w-full text-left px-4 py-2.5 hover:bg-neutral-800 text-red-400 flex items-center space-x-2 transition-colors font-mono text-[11px]"
-                                    >
-                                        <span>Remove Image</span>
-                                    </button>
-                                    <button 
-                                        onClick={() => { setHeroImage('https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&q=80&w=1200'); setShowHeroMenu(false); }}
-                                        className="w-full text-left px-4 py-2.5 hover:bg-neutral-800 text-[#FFD700] flex items-center space-x-2 transition-colors font-mono text-[11px]"
-                                    >
-                                        <span>Restore Default</span>
-                                    </button>
-                                </div>
-                            )}
-                        </div>
-
-                        {/* Personalized Greeting */}
-                        <div className="relative z-10 p-6 space-y-2">
-                            <div className="inline-block bg-[#FFD700] text-black font-mono text-[9px] px-2 py-0.5 font-extrabold uppercase tracking-widest rounded">
-                                CAMBRIDGE SCHOLAR
-                            </div>
-                            <h1 className="text-2xl font-black tracking-tight text-white uppercase font-mono">
-                                WELCOME, {userName}
-                            </h1>
-                            <p className="text-xs text-[#FFD700] font-medium tracking-wide">
-                                Ready to continue your academic journey?
-                            </p>
-                        </div>
-                    </div>
-
-                    {/* Futuristic Search Bar */}
-                    <div className="relative">
-                        <div className={`flex items-center border rounded-2xl bg-neutral-50 dark:bg-neutral-900 px-4 py-3.5 space-x-3 transition-all duration-300 ${isSearchFocused ? 'border-[#FFD700] shadow-lg shadow-[#FFD700]/5 ring-1 ring-[#FFD700]' : 'border-neutral-200 dark:border-neutral-800'}`}>
-                            <span className="text-neutral-400 text-xs font-mono font-bold">[SEARCH]</span>
-                            <input 
-                                type="text" 
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                onFocus={() => setIsSearchFocused(true)}
-                                onBlur={() => setIsSearchFocused(false)}
-                                placeholder="Search your academic world..."
-                                className="bg-transparent text-xs flex-1 focus:outline-none text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-400 font-medium"
-                            />
-                            {searchQuery && (
-                                <button onClick={() => setSearchQuery('')} className="text-xs text-neutral-400 hover:text-neutral-600 font-mono">CLEAR</button>
-                            )}
-                        </div>
-                    </div>
-
-                    {/* Academic Command Center: Creative Cards Arrangement */}
-                    <div className="space-y-4">
-                        <div className="flex justify-between items-center px-1">
-                            <span className="text-[10px] font-mono text-neutral-400 uppercase tracking-widest">[ COMMAND CENTER ]</span>
-                            <span className="text-[10px] font-mono text-[#FFD700]">CAMBRIDGE CULTURE</span>
-                        </div>
-                        
-                        <div className="grid grid-cols-2 gap-3">
-                            {/* Academic Card with Creative Imagery */}
-                            <div 
-                                onClick={() => setActiveSubView('academics')}
-                                className="relative rounded-3xl overflow-hidden h-44 bg-neutral-900 p-4 flex flex-col justify-end shadow-md cursor-pointer group border border-neutral-800"
-                            >
-                                <div className="absolute inset-0 bg-cover bg-center opacity-40 group-hover:scale-105 transition-transform duration-500" style={{ backgroundImage: `url('https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&q=80&w=600')` }}></div>
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent"></div>
-                                <div className="relative z-10 space-y-1">
-                                    <span className="text-[9px] font-mono text-[#FFD700] font-bold">MODULE 01</span>
-                                    <h3 className="font-black text-base text-white">Academics</h3>
-                                    <p className="text-[10px] text-neutral-300 font-medium">Courses & Lectures</p>
-                                </div>
-                            </div>
-
-                            {/* Upcoming Events Card with Creative Imagery */}
-                            <div 
-                                onClick={() => setActiveSubView('events')}
-                                className="relative rounded-3xl overflow-hidden h-44 bg-neutral-900 p-4 flex flex-col justify-end shadow-md cursor-pointer group border border-neutral-800"
-                            >
-                                <div className="absolute inset-0 bg-cover bg-center opacity-40 group-hover:scale-105 transition-transform duration-500" style={{ backgroundImage: `url('https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?auto=format&fit=crop&q=80&w=600')` }}></div>
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent"></div>
-                                <div className="relative z-10 space-y-1">
-                                    <span className="text-[9px] font-mono text-[#FFD700] font-bold">SCHEDULE</span>
-                                    <h3 className="font-black text-base text-white">Upcoming Events</h3>
-                                    <p className="text-[10px] text-neutral-300 font-medium">Seminars & Deadlines</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Secondary Interactive Horizontal Banner Cards */}
-                        <div className="space-y-3">
-                            <div 
-                                onClick={() => setActiveSubView('sports')}
-                                className="bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-4 flex items-center justify-between cursor-pointer hover:border-[#FFD700] transition-all group"
-                            >
-                                <div className="flex items-center space-x-3.5">
-                                    <div className="w-10 h-10 rounded-xl bg-neutral-200 dark:bg-neutral-800 flex items-center justify-center text-xs font-mono font-bold">ATH</div>
-                                    <div>
-                                        <h4 className="font-black text-xs">University Sports & Fitness</h4>
-                                        <p className="text-[10px] text-neutral-500 dark:text-neutral-400">Upcoming matches & training schedules</p>
-                                    </div>
-                                </div>
-                                <span className="text-xs font-mono text-neutral-400 group-hover:translate-x-1 transition-transform">→</span>
-                            </div>
-
-                            <div 
-                                onClick={() => setActiveSubView('library')}
-                                className="bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-4 flex items-center justify-between cursor-pointer hover:border-[#FFD700] transition-all group"
-                            >
-                                <div className="flex items-center space-x-3.5">
-                                    <div className="w-10 h-10 rounded-xl bg-neutral-200 dark:bg-neutral-800 flex items-center justify-center text-xs font-mono font-bold">LIB</div>
-                                    <div>
-                                        <h4 className="font-black text-xs">Digital Library & Resources</h4>
-                                        <p className="text-[10px] text-neutral-500 dark:text-neutral-400">Research papers, books & notes</p>
-                                    </div>
-                                </div>
-                                <span className="text-xs font-mono text-neutral-400 group-hover:translate-x-1 transition-transform">→</span>
-                            </div>
-
-                            <div 
-                                onClick={() => setActiveSubView('community')}
-                                className="bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-4 flex items-center justify-between cursor-pointer hover:border-[#FFD700] transition-all group"
-                            >
-                                <div className="flex items-center space-x-3.5">
-                                    <div className="w-10 h-10 rounded-xl bg-neutral-200 dark:bg-neutral-800 flex items-center justify-center text-xs font-mono font-bold">COM</div>
-                                    <div>
-                                        <h4 className="font-black text-xs">Student Community & Societies</h4>
-                                        <p className="text-[10px] text-neutral-500 dark:text-neutral-400">Discussions and academic groups</p>
-                                    </div>
-                                </div>
-                                <span className="text-xs font-mono text-neutral-400 group-hover:translate-x-1 transition-transform">→</span>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-            );
-        }
-
-        // AI COMPANION VIEW
-        function AICampanionView({ userName }) {
-            const [messages, setMessages] = useState([
-                { sender: 'ai', text: `Hello ${userName}. I'm your Cambridge AI Academic Mentor. You've improved your mathematics performance by 18% this month. I recommend revisiting integration before Friday's lecture.` }
-            ]);
-            const [input, setInput] = useState('');
-
-            const handleSend = () => {
-                if (!input.trim()) return;
-                const userMsg = input;
-                setMessages(prev => [...prev, { sender: 'user', text: userMsg }]);
-                setInput('');
-
-                setTimeout(() => {
-                    setMessages(prev => [
-                        ...prev, 
-                        { sender: 'ai', text: `Analyzing "${userMsg}" through our Cambridge curriculum model. Based on your learning telemetry, let's break this down into key conceptual milestones...` }
-                    ]);
-                }, 800);
-            };
-
-            return (
-                <div className="p-6 space-y-6 flex flex-col h-[calc(100vh-120px)] justify-between animate-fadeIn">
-                    <div className="space-y-4">
-                        <div className="flex items-center justify-between border-b border-neutral-200 dark:border-neutral-900 pb-3">
-                            <div className="flex items-center space-x-2">
-                                <div className="w-2.5 h-2.5 rounded-full bg-[#FFD700] animate-pulse"></div>
-                                <h2 className="font-black text-xs tracking-widest uppercase font-mono">APPEARICH AI MENTOR</h2>
-                            </div>
-                            <span className="text-[9px] font-mono bg-neutral-100 dark:bg-neutral-900 px-2 py-0.5 rounded text-neutral-500">SOCRATIC v3</span>
-                        </div>
-
-                        {/* AI Core Interactive Banner */}
-                        <div className="bg-black text-white rounded-3xl p-6 text-center relative overflow-hidden shadow-xl space-y-3 border border-neutral-800">
-                            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-neutral-800 via-black to-black opacity-50"></div>
-                            <div className="relative z-10 w-14 h-14 mx-auto rounded-full bg-[#FFD700]/20 border border-[#FFD700] flex items-center justify-center animate-pulse shadow-lg shadow-[#FFD700]/10 font-mono font-black text-[#FFD700]">
-                                AI
-                            </div>
-                            <div className="relative z-10">
-                                <h4 className="font-black text-xs text-[#FFD700] tracking-wider uppercase font-mono">KNOWLEDGE TELEMETRY ACTIVE</h4>
-                                <p className="text-[10px] text-neutral-400 mt-0.5">Real-time learning optimization in progress</p>
-                            </div>
-                        </div>
-
-                        {/* Chat Messages */}
-                        <div className="space-y-3 overflow-y-auto max-h-56 pr-1">
-                            {messages.map((m, i) => (
-                                <div key={i} className={`flex ${m.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
-                                    <div className={`max-w-[85%] rounded-2xl p-4 text-xs font-medium leading-relaxed ${m.sender === 'user' ? 'bg-[#FFD700] text-black font-bold shadow-md' : 'bg-neutral-100 dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 border border-neutral-200 dark:border-neutral-800'}`}>
-                                        <div className="text-[9px] font-mono opacity-60 mb-1 uppercase">{m.sender === 'user' ? userName : 'AI MENTOR'}</div>
-                                        {m.text}
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-
-                    {/* Input Bar with Creative Button */}
-                    <div className="pt-2">
-                        <div className="flex items-center border border-neutral-200 dark:border-neutral-800 rounded-2xl bg-neutral-50 dark:bg-neutral-900 px-3 py-2 space-x-2 focus-within:border-[#FFD700] transition-colors">
-                            <input 
-                                type="text"
-                                value={input}
-                                onChange={(e) => setInput(e.target.value)}
-                                onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-                                placeholder="Ask about concepts, schedules, or feedback..."
-                                className="bg-transparent text-xs flex-1 focus:outline-none text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-400"
-                            />
-                            <button 
-                                onClick={handleSend}
-                                className="bg-[#FFD700] text-black font-mono font-black text-[10px] uppercase tracking-wider px-4 py-2.5 rounded-xl hover:bg-white transition-all shadow-sm"
-                            >
-                                Query AI
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            );
-        }
-
-        // ACTIVITY JOURNEY VIEW
-        function ActivityJourneyView() {
-            return (
-                <div className="p-6 space-y-6 animate-fadeIn">
-                    <div className="space-y-1">
-                        <div className="text-[10px] font-mono text-neutral-400 uppercase tracking-widest">[ ACTIVITY INTELLIGENCE ]</div>
-                        <h2 className="text-xl font-black tracking-tight">Your Academic Pathway</h2>
-                    </div>
-
-                    {/* Progress Metrics Overview */}
-                    <div className="grid grid-cols-2 gap-3">
-                        <div className="bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-4 space-y-1">
-                            <span className="text-[10px] font-mono text-neutral-400 uppercase">Courses</span>
-                            <div className="text-2xl font-black font-mono">4 / 6</div>
-                            <p className="text-[10px] text-[#FFD700] font-medium">78% Progress</p>
-                        </div>
-                        <div className="bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-4 space-y-1">
-                            <span className="text-[10px] font-mono text-neutral-400 uppercase">Study Streak</span>
-                            <div className="text-2xl font-black font-mono">12 Days</div>
-                            <p className="text-[10px] text-[#FFD700] font-medium">Top 5% Student</p>
-                        </div>
-                    </div>
-
-                    {/* Visual Journey Pathway */}
-                    <div className="space-y-3">
-                        <div className="text-[10px] font-mono text-neutral-400 uppercase tracking-widest">[ RECENT MILESTONES ]</div>
-                        
-                        <div className="space-y-2.5">
-                            {[
-                                { title: 'Exam Preparation Started', time: 'Today, 10:00 AM', status: 'completed' },
-                                { title: 'Project Research Submitted', time: 'Yesterday', status: 'completed' },
-                                { title: 'Advanced Calculus Quiz', time: '3 days ago', status: 'completed' },
-                                { title: 'Physics Laboratory Report', time: 'Pending Deadline', status: 'current' }
-                            ].map((item, idx) => (
-                                <div key={idx} className={`border rounded-2xl p-4 flex items-center justify-between ${item.status === 'current' ? 'border-[#FFD700] bg-[#FFD700]/5' : 'border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900'}`}>
-                                    <div className="space-y-0.5">
-                                        <h4 className="font-black text-xs">{item.title}</h4>
-                                        <p className="text-[10px] text-neutral-500 font-mono">{item.time}</p>
-                                    </div>
-                                    <span className={`text-[9px] font-mono px-2.5 py-1 rounded font-bold tracking-wider ${item.status === 'current' ? 'bg-[#FFD700] text-black' : 'bg-neutral-200 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300'}`}>
-                                        {item.status === 'current' ? 'ACTIVE' : 'DONE'}
-                                    </span>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </div>
-            );
-        }
-
-        // PROFILE VIEW
-        function ProfileView({ userName, heroImage, onLogout }) {
-            return (
-                <div className="p-6 space-y-6 animate-fadeIn">
-                    <div className="flex items-center space-x-4 border-b border-neutral-200 dark:border-neutral-900 pb-6">
-                        <div className="w-16 h-16 rounded-full bg-neutral-900 text-[#FFD700] font-black flex items-center justify-center text-xl overflow-hidden border-2 border-[#FFD700] shadow-lg shrink-0 font-mono">
-                            {heroImage ? <img src={heroImage} className="w-full h-full object-cover" /> : userName[0]}
-                        </div>
-                        <div>
-                            <h2 className="font-black text-lg tracking-tight uppercase font-mono">{userName}</h2>
-                            <p className="text-xs text-neutral-500 font-mono">Cambridge Scholar ID: #CAM-9042</p>
-                            <span className="inline-block mt-1.5 bg-[#FFD700] text-black font-mono text-[9px] px-2 py-0.5 font-extrabold uppercase rounded">
-                                Premium University Tier
-                            </span>
-                        </div>
-                    </div>
-
-                    <div className="space-y-2">
-                        <div className="text-[10px] font-mono text-neutral-400 uppercase tracking-widest">[ ACCOUNT SETTINGS ]</div>
-                        <div className="bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl overflow-hidden divide-y divide-neutral-200 dark:divide-neutral-800 text-xs font-bold">
-                            <div className="p-4 hover:bg-neutral-100 dark:hover:bg-neutral-800 cursor-pointer flex justify-between items-center transition-colors">
-                                <span>Edit Personal Profile</span>
-                                <span className="text-neutral-400 font-mono">→</span>
-                            </div>
-                            <div className="p-4 hover:bg-neutral-100 dark:hover:bg-neutral-800 cursor-pointer flex justify-between items-center transition-colors">
-                                <span>Notification Preferences</span>
-                                <span className="text-neutral-400 font-mono">→</span>
-                            </div>
-                            <div className="p-4 hover:bg-neutral-100 dark:hover:bg-neutral-800 cursor-pointer flex justify-between items-center transition-colors">
-                                <span>Privacy & Security</span>
-                                <span className="text-neutral-400 font-mono">→</span>
-                            </div>
-                            <div className="p-4 hover:bg-neutral-100 dark:hover:bg-neutral-800 cursor-pointer flex justify-between items-center transition-colors">
-                                <span>Help & Academic Support</span>
-                                <span className="text-neutral-400 font-mono">→</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <button 
-                        onClick={onLogout}
-                        className="w-full border-2 border-red-500/50 text-red-500 font-mono font-bold py-3.5 rounded-2xl text-[10px] uppercase tracking-widest hover:bg-red-500 hover:text-white transition-all shadow-sm"
-                    >
-                        Log Out Securely
-                    </button>
-                </div>
-            );
-        }
-
-        // Subviews for detailed cards
-        function AcademicsView({ onBack }) {
-            return (
-                <div className="p-6 space-y-4 animate-fadeIn">
-                    <button onClick={onBack} className="text-xs font-mono font-bold text-neutral-400 hover:text-neutral-900 dark:hover:text-white uppercase tracking-wider">← Back to Campus</button>
-                    <h2 className="text-xl font-black">Academic Courses & Lectures</h2>
-                    <div className="space-y-3">
-                        {['Advanced Mathematical Analysis', 'Theoretical Physics II', 'Cambridge Modern Philosophy'].map((c, i) => (
-                            <div key={i} className="border border-neutral-200 dark:border-neutral-800 rounded-2xl p-4 bg-neutral-50 dark:bg-neutral-900 space-y-1">
-                                <span className="text-[10px] font-mono text-neutral-400">[ MODULE 0{i+1} ]</span>
-                                <h4 className="font-bold text-sm">{c}</h4>
-                                <div className="flex justify-between text-[10px] text-neutral-500 pt-2 font-mono">
-                                    <span>Professor Assigned</span>
-                                    <span className="font-bold text-neutral-900 dark:text-neutral-100">Active</span>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            );
-        }
-
-        function EventsView({ onBack }) {
-            return (
-                <div className="p-6 space-y-4 animate-fadeIn">
-                    <button onClick={onBack} className="text-xs font-mono font-bold text-neutral-400 hover:text-neutral-900 dark:hover:text-white uppercase tracking-wider">← Back to Campus</button>
-                    <h2 className="text-xl font-black">Upcoming University Events</h2>
-                    <div className="space-y-3">
-                        <div className="bg-[#FFD700] text-black border border-yellow-500 rounded-2xl p-4 space-y-1 shadow-md">
-                            <span className="text-[10px] font-mono font-bold">14 AUG • 10:00 AM</span>
-                            <h4 className="font-black text-sm">Advanced Mathematics Lecture</h4>
-                            <p className="text-[10px] text-black/80 font-medium font-mono">Science Building • Hall A</p>
-                        </div>
-                    </div>
-                </div>
-            );
-        }
-
-        function SportsView({ onBack }) {
-            return (
-                <div className="p-6 space-y-4 animate-fadeIn">
-                    <button onClick={onBack} className="text-xs font-mono font-bold text-neutral-400 hover:text-neutral-900 dark:hover:text-white uppercase tracking-wider">← Back to Campus</button>
-                    <h2 className="text-xl font-black">Sports & Fitness Arena</h2>
-                    <div className="space-y-3">
-                        <div className="border border-neutral-200 dark:border-neutral-800 rounded-2xl p-4 bg-neutral-50 dark:bg-neutral-900 space-y-1">
-                            <span className="text-[10px] font-mono text-[#FFD700]">UNIVERSITY ROWING CLUB</span>
-                            <h4 className="font-bold text-sm">River Cam Training Session</h4>
-                            <p className="text-[10px] text-neutral-500 font-mono">Tomorrow at 06:00 AM</p>
-                        </div>
-                    </div>
-                </div>
-            );
-        }
+        <button class="primary-btn" id="authActionBtn" onclick="handleAuthSubmit()">Initialize Session</button>
         
-        function LibraryView({ onBack }) {
-            return (
-                <div className="p-6 space-y-4 animate-fadeIn">
-                    <button onClick={onBack} className="text-xs font-mono font-bold text-neutral-400 hover:text-neutral-900 dark:hover:text-white uppercase tracking-wider">← Back to Campus</button>
-                    <h2 className="text-xl font-black">Digital University Library</h2>
-                    <div className="space-y-3">
-                        {['Principia Mathematica (Archive)', 'Quantum Mechanics Primer', 'Cambridge Historical Essays'].map((lib, i) => (
-                            <div key={i} className="border border-neutral-200 dark:border-neutral-800 rounded-2xl p-4 bg-neutral-50 dark:bg-neutral-900 flex justify-between items-center">
-                                <div>
-                                    <span className="text-[10px] font-mono text-neutral-400">[ VAULT 0{i+1} ]</span>
-                                    <h4 className="font-bold text-sm mt-0.5">{lib}</h4>
-                                </div>
-                                <span className="text-[10px] font-mono font-bold text-black bg-[#FFD700] px-3.5 py-1.5 rounded-xl uppercase">Read</span>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            );
-        }
+        <div class="auth-switch-text" onclick="toggleAuthMode()">
+          <span id="authSwitchPrompt">New researcher? <span>Create Account</span></span>
+        </div>
+      </div>
+    </div>
 
-        function CommunityView({ onBack }) {
-            return (
-                <div className="p-6 space-y-4 animate-fadeIn">
-                    <button onClick={onBack} className="text-xs font-mono font-bold text-neutral-400 hover:text-neutral-900 dark:hover:text-white uppercase tracking-wider">← Back to Campus</button>
-                    <h2 className="text-xl font-black">Student Societies & Discussions</h2>
-                    <div className="space-y-3">
-                        <div className="border border-neutral-200 dark:border-neutral-800 rounded-2xl p-4 bg-neutral-50 dark:bg-neutral-900 space-y-1">
-                            <span className="text-[10px] font-mono text-[#FFD700]">ACTIVE DISCUSSION</span>
-                            <h4 className="font-bold text-sm">Artificial Intelligence Ethics in Modern Academia</h4>
-                            <p className="text-[10px] text-neutral-500 font-mono">142 Participants • Joined by Dr. Harrison</p>
-                        </div>
-                    </div>
-                </div>
-            );
-        }
+    <!-- MAIN APP HEADER -->
+    <header class="app-header" id="mainHeader" style="display: none;">
+      <div class="header-brand">
+        <div class="header-logo-icon">A</div>
+        <span>Appearich</span>
+      </div>
+      <div style="display: flex; gap: 8px;">
+        <button class="icon-btn" onclick="toggleThemeMode()" title="Toggle Theme">
+          <i class="fa-solid fa-moon" id="themeIcon"></i>
+        </button>
+      </div>
+    </header>
 
-        ReactDOM.createRoot(document.getElementById('root')).render(<App />);
-    </script>
+    <!-- SCREEN 1: HOME (CENTRAL HUB) -->
+    <div id="screen-home" class="screen">
+      <!-- HERO BANNER -->
+      <div class="hero-container" id="heroContainer">
+        <img src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?q=80&w=800&auto=format&fit=cover" alt="Hero Campus" class="hero-bg-image" id="heroImageElement">
+        <div class="hero-gradient-overlay"></div>
+        <div class="hero-content">
+          <div>
+            <h2 class="hero-greeting" id="dynamicGreeting">WELCOME, SCHOLAR</h2>
+            <div class="hero-msg">Tripos Term — Easter Session</div>
+          </div>
+          <button class="hero-control-btn" onclick="openHeroModal()">
+            <i class="fa-solid fa-sliders"></i> Edit Hero
+          </button>
+        </div>
+      </div>
+
+      <!-- ACADEMIC COMMAND SEARCH -->
+      <div class="search-command-bar">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" placeholder="Search courses, lectures, assignments, or resources..." id="globalSearchInput" oninput="handleGlobalSearch(this.value)">
+      </div>
+
+      <!-- DISCOVERY SECTION -->
+      <div class="section-header-title">
+        <i class="fa-solid fa-compass" style="color: var(--accent-gold);"></i> Academic Discovery
+      </div>
+
+      <div class="cards-grid">
+        <div class="discovery-card featured" onclick="triggerDiscoveryModal('Academic Hub', 'Accessing Tripos modules, lecture archives, and assessment schedules.')">
+          <div>
+            <div class="card-icon-wrap"><i class="fa-solid fa-graduation-cap"></i></div>
+            <div class="card-title">Academic Core</div>
+            <div class="card-desc">Courses, assignments, timetables & grades</div>
+          </div>
+          <i class="fa-solid fa-chevron-right" style="color: var(--text-sub);"></i>
+        </div>
+
+        <div class="discovery-card" onclick="triggerDiscoveryModal('Upcoming Events', 'Seminars, supervisions, and examination deadlines.')">
+          <div>
+            <div class="card-icon-wrap"><i class="fa-solid fa-calendar-days"></i></div>
+            <div class="card-title">Events</div>
+            <div class="card-desc">Lectures & deadlines</div>
+          </div>
+        </div>
+
+        <div class="discovery-card" onclick="triggerDiscoveryModal('Library Repository', 'Digital texts, research papers, and archived journals.')">
+          <div>
+            <div class="card-icon-wrap"><i class="fa-solid fa-book-bookmark"></i></div>
+            <div class="card-title">Library</div>
+            <div class="card-desc">Research materials</div>
+          </div>
+        </div>
+
+        <div class="discovery-card" onclick="triggerDiscoveryModal('Student Community', 'College societies, syndicates, and peer collaboration groups.')">
+          <div>
+            <div class="card-icon-wrap"><i class="fa-solid fa-users-rectangle"></i></div>
+            <div class="card-title">Community</div>
+            <div class="card-desc">Clubs & discussions</div>
+          </div>
+        </div>
+
+        <div class="discovery-card" onclick="triggerDiscoveryModal('Athletics & Sports', 'College rowing, tennis fixtures, and training camps.')">
+          <div>
+            <div class="card-icon-wrap"><i class="fa-solid fa-medal"></i></div>
+            <div class="card-title">Sports</div>
+            <div class="card-desc">Teams & fixtures</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCREEN 2: AI COMPANION -->
+    <div id="screen-ai" class="screen">
+      <div class="ai-companion-hero">
+        <div class="ai-core-pulse">
+          <i class="fa-solid fa-microchip"></i>
+        </div>
+        <h2 style="font-size: 1.3rem; font-weight: 900; margin-bottom: 6px;">AI Academic Intelligence</h2>
+        <p style="font-size: 0.8rem; color: var(--text-sub); max-width: 280px; margin: 0 auto;">Your neural study partner trained on Cambridge Tripos syllabi and research datasets.</p>
+      </div>
+
+      <div class="section-header-title">
+        <i class="fa-solid fa-wand-magic-sparkles" style="color: var(--accent-gold);"></i> Intelligent Capabilities
+      </div>
+
+      <div class="ai-tools-grid">
+        <div class="ai-tool-card" onclick="triggerAiAction('Summarizing Material')">
+          <div class="card-icon-wrap"><i class="fa-solid fa-file-lines"></i></div>
+          <div class="card-title" style="font-size: 0.88rem;">Summarizer</div>
+          <div class="card-desc">Condense lecture notes</div>
+        </div>
+        <div class="ai-tool-card" onclick="triggerAiAction('Creating Practice Quizzes')">
+          <div class="card-icon-wrap"><i class="fa-solid fa-brain"></i></div>
+          <div class="card-title" style="font-size: 0.88rem;">Quiz Engine</div>
+          <div class="card-desc">Active recall tests</div>
+        </div>
+        <div class="ai-tool-card" onclick="triggerAiAction('Building Dynamic Study Plans')">
+          <div class="card-icon-wrap"><i class="fa-solid fa-timeline"></i></div>
+          <div class="card-title" style="font-size: 0.88rem;">Study Planner</div>
+          <div class="card-desc">Optimized revision schedules</div>
+        </div>
+        <div class="ai-tool-card" onclick="triggerAiAction('Explaining Complex Topics')">
+          <div class="card-icon-wrap"><i class="fa-solid fa-lightbulb"></i></div>
+          <div class="card-title" style="font-size: 0.88rem;">Concept Tutor</div>
+          <div class="card-desc">Break down difficult theories</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCREEN 3: ACTIVITY & 3D JOURNEY -->
+    <div id="screen-activity" class="screen">
+      <div class="section-header-title">
+        <i class="fa-solid fa-chart-line" style="color: var(--accent-gold);"></i> Academic Progression
+      </div>
+
+      <!-- PROGRESS SUMMARY CARD -->
+      <div style="background: var(--surface-color); border: 1px solid var(--border-color); border-radius: 20px; padding: 20px; margin-bottom: 24px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+          <span style="font-size: 0.85rem; font-weight: 800;">Semester Milestone Streak</span>
+          <span style="background: var(--accent-gold-glow); color: var(--accent-gold); padding: 4px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 800;">14 Days Active</span>
+        </div>
+        <div style="width: 100%; height: 8px; background: var(--bg-color); border-radius: 4px; overflow: hidden; border: 1px solid var(--border-color);">
+          <div style="width: 78%; height: 100%; background: var(--accent-gold); border-radius: 4px;"></div>
+        </div>
+        <div style="display: flex; justify-content: space-between; font-size: 0.72rem; color: var(--text-sub); margin-top: 8px;">
+          <span>Courses Completed: 12/16</span>
+          <span>78% Index</span>
+        </div>
+      </div>
+
+      <div class="section-header-title">
+        <i class="fa-solid fa-cube" style="color: var(--accent-gold);"></i> 3D Academic Journey
+      </div>
+
+      <div class="journey-timeline">
+        <div class="timeline-node">
+          <div class="timeline-content">
+            <div style="font-size: 0.7rem; color: var(--accent-gold); font-weight: 800; text-transform: uppercase;">Milestone 01</div>
+            <div style="font-size: 0.9rem; font-weight: 800; margin-top: 2px;">Advanced Algorithm Tripos</div>
+            <div style="font-size: 0.75rem; color: var(--text-sub); margin-top: 2px;">Completed lecture modules and practical lab work.</div>
+          </div>
+        </div>
+        <div class="timeline-node">
+          <div class="timeline-content">
+            <div style="font-size: 0.7rem; color: var(--accent-gold); font-weight: 800; text-transform: uppercase;">Milestone 02</div>
+            <div style="font-size: 0.9rem; font-weight: 800; margin-top: 2px;">Quantum Mechanics Seminar</div>
+            <div style="font-size: 0.75rem; color: var(--text-sub); margin-top: 2px;">Passed interactive quiz assessment with distinction.</div>
+          </div>
+        </div>
+        <div class="timeline-node">
+          <div class="timeline-content">
+            <div style="font-size: 0.7rem; color: var(--accent-gold); font-weight: 800; text-transform: uppercase;">Milestone 03 — Current</div>
+            <div style="font-size: 0.9rem; font-weight: 800; margin-top: 2px;">Thesis Dissertation Draft</div>
+            <div style="font-size: 0.75rem; color: var(--text-sub); margin-top: 2px;">Submissions open for supervisor peer review.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCREEN 4: PROFILE -->
+    <div id="screen-profile" class="screen">
+      <div class="profile-card-header">
+        <div class="profile-avatar-lg" id="profileInitial">A</div>
+        <h2 style="font-size: 1.2rem; font-weight: 900;" id="profileDisplayName">Alistair Sterling</h2>
+        <p style="font-size: 0.8rem; color: var(--accent-gold); font-weight: 700; margin-top: 2px;" id="profileDisplayProgram">B.A. Computer Science & Tripos</p>
+        <p style="font-size: 0.75rem; color: var(--text-sub); margin-top: 4px;" id="profileDisplayEmail">alistair@appearich.ac.uk</p>
+      </div>
+
+      <div class="section-header-title">Account Preferences</div>
+      <div class="settings-list">
+        <div class="settings-item" onclick="alert('Notification settings updated.')">
+          <span>Push Notifications</span>
+          <i class="fa-solid fa-chevron-right" style="color: var(--text-sub); font-size: 0.75rem;"></i>
+        </div>
+        <div class="settings-item" onclick="alert('Privacy configuration secured.')">
+          <span>Privacy & Security</span>
+          <i class="fa-solid fa-chevron-right" style="color: var(--text-sub); font-size: 0.75rem;"></i>
+        </div>
+        <div class="settings-item" onclick="alert('Appearich Academic LMS v3.4.0 — Built for elite collegiate standards.')">
+          <span>About Appearich</span>
+          <i class="fa-solid fa-chevron-right" style="color: var(--text-sub); font-size: 0.75rem;"></i>
+        </div>
+      </div>
+
+      <button class="danger-btn" onclick="handleLogout()">
+        <i class="fa-solid fa-right-from-bracket"></i> Terminate Session
+      </button>
+    </div>
+
+    <!-- PERSISTENT BOTTOM NAVIGATION -->
+    <nav class="bottom-nav" id="mainNavBar" style="display: none;">
+      <button class="nav-item active" onclick="switchTab('screen-home', this)">
+        <i class="fa-solid fa-house"></i>
+        <span>Home</span>
+      </button>
+      <button class="nav-item" onclick="switchTab('screen-ai', this)">
+        <i class="fa-solid fa-robot"></i>
+        <span>AI</span>
+      </button>
+      <button class="nav-item" onclick="switchTab('screen-activity', this)">
+        <i class="fa-solid fa-chart-pie"></i>
+        <span>Activity</span>
+      </button>
+      <button class="nav-item" onclick="switchTab('screen-profile', this)">
+        <i class="fa-solid fa-user"></i>
+        <span>Profile</span>
+      </button>
+    </nav>
+
+  </div>
+
+  <!-- HERO IMAGE CONTROL MODAL -->
+  <div id="heroModal" class="modal-overlay">
+    <div class="modal-sheet">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <h3 style="font-size: 1.1rem; font-weight: 800;">Hero Visual Control</h3>
+        <i class="fa-solid fa-xmark" style="cursor: pointer; font-size: 1.2rem; color: var(--text-sub);" onclick="closeHeroModal()"></i>
+      </div>
+      <p style="font-size: 0.8rem; color: var(--text-sub); margin-bottom: 16px;">Select or customize your personalized academic dashboard banner.</p>
+      
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        <button class="primary-btn" onclick="updateHeroImage('https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=800&auto=format&fit=cover')">
+          Set Classic Collegiate Hall
+        </button>
+        <button class="primary-btn" onclick="updateHeroImage('https://images.unsplash.com/photo-1541339907198-e08756dedf3f?q=80&w=800&auto=format&fit=cover')" style="background: var(--surface-elevated); color: var(--text-main); border: 1px solid var(--border-color);">
+          Set Modern Research Library
+        </button>
+        <button class="primary-btn" onclick="updateHeroImage('https://images.unsplash.com/photo-1509062522246-3755977927d7?q=80&w=800&auto=format&fit=cover')" style="background: var(--surface-elevated); color: var(--text-main); border: 1px solid var(--border-color);">
+          Set Lecture Auditorium
+        </button>
+        <button class="primary-btn" onclick="resetDefaultHero()" style="background: transparent; border: 1px dashed var(--border-color); color: var(--text-sub);">
+          Restore Default Image
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DISCOVERY / ACTION MODAL -->
+  <div id="discoveryModal" class="modal-overlay">
+    <div class="modal-sheet">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <h3 id="modalDiscoveryTitle" style="font-size: 1.1rem; font-weight: 800;">Module Details</h3>
+        <i class="fa-solid fa-xmark" style="cursor: pointer; font-size: 1.2rem; color: var(--text-sub);" onclick="closeDiscoveryModal()"></i>
+      </div>
+      <p id="modalDiscoveryDesc" style="font-size: 0.85rem; color: var(--text-sub); line-height: 1.5; margin-bottom: 20px;"></p>
+      <button class="primary-btn" onclick="closeDiscoveryModal()">Dismiss Module</button>
+    </div>
+  </div>
+
+  <!-- APPLICATION LOGIC SCRIPT -->
+  <script>
+    let isRegisterState = false;
+    let currentUserProfile = {
+      name: "Alistair Sterling",
+      email: "scholar@appearich.ac.uk",
+      program: "B.A. Computer Science & Tripos"
+    };
+
+    window.addEventListener('DOMContentLoaded', () => {
+      // Check for saved session
+      const savedUser = localStorage.getItem('appearich_student_profile');
+      if (savedUser) {
+        currentUserProfile = JSON.parse(savedUser);
+        launchMainDashboard();
+      }
+
+      // Hide cinematic splash after sequence
+      setTimeout(() => {
+        const splash = document.getElementById('cinematic-splash');
+        if (splash) splash.style.display = 'none';
+      }, 1800);
+
+      // Load saved hero image if available
+      const savedHero = localStorage.getItem('appearich_hero_img');
+      if (savedHero) {
+        document.getElementById('heroImageElement').src = savedHero;
+      }
+    });
+
+    function toggleAuthMode() {
+      isRegisterState = !isRegisterState;
+      document.getElementById('authTitleText').innerText = isRegisterState ? "Create Scholar ID" : "Welcome Scholar";
+      document.getElementById('authSubText').innerText = isRegisterState ? "Register your profile for Appearich LMS" : "Authenticate to access your Cambridge matrix";
+      document.getElementById('authActionBtn').innerText = isRegisterState ? "Complete Registration" : "Initialize Session";
+      document.getElementById('nameGroup').style.display = isRegisterState ? "block" : "none";
+      document.getElementById('programGroup').style.display = isRegisterState ? "block" : "none";
+      document.getElementById('authSwitchPrompt').innerHTML = isRegisterState ? "Existing scholar? <span>Sign In</span>" : "New researcher? <span>Create Account</span>";
+    }
+
+    function handleAuthSubmit() {
+      const email = document.getElementById('authEmail').value.trim();
+      const pass = document.getElementById('authPassword').value.trim();
+      const nameInput = document.getElementById('regName').value.trim();
+      const programInput = document.getElementById('regProgram').value.trim();
+
+      if (!email || !pass) {
+        alert("Please enter valid academic credentials.");
+        return;
+      }
+
+      if (isRegisterState && nameInput) {
+        currentUserProfile.name = nameInput;
+        currentUserProfile.email = email;
+        if (programInput) currentUserProfile.program = programInput;
+      } else {
+        currentUserProfile.email = email;
+        currentUserProfile.name = email.split('@')[0].toUpperCase();
+      }
+
+      localStorage.setItem('appearich_student_profile', JSON.stringify(currentUserProfile));
+      launchMainDashboard();
+    }
+
+    function launchMainDashboard() {
+      document.getElementById('screen-auth').classList.remove('active');
+      document.getElementById('screen-home').classList.add('active');
+      document.getElementById('mainHeader').style.display = 'flex';
+      document.getElementById('mainNavBar').style.display = 'flex';
+
+      // Update dynamic greeting & profile UI
+      document.getElementById('dynamicGreeting').innerText = `WELCOME, ${currentUserProfile.name.toUpperCase()}`;
+      document.getElementById('profileDisplayName').innerText = currentUserProfile.name;
+      document.getElementById('profileDisplayEmail').innerText = currentUserProfile.email;
+      document.getElementById('profileDisplayProgram').innerText = currentUserProfile.program;
+      document.getElementById('profileInitial').innerText = currentUserProfile.name.charAt(0).toUpperCase();
+    }
+
+    function handleLogout() {
+      localStorage.removeItem('appearich_student_profile');
+      document.getElementById('mainHeader').style.display = 'none';
+      document.getElementById('mainNavBar').style.display = 'none';
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById('screen-auth').classList.add('active');
+    }
+
+    function switchTab(screenId, element) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      document.getElementById(screenId).classList.add('active');
+      if (element) element.classList.add('active');
+    }
+
+    function toggleThemeMode() {
+      const htmlEl = document.documentElement;
+      const icon = document.getElementById('themeIcon');
+      if (htmlEl.getAttribute('data-theme') === 'dark') {
+        htmlEl.setAttribute('data-theme', 'light');
+        icon.className = 'fa-solid fa-sun';
+      } else {
+        htmlEl.setAttribute('data-theme', 'dark');
+        icon.className = 'fa-solid fa-moon';
+      }
+    }
+
+    function openHeroModal() {
+      document.getElementById('heroModal').classList.add('active');
+    }
+
+    function closeHeroModal() {
+      document.getElementById('heroModal').classList.remove('active');
+    }
+
+    function updateHeroImage(url) {
+      document.getElementById('heroImageElement').src = url;
+      localStorage.setItem('appearich_hero_img', url);
+      closeHeroModal();
+    }
+
+    function resetDefaultHero() {
+      const defaultUrl = "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?q=80&w=800&auto=format&fit=cover";
+      updateHeroImage(defaultUrl);
+    }
+
+    function triggerDiscoveryModal(title, desc) {
+      document.getElementById('modalDiscoveryTitle').innerText = title;
+      document.getElementById('modalDiscoveryDesc').innerText = desc;
+      document.getElementById('discoveryModal').classList.add('active');
+    }
+
+    function closeDiscoveryModal() {
+      document.getElementById('discoveryModal').classList.remove('active');
+    }
+
+    function triggerAiAction(actionName) {
+      alert(`Appearich AI Companion initializing protocol: ${actionName}...`);
+    }
+
+    function handleGlobalSearch(query) {
+      if (query.trim().length > 2) {
+        // Simulated responsive search feedback across modules
+        console.log(`Searching academic matrix for: ${query}`);
+      }
+    }
+  </script>
 </body>
 </html>
