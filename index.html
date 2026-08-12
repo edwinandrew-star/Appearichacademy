@@ -56,7 +56,6 @@
       align-items: center;
       overflow-x: hidden;
     }
-
     /* ========================================================= */
     /* 1. SPLASH SCREEN — LOGO ONLY (PURE WHITE)                 */
     /* ========================================================= */
@@ -94,7 +93,6 @@
       80% { opacity: 1; transform: scale(1); filter: blur(0); }
       100% { opacity: 0; transform: scale(1.04); filter: blur(4px); visibility: hidden; }
     }
-
     /* APP CONTAINER & SCREENS */
     .app-viewport {
       width: 100%;
@@ -119,9 +117,8 @@
       from { opacity: 0; transform: translateY(8px); }
       to { opacity: 1; transform: translateY(0); }
     }
-
     /* ========================================================= */
-    /* 2. AUTHENTICATION — TRUE FULL-WHITE SEAMLESS PAGE         */
+    /* 2. AUTHENTICATION & PORTAL SWITCHING SEAMLESS PAGE        */
     /* ========================================================= */
     #screen-auth {
       justify-content: center;
@@ -140,7 +137,7 @@
     }
     .auth-brand-header {
       text-align: left;
-      margin-bottom: 32px;
+      margin-bottom: 24px;
       animation: authSeqIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both;
     }
     .auth-title {
@@ -155,9 +152,34 @@
       margin-top: 6px;
     }
     
+    /* Role Selector Tabs */
+    .role-tabs {
+      display: flex;
+      background: #f1f5f9;
+      padding: 4px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+    }
+    .role-tab {
+      flex: 1;
+      text-align: center;
+      padding: 10px;
+      font-size: 0.8rem;
+      font-weight: 800;
+      color: #71717a;
+      cursor: pointer;
+      border-radius: 10px;
+      transition: all 0.2s ease;
+    }
+    .role-tab.active {
+      background: #ffffff;
+      color: #09090b;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+
     /* Sequential Left-to-Right Entrance Animations */
     .form-group {
-      margin-bottom: 20px;
+      margin-bottom: 16px;
       opacity: 0;
       animation: authSeqIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
@@ -165,11 +187,12 @@
     .form-group:nth-child(2) { animation-delay: 0.22s; }
     .form-group:nth-child(3) { animation-delay: 0.29s; }
     .form-group:nth-child(4) { animation-delay: 0.36s; }
+    
     .auth-row-options {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 24px;
+      margin-bottom: 20px;
       font-size: 0.82rem;
       color: #71717a;
       opacity: 0;
@@ -186,12 +209,10 @@
       text-decoration: none;
       font-weight: 700;
     }
-
     @keyframes authSeqIn {
       from { opacity: 0; transform: translateX(-24px); }
       to { opacity: 1; transform: translateX(0); }
     }
-
     .form-group label {
       display: block;
       font-size: 0.75rem;
@@ -199,9 +220,9 @@
       text-transform: uppercase;
       letter-spacing: 0.6px;
       color: #71717a;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
     }
-    .form-group input {
+    .form-group input, .form-group select {
       width: 100%;
       background: #f8fafc;
       border: 1px solid #e2e8f0;
@@ -211,11 +232,34 @@
       font-size: 0.95rem;
       outline: none;
     }
-    .form-group input:focus {
+    .form-group input:focus, .form-group select:focus {
       border-color: var(--accent-gold);
       background: #ffffff;
       box-shadow: 0 0 0 3px var(--accent-gold-glow);
     }
+    
+    /* Checkbox Group Styles for Multiple Classes/Subjects */
+    .checkbox-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      padding: 12px;
+      border-radius: 14px;
+      max-height: 130px;
+      overflow-y: auto;
+    }
+    .checkbox-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #09090b;
+      cursor: pointer;
+    }
+
     .primary-btn {
       width: 100%;
       background: var(--accent-gold);
@@ -238,7 +282,7 @@
       text-align: center;
       font-size: 0.85rem;
       color: #71717a;
-      margin-top: 24px;
+      margin-top: 20px;
       cursor: pointer;
       opacity: 0;
       animation: authSeqIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.5s forwards;
@@ -247,7 +291,7 @@
       color: var(--accent-gold);
       font-weight: 700;
     }
-
+    
     /* TOP HEADER */
     .app-header {
       position: sticky;
@@ -287,8 +331,8 @@
       cursor: pointer;
       font-size: 0.9rem;
     }
-
-    /* HOME HERO SYSTEM */
+    
+    /* HERO SYSTEM */
     .hero-container {
       position: relative;
       width: 100%;
@@ -307,10 +351,6 @@
       object-fit: cover;
       filter: brightness(0.68);
       transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), filter 0.6s ease;
-    }
-    .hero-container.transitioning .hero-bg-image {
-      filter: blur(8px) brightness(0.4);
-      transform: scale(1.05);
     }
     .hero-gradient-overlay {
       position: absolute;
@@ -432,9 +472,7 @@
       gap: 8px;
     }
 
-    /* ========================================================= */
-    /* ACADEMIC CORE (UNCHANGED)                                 */
-    /* ========================================================= */
+    /* ACADEMIC CORE */
     .academic-core-container {
       margin-bottom: 28px;
       position: relative;
@@ -451,7 +489,6 @@
     .academic-scroll-wrapper::-webkit-scrollbar {
       display: none;
     }
-
     .academic-card {
       flex: 0 0 240px;
       scroll-snap-align: start;
@@ -474,18 +511,6 @@
       border-color: var(--accent-gold-border);
       box-shadow: 0 14px 28px -6px var(--accent-gold-glow);
     }
-    .academic-card::before {
-      content: '';
-      position: absolute;
-      top: -20%;
-      right: -10%;
-      width: 110px;
-      height: 110px;
-      background: radial-gradient(circle, var(--accent-gold-glow) 0%, transparent 70%);
-      border-radius: 50%;
-      pointer-events: none;
-    }
-    
     .academic-card-top {
       display: flex;
       justify-content: space-between;
@@ -531,7 +556,6 @@
       color: var(--text-sub);
       margin-top: 3px;
     }
-    
     .academic-card-bottom {
       margin-top: auto;
       width: 100%;
@@ -558,9 +582,7 @@
       border-radius: 10px;
     }
 
-    /* ========================================================= */
-    /* 3. PHOTO CARDS GRID (EXACT FILE PATHS & ANIMATION)       */
-    /* ========================================================= */
+    /* PHOTO CARDS GRID */
     .photo-grid-2x2 {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -569,7 +591,6 @@
       width: 100%;
       overflow: hidden;
     }
-
     .photo-card {
       position: relative;
       height: 120px;
@@ -578,35 +599,18 @@
       cursor: pointer;
       box-shadow: var(--shadow-sm);
       border: 1px solid var(--border-color);
-      opacity: 0;
-      will-change: transform, opacity;
-      transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    /* Dynamic LEFT -> RIGHT -> LEFT -> RIGHT Animation States */
-    .photo-card.slide-left {
-      transform: translateX(-40px) scale(0.95);
-    }
-    .photo-card.slide-right {
-      transform: translateX(40px) scale(0.95);
-    }
-    .photo-card.pop-in-visible {
       opacity: 1;
-      transform: translateX(0) scale(1);
+      transition: transform 0.3s ease;
     }
-
+    .photo-card:hover {
+      transform: scale(1.02);
+    }
     .photo-card img {
       width: 100%;
       height: 100%;
       object-fit: cover;
       filter: brightness(0.65) contrast(1.05);
-      transition: transform 0.5s ease, filter 0.5s ease;
     }
-    .photo-card:hover img {
-      transform: scale(1.05);
-      filter: brightness(0.55) contrast(1.1);
-    }
-
     .photo-card-overlay {
       position: absolute;
       inset: 0;
@@ -622,6 +626,75 @@
       letter-spacing: 1.5px;
       text-transform: uppercase;
       text-shadow: 0 2px 6px rgba(0, 0, 0, 0.8);
+    }
+
+    /* TEACHER UPLOAD DASHBOARD STYLES */
+    .upload-section-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .upload-option-card {
+      background: var(--surface-color);
+      border: 1px solid var(--border-color);
+      border-radius: 18px;
+      padding: 16px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.2s ease;
+    }
+    .upload-option-card:hover {
+      border-color: var(--accent-gold);
+      transform: translateY(-2px);
+    }
+
+    /* FEED STYLES FOR STUDENTS */
+    .feed-container {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .feed-item {
+      background: var(--surface-color);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: var(--shadow-sm);
+    }
+    .feed-tag {
+      font-size: 0.65rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 10px;
+      background: var(--accent-gold-glow);
+      color: var(--accent-gold);
+      display: inline-block;
+      margin-bottom: 6px;
+    }
+
+    /* TEACHER DIRECTORY LISTING STYLES */
+    .teacher-directory-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+    .teacher-dir-item {
+      background: var(--surface-color);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 14px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.88rem;
+      font-weight: 700;
     }
 
     /* BOTTOM NAVIGATION */
@@ -662,83 +735,6 @@
     .nav-item.active {
       color: var(--accent-gold);
       background: var(--accent-gold-glow);
-    }
-
-    /* AI SECTION */
-    .ai-companion-hero {
-      background: var(--surface-color);
-      border: 1px solid var(--border-color);
-      border-radius: 24px;
-      padding: 24px;
-      text-align: center;
-      margin-bottom: 20px;
-    }
-    .ai-core-pulse {
-      width: 70px;
-      height: 70px;
-      border-radius: 50%;
-      background: var(--accent-gold-glow);
-      border: 2px solid var(--accent-gold);
-      margin: 0 auto 16px auto;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--accent-gold);
-      font-size: 1.6rem;
-      box-shadow: 0 0 30px var(--accent-gold-glow);
-      animation: corePulse 2s infinite alternate;
-    }
-    @keyframes corePulse {
-      from { transform: scale(0.95); }
-      to { transform: scale(1.05); }
-    }
-    .ai-tools-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-    .ai-tool-card {
-      background: var(--surface-color);
-      border: 1px solid var(--border-color);
-      border-radius: 16px;
-      padding: 16px;
-      cursor: pointer;
-    }
-
-    /* ACTIVITY JOURNEY SECTION */
-    .journey-timeline {
-      position: relative;
-      padding-left: 24px;
-      margin-top: 10px;
-    }
-    .journey-timeline::before {
-      content: '';
-      position: absolute;
-      left: 7px;
-      top: 6px;
-      bottom: 6px;
-      width: 2px;
-      background: var(--border-color);
-    }
-    .timeline-node {
-      position: relative;
-      margin-bottom: 20px;
-    }
-    .timeline-node::before {
-      content: '';
-      position: absolute;
-      left: -20px;
-      top: 4px;
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      background: var(--accent-gold);
-    }
-    .timeline-content {
-      background: var(--surface-color);
-      border: 1px solid var(--border-color);
-      border-radius: 14px;
-      padding: 14px;
     }
 
     /* PROFILE SCREEN */
@@ -796,7 +792,7 @@
       gap: 8px;
     }
 
-    /* MODALS & GALLERIES */
+    /* MODALS & POPUPS */
     .modal-overlay {
       position: fixed;
       inset: 0;
@@ -821,50 +817,10 @@
       max-height: 85vh;
       overflow-y: auto;
     }
-    .section-modal-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
-      margin: 16px 0;
-    }
-    .section-photo-thumb {
-      height: 100px;
-      border-radius: 12px;
-      overflow: hidden;
-      position: relative;
-    }
-    .section-photo-thumb img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-    .section-upload-tile {
-      height: 100px;
-      border-radius: 12px;
-      border: 2px dashed var(--border-color);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      cursor: pointer;
-      color: var(--text-sub);
-      background: var(--surface-elevated);
-    }
-    .content-item-box {
-      background: var(--surface-elevated);
-      border-radius: 12px;
-      padding: 12px;
-      margin-bottom: 8px;
-      font-size: 0.82rem;
-      font-weight: 700;
-      border: 1px solid var(--border-color);
-    }
   </style>
 </head>
 <body>
-
-  <!-- 1. SPLASH SCREEN — LOGO ONLY ON PURE WHITE BACKGROUND -->
+  <!-- 1. SPLASH SCREEN -->
   <div id="cinematic-splash">
     <div class="splash-logo-container">
       <img src="images/appearich-logo.png" alt="Appearich" class="splash-logo-img">
@@ -873,21 +829,27 @@
 
   <div class="app-viewport">
     
-    <!-- 2. AUTHENTICATION SCREEN — TRUE FULL-WHITE PAGE -->
+    <!-- 2. AUTHENTICATION & REGISTRATION SCREEN -->
     <div id="screen-auth" class="screen active">
       <div class="auth-card">
         <div class="auth-brand-header">
           <h1 class="auth-title" id="authTitleText">Welcome back</h1>
-          <p class="auth-subtitle" id="authSubText">Enter your credentials to access your account</p>
+          <p class="auth-subtitle" id="authSubText">Select your portal and enter your credentials</p>
+        </div>
+
+        <!-- Role Selector (Student vs Teacher) -->
+        <div class="role-tabs">
+          <div class="role-tab active" id="tabRoleStudent" onclick="switchAuthRole('student')">Student</div>
+          <div class="role-tab" id="tabRoleTeacher" onclick="switchAuthRole('teacher')">Teacher</div>
         </div>
         
         <div class="form-group" id="nameGroup" style="display: none;">
           <label>Full Name</label>
-          <input type="text" id="regName" placeholder="e.g. Alistair Sterling">
+          <input type="text" id="regName" placeholder="e.g. Dr. Jane Doe / Alistair Sterling">
         </div>
         
         <div class="form-group">
-          <label>Email / Student ID</label>
+          <label id="emailLabel">Email / Student ID</label>
           <input type="email" id="authEmail" placeholder="scholar@appearich.ac.uk">
         </div>
         
@@ -895,15 +857,51 @@
           <label>Password</label>
           <input type="password" id="authPassword" placeholder="••••••••••••">
         </div>
-        
-        <div class="form-group" id="programGroup" style="display: none;">
-          <label>Degree Program</label>
-          <input type="text" id="regProgram" placeholder="e.g. B.A. Computer Science & Tripos">
+
+        <!-- Teacher Specific Multi-Select Fields -->
+        <div id="teacherDetailsFields" style="display: none;">
+          <div class="form-group">
+            <label>Select Class(es)</label>
+            <div class="checkbox-grid">
+              <label class="checkbox-item"><input type="checkbox" name="teacherClass" value="Form 3"> Form 3</label>
+              <label class="checkbox-item"><input type="checkbox" name="teacherClass" value="Form 4"> Form 4</label>
+              <label class="checkbox-item"><input type="checkbox" name="teacherClass" value="Lower Secondary"> Lower Sec</label>
+              <label class="checkbox-item"><input type="checkbox" name="teacherClass" value="Upper Secondary"> Upper Sec</label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Select Subject(s)</label>
+            <div class="checkbox-grid">
+              <label class="checkbox-item"><input type="checkbox" name="teacherSubject" value="Mathematics"> Mathematics</label>
+              <label class="checkbox-item"><input type="checkbox" name="teacherSubject" value="Physics"> Physics</label>
+              <label class="checkbox-item"><input type="checkbox" name="teacherSubject" value="Chemistry"> Chemistry</label>
+              <label class="checkbox-item"><input type="checkbox" name="teacherSubject" value="Biology"> Biology</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Student Education Level & Combination Selection -->
+        <div id="studentDetailsFields">
+          <div class="form-group">
+            <label>Education Level</label>
+            <select id="eduLevelSelect" onchange="handleEduLevelChange()">
+              <option value="Primary">Primary</option>
+              <option value="Lower Secondary">Lower Secondary</option>
+              <option value="Upper Secondary">Upper Secondary</option>
+              <option value="Higher-level">Higher-level / Advanced (e.g. PCB)</option>
+            </select>
+          </div>
+
+          <div class="form-group" id="combinationGroup" style="display: none;">
+            <label>Subject Combination / Course</label>
+            <input type="text" id="regCombination" placeholder="e.g. PCB (Physics, Chemistry, Biology)">
+          </div>
         </div>
 
         <div class="auth-row-options" id="authOptionsRow">
           <label><input type="checkbox" checked style="accent-color: var(--accent-gold);"> Remember me</label>
-          <a href="#" onclick="alert('Password reset link sent to your university email.'); return false;">Forgot password?</a>
+          <a href="#" onclick="alert('Password reset link sent to your email.'); return false;">Forgot password?</a>
         </div>
         
         <button class="primary-btn" id="authActionBtn" onclick="handleAuthSubmit()">Login</button>
@@ -918,7 +916,7 @@
     <header class="app-header" id="mainHeader" style="display: none;">
       <div class="header-brand">
         <img src="images/appearich-logo.png" alt="Appearich" class="header-logo-icon">
-        <span>Appearich</span>
+        <span id="headerBrandTitle">Appearich Student Portal</span>
       </div>
       <div style="display: flex; gap: 8px;">
         <button class="icon-btn" onclick="toggleThemeMode()" title="Toggle Theme">
@@ -927,7 +925,7 @@
       </div>
     </header>
 
-    <!-- SCREEN 1: HOME (CENTRAL HUB) -->
+    <!-- SCREEN 1: STUDENT HOME / PORTAL -->
     <div id="screen-home" class="screen">
       
       <!-- HERO BANNER -->
@@ -937,226 +935,217 @@
         
         <div class="hero-integrated-badge">
           <img src="images/appearich-logo.png" alt="Appearich" class="hero-badge-logo">
-          <span class="hero-badge-text" id="heroBadgeLabel">Smart Matrix</span>
+          <span class="hero-badge-text" id="heroBadgeLabel">Student Portal</span>
         </div>
         
         <div class="hero-content">
           <div>
             <h2 class="hero-greeting" id="dynamicGreeting">WELCOME, SCHOLAR</h2>
-            <div class="hero-msg" id="dynamicSubGreeting">Ready for another productive day?</div>
-          </div>
-          <div class="hero-controls-group">
-            <button class="hero-control-btn" onclick="triggerHeroUploadDialog()">
-              <i class="fa-solid fa-camera"></i> Replace Hero
-            </button>
+            <div class="hero-msg" id="dynamicSubGreeting">Enrolled: General Course</div>
           </div>
         </div>
       </div>
-      <input type="file" id="heroFileInput" accept="image/*" style="display: none;" onchange="handleHeroPhotoUpload(event)">
 
-      <!-- ACADEMIC COMMAND SEARCH -->
-      <div class="search-command-bar">
-        <i class="fa-solid fa-magnifying-glass"></i>
-        <input type="text" placeholder="Search courses, lectures, assignments, or resources..." id="globalSearchInput" oninput="handleGlobalSearch(this.value)">
+      <!-- ENROLLMENT KEY VERIFICATION BANNER -->
+      <div style="background: var(--surface-color); border: 1px solid var(--border-color); border-radius: 16px; padding: 16px; margin-bottom: 20px; box-shadow: var(--shadow-sm);">
+        <div class="section-header-title" style="margin-bottom: 8px;">
+          <span><i class="fa-solid fa-key" style="color: var(--accent-gold);"></i> Course Enrollment Key</span>
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <input type="text" id="enrollmentKeyInput" placeholder="Enter course enrollment key..." style="flex:1; background: var(--surface-elevated); border: 1px solid var(--border-color); border-radius: 10px; padding: 10px; color: var(--text-main); font-size: 0.85rem; outline: none;">
+          <button onclick="verifyEnrollmentKey()" style="background: var(--accent-gold); border: none; padding: 0 16px; border-radius: 10px; font-weight: 800; font-size: 0.8rem; cursor: pointer; color: #fff;">Join</button>
+        </div>
       </div>
 
-      <!-- ACADEMIC CORE (PRESERVED & UNCHANGED) -->
+      <!-- TEACHER INFORMATION DISPLAYED TO STUDENTS -->
+      <div class="section-header-title">
+        <span><i class="fa-solid fa-chalkboard-user" style="color: var(--accent-gold);"></i> Your Instructors & Subjects</span>
+      </div>
+      <div class="teacher-directory-list" id="studentTeacherDirectory">
+        <div class="teacher-dir-item">
+          <span>Mathematics</span>
+          <span style="color: var(--text-sub);">Mr. Kelvin Vance</span>
+        </div>
+        <div class="teacher-dir-item">
+          <span>Physics</span>
+          <span style="color: var(--text-sub);">Dr. Alistair Thorne</span>
+        </div>
+      </div>
+
+      <!-- LIVE STUDENT FEED FOR TEACHER UPLOADS -->
+      <div class="section-header-title">
+        <span><i class="fa-solid fa-bell" style="color: var(--accent-gold);"></i> Class Updates & Materials</span>
+      </div>
+      <div class="feed-container" id="studentFeedContainer">
+        <div class="feed-item">
+          <span class="feed-tag">Announcement</span>
+          <div style="font-weight: 800; font-size: 0.9rem; margin-bottom: 4px;">Welcome to Upper Secondary Term 2</div>
+          <div style="font-size: 0.8rem; color: var(--text-sub);">Please ensure you review the syllabus before our live session tomorrow morning.</div>
+        </div>
+      </div>
+
+      <!-- ACADEMIC CORE -->
       <div class="academic-core-container">
         <div class="section-header-title">
-          <span><i class="fa-solid fa-graduation-cap" style="color: var(--accent-gold);"></i> Academic Core</span>
-          <span style="font-size: 0.65rem; color: var(--accent-gold); font-weight: 700;">Swipe Left <i class="fa-solid fa-arrow-right-long"></i></span>
+          <span><i class="fa-solid fa-graduation-cap" style="color: var(--accent-gold);"></i> Academic Progress</span>
         </div>
         
         <div class="academic-scroll-wrapper">
-          
-          <!-- ITEM 1: COURSES -->
-          <div class="academic-card" onclick="triggerDiscoveryModal('Active Tripos Courses', 'Accessing active lectures, syllabus modules, and reading materials.')">
-            <div class="academic-card-top">
-              <div class="academic-icon-box"><i class="fa-solid fa-book-open"></i></div>
-              <span class="academic-tag">4 Active</span>
-            </div>
-            <div class="academic-card-mid">
-              <div class="academic-card-title">Courses</div>
-              <div class="academic-card-sub">Lectures & Syllabi</div>
-            </div>
-            <div class="academic-card-bottom">
-              <div class="academic-progress-info">
-                <span>Term Progress</span>
-                <span>85%</span>
-              </div>
-              <div class="academic-progress-track">
-                <div class="academic-progress-fill" style="width: 85%;"></div>
-              </div>
-            </div>
-          </div>
-
-          <!-- ITEM 2: ASSIGNMENTS -->
-          <div class="academic-card" onclick="triggerDiscoveryModal('Assignments & Tasks', 'Reviewing pending essays, code repositories, and problem sets.')">
+          <div class="academic-card" onclick="triggerDiscoveryModal('Assignments Progress', 'Completed assignments contribute directly to your academic progress score.')">
             <div class="academic-card-top">
               <div class="academic-icon-box"><i class="fa-solid fa-pen-ruler"></i></div>
               <span class="academic-tag" style="color: #ef4444; border-color: rgba(239, 68, 68, 0.3); background: rgba(239, 68, 68, 0.1);">2 Due Soon</span>
             </div>
             <div class="academic-card-mid">
               <div class="academic-card-title">Assignments</div>
-              <div class="academic-card-sub">Task deadlines & submissions</div>
+              <div class="academic-card-sub">Task submissions & score tracking</div>
             </div>
             <div class="academic-card-bottom">
               <div class="academic-progress-info">
-                <span>Submitted</span>
-                <span>12/14</span>
+                <span>Progress Contribution</span>
+                <span id="assignmentProgressText">86%</span>
               </div>
               <div class="academic-progress-track">
-                <div class="academic-progress-fill" style="width: 86%;"></div>
+                <div class="academic-progress-fill" id="assignmentProgressBar" style="width: 86%;"></div>
               </div>
             </div>
           </div>
 
-          <!-- ITEM 3: EXAMS -->
-          <div class="academic-card" onclick="triggerDiscoveryModal('Exams & Assessments', 'Viewing exam schedules, hall allocations, and revision papers.')">
+          <div class="academic-card" onclick="triggerDiscoveryModal('Quizzes Progress', 'Finished quizzes automatically update your overall academic standing.')">
             <div class="academic-card-top">
-              <div class="academic-icon-box"><i class="fa-solid fa-clock-rotate-left"></i></div>
-              <span class="academic-tag">Tripos Part II</span>
+              <div class="academic-icon-box"><i class="fa-solid fa-brain"></i></div>
+              <span class="academic-tag">Active</span>
             </div>
             <div class="academic-card-mid">
-              <div class="academic-card-title">Exams</div>
-              <div class="academic-card-sub">Schedules & Assessment</div>
+              <div class="academic-card-title">Quizzes</div>
+              <div class="academic-card-sub">Active recall & assessments</div>
             </div>
             <div class="academic-card-bottom">
               <div class="academic-progress-info">
-                <span>Preparation</span>
-                <span>60%</span>
+                <span>Score Average</span>
+                <span id="quizProgressText">92%</span>
               </div>
               <div class="academic-progress-track">
-                <div class="academic-progress-fill" style="width: 60%;"></div>
+                <div class="academic-progress-fill" id="quizProgressBar" style="width: 92%;"></div>
               </div>
             </div>
           </div>
-
-          <!-- ITEM 4: STUDY PLANNER -->
-          <div class="academic-card" onclick="triggerDiscoveryModal('Study Planner', 'Managing focus blocks, revision timetables, and group study.')">
-            <div class="academic-card-top">
-              <div class="academic-icon-box"><i class="fa-solid fa-calendar-check"></i></div>
-              <span class="academic-tag">Today</span>
-            </div>
-            <div class="academic-card-mid">
-              <div class="academic-card-title">Study Planner</div>
-              <div class="academic-card-sub">Timetables & Focus sessions</div>
-            </div>
-            <div class="academic-card-bottom">
-              <div class="academic-progress-info">
-                <span>Tasks Done</span>
-                <span>3/4</span>
-              </div>
-              <div class="academic-progress-track">
-                <div class="academic-progress-fill" style="width: 75%;"></div>
-              </div>
-            </div>
-          </div>
-
-          <!-- ITEM 5: PROGRESS -->
-          <div class="academic-card" onclick="triggerDiscoveryModal('Academic Progress', 'Analyzing GPA breakdown, credits earned, and faculty rank.')">
-            <div class="academic-card-top">
-              <div class="academic-icon-box"><i class="fa-solid fa-chart-line"></i></div>
-              <span class="academic-tag">First Class</span>
-            </div>
-            <div class="academic-card-mid">
-              <div class="academic-card-title">Progress</div>
-              <div class="academic-card-sub">Grades, GPA & Performance</div>
-            </div>
-            <div class="academic-card-bottom">
-              <div class="academic-progress-info">
-                <span>Cumulative GPA</span>
-                <span>3.92</span>
-              </div>
-              <div class="academic-progress-track">
-                <div class="academic-progress-fill" style="width: 95%;"></div>
-              </div>
-            </div>
-          </div>
-
         </div>
       </div>
 
-      <!-- COMPACT 2x2 PHOTOGRAPHIC GRID (EXACT FILE PATH MAPPING) -->
-      <div class="photo-grid-2x2" id="photoGridContainer">
-        
-        <!-- ROW 1: EVENTS (LEFT) | COMMUNITY (RIGHT) -->
-        <div class="photo-card slide-left" onclick="openSectionModal('EVENTS')">
+      <!-- PHOTOGRAPHIC GRID WITH COMING SOON POPUPS -->
+      <div class="photo-grid-2x2">
+        <div class="photo-card" onclick="showComingSoonModal('Events')">
           <img src="images/events.jpg" alt="Events">
-          <div class="photo-card-overlay">
-            <div class="photo-card-title">Events</div>
-          </div>
+          <div class="photo-card-overlay"><div class="photo-card-title">Events</div></div>
         </div>
-
-        <div class="photo-card slide-right" onclick="openSectionModal('COMMUNITY')">
+        <div class="photo-card" onclick="showComingSoonModal('Community')">
           <img src="images/community.jpg" alt="Community">
-          <div class="photo-card-overlay">
-            <div class="photo-card-title">Community</div>
-          </div>
+          <div class="photo-card-overlay"><div class="photo-card-title">Community</div></div>
         </div>
-
-        <!-- ROW 2: SPORTS (LEFT) | LIBRARY (RIGHT) -->
-        <div class="photo-card slide-left" onclick="openSectionModal('SPORTS')">
+        <div class="photo-card" onclick="showComingSoonModal('Sports')">
           <img src="images/sport.jpg" alt="Sports">
-          <div class="photo-card-overlay">
-            <div class="photo-card-title">Sports</div>
-          </div>
+          <div class="photo-card-overlay"><div class="photo-card-title">Sports</div></div>
         </div>
-
-        <div class="photo-card slide-right" onclick="openSectionModal('LIBRARY')">
+        <div class="photo-card" onclick="showComingSoonModal('Library')">
           <img src="images/library.jpg" alt="Library">
-          <div class="photo-card-overlay">
-            <div class="photo-card-title">Library</div>
-          </div>
+          <div class="photo-card-overlay"><div class="photo-card-title">Library</div></div>
         </div>
-
       </div>
-
     </div>
 
-    <!-- SCREEN 2: AI COMPANION -->
-    <div id="screen-ai" class="screen">
-      <div class="ai-companion-hero">
-        <div class="ai-core-pulse">
-          <i class="fa-solid fa-microchip"></i>
+    <!-- SCREEN 1B: TEACHER PORTAL -->
+    <div id="screen-teacher-portal" class="screen">
+      
+      <!-- TEACHER HERO SECTION WITH CUSTOMIZABLE PHOTO AREA -->
+      <div class="hero-container" id="teacherHeroContainer">
+        <img src="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?q=80&w=800&auto=format&fit=cover" alt="Teacher Hero" class="hero-bg-image" id="teacherHeroImageElement">
+        <div class="hero-gradient-overlay"></div>
+        
+        <div class="hero-integrated-badge">
+          <img src="images/appearich-logo.png" alt="Appearich" class="hero-badge-logo">
+          <span class="hero-badge-text">Teacher Portal</span>
         </div>
-        <h2 style="font-size: 1.3rem; font-weight: 900; margin-bottom: 6px;">AI Academic Intelligence</h2>
-        <p style="font-size: 0.8rem; color: var(--text-sub); max-width: 280px; margin: 0 auto;">Your neural study partner trained on Cambridge Tripos syllabi and research datasets.</p>
+        
+        <div class="hero-content">
+          <div>
+            <h2 class="hero-greeting" id="teacherPortalGreeting">PROFESSOR PORTAL</h2>
+            <div class="hero-msg">Manage Content & Student Access</div>
+          </div>
+          <div class="hero-controls-group">
+            <button class="hero-control-btn" onclick="triggerTeacherPhotoUpload()">
+              <i class="fa-solid fa-camera"></i> Change Photo
+            </button>
+            <button class="hero-control-btn" onclick="removeTeacherPhoto()" style="color: #ef4444;">
+              <i class="fa-solid fa-trash"></i> Remove
+            </button>
+          </div>
+        </div>
       </div>
+      <input type="file" id="teacherHeroFileInput" accept="image/*" style="display: none;" onchange="handleTeacherPhotoUpload(event)">
+
+      <!-- TEACHER UPLOAD SECTION (4 MAIN OPTIONS) -->
       <div class="section-header-title">
-        <span><i class="fa-solid fa-wand-magic-sparkles" style="color: var(--accent-gold);"></i> Intelligent Capabilities</span>
+        <span><i class="fa-solid fa-cloud-arrow-up" style="color: var(--accent-gold);"></i> Content Management Hub</span>
       </div>
-      <div class="ai-tools-grid">
-        <div class="ai-tool-card" onclick="triggerAiAction('Summarizing Material')">
-          <div class="academic-icon-box"><i class="fa-solid fa-file-lines"></i></div>
-          <div class="card-title" style="font-size: 0.88rem; margin-top: 10px; font-weight: 800;">Summarizer</div>
-          <div class="card-desc" style="font-size: 0.72rem; color: var(--text-sub); margin-top: 2px;">Condense lecture notes</div>
+      <div class="upload-section-grid">
+        <div class="upload-option-card" onclick="openUploadModal('Assignment')">
+          <div class="academic-icon-box"><i class="fa-solid fa-file-pen"></i></div>
+          <div style="font-weight: 800; font-size: 0.9rem;">Assignments</div>
+          <div style="font-size: 0.72rem; color: var(--text-sub);">Upload tasks & deadlines</div>
         </div>
-        <div class="ai-tool-card" onclick="triggerAiAction('Creating Practice Quizzes')">
+        <div class="upload-option-card" onclick="openUploadModal('Announcement')">
+          <div class="academic-icon-box"><i class="fa-solidbullhorn fa-bullhorn"></i></div>
+          <div style="font-weight: 800; font-size: 0.9rem;">Announcements</div>
+          <div style="font-size: 0.72rem; color: var(--text-sub);">Broadcast news to class</div>
+        </div>
+        <div class="upload-option-card" onclick="openUploadModal('Quiz')">
           <div class="academic-icon-box"><i class="fa-solid fa-brain"></i></div>
-          <div class="card-title" style="font-size: 0.88rem; margin-top: 10px; font-weight: 800;">Quiz Engine</div>
-          <div class="card-desc" style="font-size: 0.72rem; color: var(--text-sub); margin-top: 2px;">Active recall tests</div>
+          <div style="font-weight: 800; font-size: 0.9rem;">Quizzes</div>
+          <div style="font-size: 0.72rem; color: var(--text-sub);">Publish active recall tests</div>
         </div>
+        <div class="upload-option-card" onclick="openUploadModal('Other Learning Material')">
+          <div class="academic-icon-box"><i class="fa-solid fa-folder-open"></i></div>
+          <div style="font-weight: 800; font-size: 0.9rem;">Learning Materials</div>
+          <div style="font-size: 0.72rem; color: var(--text-sub);">Upload notes & syllabi</div>
+        </div>
+      </div>
+
+      <!-- ACTIVE UPLOADS LIST FOR TEACHER -->
+      <div class="section-header-title">
+        <span><i class="fa-solid fa-list-check" style="color: var(--accent-gold);"></i> Your Published Uploads</span>
+      </div>
+      <div class="feed-container" id="teacherUploadedItemsList">
+        <div style="font-size: 0.8rem; color: var(--text-sub); text-align: center; padding: 20px;">No items published yet. Use the cards above to upload items.</div>
+      </div>
+    </div>
+
+    <!-- SCREEN 2: AI COMPANION (COMING SOON) -->
+    <div id="screen-ai" class="screen">
+      <div class="ai-companion-hero" style="background: var(--surface-color); border: 1px solid var(--border-color); border-radius: 24px; padding: 32px 24px; text-align: center; margin-top: 40px;">
+        <div class="ai-core-pulse" style="width: 70px; height: 70px; border-radius: 50%; background: var(--accent-gold-glow); border: 2px solid var(--accent-gold); margin: 0 auto 16px auto; display: flex; align-items: center; justify-content: center; color: var(--accent-gold); font-size: 1.6rem;">
+          <i class="fa-solid fa-robot"></i>
+        </div>
+        <h2 style="font-size: 1.4rem; font-weight: 900; margin-bottom: 8px;">Coming Soon</h2>
+        <p style="font-size: 0.85rem; color: var(--text-sub); max-width: 280px; margin: 0 auto;">Our advanced AI academic companion is currently under development. Stay tuned for intelligent tutoring!</p>
       </div>
     </div>
 
     <!-- SCREEN 3: ACTIVITY & JOURNEY -->
     <div id="screen-activity" class="screen">
       <div class="section-header-title">
-        <span><i class="fa-solid fa-chart-line" style="color: var(--accent-gold);"></i> Academic Progression</span>
+        <span><i class="fa-solid fa-chart-line" style="color: var(--accent-gold);"></i> Academic Progression & Completion</span>
       </div>
-      <div class="journey-timeline">
-        <div class="timeline-node">
-          <div class="timeline-content">
-            <div style="font-size: 0.7rem; color: var(--accent-gold); font-weight: 800; text-transform: uppercase;">Milestone 01</div>
-            <div style="font-size: 0.9rem; font-weight: 800; margin-top: 2px;">Advanced Algorithm Tripos</div>
-          </div>
+      <div class="feed-container">
+        <div class="feed-item">
+          <div style="font-size: 0.7rem; color: var(--accent-gold); font-weight: 800; text-transform: uppercase;">Completed Assignment</div>
+          <div style="font-size: 0.9rem; font-weight: 800; margin-top: 2px;">Advanced Calculus Problem Set 3</div>
+          <div style="font-size: 0.75rem; color: var(--text-sub); margin-top: 4px;">Contributed +5% to overall academic progress score.</div>
         </div>
-        <div class="timeline-node">
-          <div class="timeline-content">
-            <div style="font-size: 0.7rem; color: var(--accent-gold); font-weight: 800; text-transform: uppercase;">Milestone 02</div>
-            <div style="font-size: 0.9rem; font-weight: 800; margin-top: 2px;">Quantum Mechanics Seminar</div>
-          </div>
+        <div class="feed-item">
+          <div style="font-size: 0.7rem; color: var(--accent-gold); font-weight: 800; text-transform: uppercase;">Completed Quiz</div>
+          <div style="font-size: 0.9rem; font-weight: 800; margin-top: 2px;">Quantum Physics Module Assessment</div>
+          <div style="font-size: 0.75rem; color: var(--text-sub); margin-top: 4px;">Score: 94% — Successfully updated student profile metrics.</div>
         </div>
       </div>
     </div>
@@ -1166,8 +1155,8 @@
       <div class="profile-card-header">
         <div class="profile-avatar-lg" id="profileInitial">A</div>
         <h2 style="font-size: 1.2rem; font-weight: 900;" id="profileDisplayName">Alistair Sterling</h2>
-        <p style="font-size: 0.8rem; color: var(--accent-gold); font-weight: 700; margin-top: 2px;" id="profileDisplayProgram">B.A. Computer Science & Tripos</p>
-        <p style="font-size: 0.75rem; color: var(--text-sub); margin-top: 4px;" id="profileDisplayEmail">alistair@appearich.ac.uk</p>
+        <p style="font-size: 0.8rem; color: var(--accent-gold); font-weight: 700; margin-top: 2px;" id="profileDisplayProgram">Upper Secondary — PCB</p>
+        <p style="font-size: 0.75rem; color: var(--text-sub); margin-top: 4px;" id="profileDisplayEmail">scholar@appearich.ac.uk</p>
       </div>
       <div class="settings-list">
         <div class="settings-item" onclick="alert('Notification settings updated.')">
@@ -1186,9 +1175,9 @@
 
     <!-- PERSISTENT BOTTOM NAVIGATION -->
     <nav class="bottom-nav" id="mainNavBar" style="display: none;">
-      <button class="nav-item active" onclick="switchTab('screen-home', this)">
+      <button class="nav-item active" onclick="switchTab('screen-home', this)" id="navHomeBtn">
         <i class="fa-solid fa-house"></i>
-        <span>Home</span>
+        <span>Portal</span>
       </button>
       <button class="nav-item" onclick="switchTab('screen-ai', this)">
         <i class="fa-solid fa-robot"></i>
@@ -1196,7 +1185,7 @@
       </button>
       <button class="nav-item" onclick="switchTab('screen-activity', this)">
         <i class="fa-solid fa-chart-pie"></i>
-        <span>Activity</span>
+        <span>Progress</span>
       </button>
       <button class="nav-item" onclick="switchTab('screen-profile', this)">
         <i class="fa-solid fa-user"></i>
@@ -1205,32 +1194,42 @@
     </nav>
   </div>
 
-  <!-- SECTION CONTENT & PHOTO GALLERY MODAL -->
-  <div id="sectionContentModal" class="modal-overlay">
+  <!-- UPLOAD MODAL FOR TEACHERS -->
+  <div id="teacherUploadModal" class="modal-overlay">
     <div class="modal-sheet">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-        <h3 id="modalSectionTitle" style="font-size: 1.2rem; font-weight: 900; letter-spacing: 0.5px;">SECTION DETAILS</h3>
-        <i class="fa-solid fa-xmark" style="cursor: pointer; font-size: 1.2rem; color: var(--text-sub);" onclick="closeSectionModal()"></i>
+        <h3 id="uploadModalTitle" style="font-size: 1.1rem; font-weight: 900;">Upload Content</h3>
+        <i class="fa-solid fa-xmark" style="cursor: pointer; font-size: 1.2rem; color: var(--text-sub);" onclick="closeUploadModal()"></i>
       </div>
-
-      <div id="modalSectionBody">
-        <!-- Dynamic Content -->
+      <div class="form-group" style="opacity: 1;">
+        <label>Item Title / Topic</label>
+        <input type="text" id="uploadItemTitle" placeholder="e.g. Organic Chemistry Problem Set">
       </div>
-
-      <div class="section-header-title" style="margin-top: 20px;">
-        <span><i class="fa-solid fa-images" style="color: var(--accent-gold);"></i> Section Media & Gallery</span>
+      <div class="form-group" style="opacity: 1;">
+        <label>Description & Instructions</label>
+        <input type="text" id="uploadItemDesc" placeholder="Enter details or instructions for students...">
       </div>
-
-      <div class="section-modal-grid" id="modalSectionGallery">
-        <!-- Photos populated by JS -->
+      <div class="form-group" style="opacity: 1;">
+        <label>Enrollment Key (To secure access)</label>
+        <input type="text" id="uploadItemKey" placeholder="e.g. CHEM2026">
       </div>
-
-      <input type="file" id="sectionMediaInput" accept="image/*" style="display: none;" onchange="handleSectionPhotoUpload(event)">
-      <button class="primary-btn" style="margin-top: 16px;" onclick="closeSectionModal()">Close Module</button>
+      <button class="primary-btn" style="opacity: 1; margin-top: 10px;" onclick="submitTeacherUpload()">Publish to Students</button>
     </div>
   </div>
 
-  <!-- GENERAL DISCOVERY MODAL -->
+  <!-- COMING SOON MODAL -->
+  <div id="comingSoonModal" class="modal-overlay">
+    <div class="modal-sheet" style="text-align: center; padding-top: 36px;">
+      <div class="ai-core-pulse" style="width: 60px; height: 60px; border-radius: 50%; background: var(--accent-gold-glow); border: 2px solid var(--accent-gold); margin: 0 auto 16px auto; display: flex; align-items: center; justify-content: center; color: var(--accent-gold); font-size: 1.3rem;">
+        <i class="fa-solid fa-hourglass-half"></i>
+      </div>
+      <h3 id="comingSoonTitle" style="font-size: 1.3rem; font-weight: 900; margin-bottom: 8px;">Coming Soon</h3>
+      <p style="font-size: 0.85rem; color: var(--text-sub); margin-bottom: 24px;">This exciting feature is currently under active development and will be available shortly.</p>
+      <button class="primary-btn" style="opacity: 1;" onclick="closeComingSoonModal()">Got it</button>
+    </div>
+  </div>
+
+  <!-- DISCOVERY MODAL -->
   <div id="discoveryModal" class="modal-overlay">
     <div class="modal-sheet">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
@@ -1238,73 +1237,25 @@
         <i class="fa-solid fa-xmark" style="cursor: pointer; font-size: 1.2rem; color: var(--text-sub);" onclick="closeDiscoveryModal()"></i>
       </div>
       <p id="modalDiscoveryDesc" style="font-size: 0.85rem; color: var(--text-sub); line-height: 1.5; margin-bottom: 20px;"></p>
-      <button class="primary-btn" onclick="closeDiscoveryModal()">Dismiss Module</button>
+      <button class="primary-btn" style="opacity: 1;" onclick="closeDiscoveryModal()">Dismiss Module</button>
     </div>
   </div>
 
   <!-- APPLICATION LOGIC SCRIPT -->
   <script>
-    let isRegisterState = false;
-    let currentSectionKey = '';
+    let currentAuthRole = 'student';
+    let currentUploadType = '';
     
     let currentUserProfile = {
+      role: 'student',
       name: "Alistair Sterling",
       email: "scholar@appearich.ac.uk",
-      program: "B.A. Computer Science & Tripos"
+      educationLevel: "Upper Secondary",
+      combination: "PCB"
     };
 
-    let sectionStores = {
-      COMMUNITY: {
-        items: [
-          "Campus Life",
-          "Clubs & Societies",
-          "Student Groups",
-          "Student Activities",
-          "University Memories",
-          "Community Interaction"
-        ],
-        photos: [
-          "images/community.jpg"
-        ]
-      },
-      EVENTS: {
-        items: [
-          "Academic Events",
-          "University Events",
-          "Seminars & Keynotes",
-          "Global Conferences",
-          "Interactive Workshops",
-          "Guest Lectures & Student Events"
-        ],
-        photos: [
-          "images/events.jpg"
-        ]
-      },
-      SPORTS: {
-        items: [
-          "College Teams",
-          "Matches & Live Scores",
-          "Competitions & League",
-          "Training Sessions",
-          "Sports Activities & Events"
-        ],
-        photos: [
-          "images/sport.jpg"
-        ]
-      },
-      LIBRARY: {
-        items: [
-          "Books & E-books",
-          "Research Papers & Journals",
-          "Digital Resources & Databases",
-          "Reading Materials & Guides",
-          "Academic References & Citations"
-        ],
-        photos: [
-          "images/library.jpg"
-        ]
-      }
-    };
+    let globalUploadsStore = [];
+    let teacherCustomPhoto = null;
 
     window.addEventListener('DOMContentLoaded', () => {
       const savedTheme = localStorage.getItem('appearich_theme_mode');
@@ -1316,102 +1267,95 @@
         localStorage.setItem('appearich_theme_mode', 'light');
       }
 
-      const storedMedia = localStorage.getItem('appearich_section_stores');
-      if (storedMedia) sectionStores = JSON.parse(storedMedia);
+      const storedUser = localStorage.getItem('appearich_user_profile');
+      if (storedUser) {
+        currentUserProfile = JSON.parse(storedUser);
+        launchDashboardBasedOnRole();
+      }
 
-      const savedHero = localStorage.getItem('appearich_custom_hero');
-      if (savedHero) document.getElementById('heroImageElement').src = savedHero;
-
-      const savedUser = localStorage.getItem('appearich_student_profile');
-      if (savedUser) {
-        currentUserProfile = JSON.parse(savedUser);
-        launchMainDashboard();
+      const storedUploads = localStorage.getItem('appearich_uploads_store');
+      if (storedUploads) {
+        globalUploadsStore = JSON.parse(storedUploads);
+        renderFeeds();
       }
 
       setTimeout(() => {
         const splash = document.getElementById('cinematic-splash');
         if (splash) splash.style.display = 'none';
       }, 1500);
-
-      setupScrollTriggerObserver();
     });
 
-    function setupScrollTriggerObserver() {
-      const observerOptions = {
-        root: null,
-        rootMargin: '0px 0px -40px 0px',
-        threshold: 0.12
-      };
+    function switchAuthRole(role) {
+      currentAuthRole = role;
+      document.getElementById('tabRoleStudent').className = role === 'student' ? 'role-tab active' : 'role-tab';
+      document.getElementById('tabRoleTeacher').className = role === 'teacher' ? 'role-tab active' : 'role-tab';
+      
+      document.getElementById('nameGroup').style.display = role === 'teacher' ? 'block' : 'block';
+      document.getElementById('teacherDetailsFields').style.display = role === 'teacher' ? 'block' : 'none';
+      document.getElementById('studentDetailsFields').style.display = role === 'student' ? 'block' : 'none';
+      document.getElementById('regName').placeholder = role === 'teacher' ? 'e.g. Dr. Kelvin Vance' : 'e.g. Alistair Sterling';
+    }
 
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('pop-in-visible');
-          }
-        });
-      }, observerOptions);
-
-      const photoCards = document.querySelectorAll('.photo-card');
-      photoCards.forEach(card => observer.observe(card));
+    function handleEduLevelChange() {
+      const level = document.getElementById('eduLevelSelect').value;
+      const combGroup = document.getElementById('combinationGroup');
+      combGroup.style.display = (level === 'Higher-level' || level === 'Upper Secondary') ? 'block' : 'none';
     }
 
     function toggleAuthMode() {
-      isRegisterState = !isRegisterState;
-      document.getElementById('authTitleText').innerText = isRegisterState ? "Create Account" : "Welcome back";
-      document.getElementById('authSubText').innerText = isRegisterState ? "Fill in your details to create a new profile" : "Enter your credentials to access your account";
-      document.getElementById('authActionBtn').innerText = isRegisterState ? "Sign Up" : "Login";
-      document.getElementById('nameGroup').style.display = isRegisterState ? "block" : "none";
-      document.getElementById('programGroup').style.display = isRegisterState ? "block" : "none";
-      document.getElementById('authOptionsRow').style.display = isRegisterState ? "none" : "flex";
-      document.getElementById('authSwitchPrompt').innerHTML = isRegisterState ? "Already have an account? <span>Login</span>" : "Don't have an account? <span>Sign Up</span>";
+      // Toggle logic placeholder for auth
     }
 
     function handleAuthSubmit() {
       const email = document.getElementById('authEmail').value.trim();
-      const pass = document.getElementById('authPassword').value.trim();
-      const nameInput = document.getElementById('regName').value.trim();
-      const programInput = document.getElementById('regProgram').value.trim();
-
-      if (!email || !pass) {
-        alert("Please enter valid credentials.");
+      const name = document.getElementById('regName').value.trim();
+      if (!email) {
+        alert("Please enter a valid email.");
         return;
       }
-
-      if (isRegisterState && nameInput) {
-        currentUserProfile.name = nameInput;
-        currentUserProfile.email = email;
-        if (programInput) currentUserProfile.program = programInput;
-      } else {
-        currentUserProfile.email = email;
-        currentUserProfile.name = email.split('@')[0].toUpperCase();
+      
+      currentUserProfile.role = currentAuthRole;
+      currentUserProfile.email = email;
+      currentUserProfile.name = name || (currentAuthRole === 'teacher' ? 'Dr. Teacher' : 'Scholar');
+      
+      if (currentAuthRole === 'student') {
+        currentUserProfile.educationLevel = document.getElementById('eduLevelSelect').value;
+        currentUserProfile.combination = document.getElementById('regCombination').value || 'Standard';
       }
 
-      localStorage.setItem('appearich_student_profile', JSON.stringify(currentUserProfile));
-      launchMainDashboard();
+      localStorage.setItem('appearich_user_profile', JSON.stringify(currentUserProfile));
+      launchDashboardBasedOnRole();
     }
 
-    function launchMainDashboard() {
+    function launchDashboardBasedOnRole() {
       document.getElementById('screen-auth').classList.remove('active');
-      document.getElementById('screen-home').classList.add('active');
       document.getElementById('mainHeader').style.display = 'flex';
       document.getElementById('mainNavBar').style.display = 'flex';
 
-      const hour = new Date().getHours();
-      let timeGreeting = hour < 12 ? "GOOD MORNING" : hour < 18 ? "GOOD AFTERNOON" : "GOOD EVENING";
-      
-      document.getElementById('dynamicGreeting').innerText = `${timeGreeting}, ${currentUserProfile.name.toUpperCase()}`;
-      document.getElementById('profileDisplayName').innerText = currentUserProfile.name;
-      document.getElementById('profileDisplayEmail').innerText = currentUserProfile.email;
-      document.getElementById('profileDisplayProgram').innerText = currentUserProfile.program;
-      document.getElementById('profileInitial').innerText = currentUserProfile.name.charAt(0).toUpperCase();
-
-      setTimeout(() => {
-        window.dispatchEvent(new Event('scroll'));
-      }, 200);
+      if (currentUserProfile.role === 'teacher') {
+        document.getElementById('screen-teacher-portal').classList.add('active');
+        document.getElementById('headerBrandTitle').innerText = 'Appearich Teacher Portal';
+        document.getElementById('teacherPortalGreeting').innerText = `WELCOME, ${currentUserProfile.name.toUpperCase()}`;
+        
+        const savedPhoto = localStorage.getItem('appearich_teacher_photo');
+        if (savedPhoto) {
+          document.getElementById('teacherHeroImageElement').src = savedPhoto;
+        }
+      } else {
+        document.getElementById('screen-home').classList.add('active');
+        document.getElementById('headerBrandTitle').innerText = 'Appearich Student Portal';
+        document.getElementById('dynamicGreeting').innerText = `WELCOME, ${currentUserProfile.name.toUpperCase()}`;
+        document.getElementById('dynamicSubGreeting').innerText = `Level: ${currentUserProfile.educationLevel} (${currentUserProfile.combination})`;
+        
+        document.getElementById('profileDisplayName').innerText = currentUserProfile.name;
+        document.getElementById('profileDisplayEmail').innerText = currentUserProfile.email;
+        document.getElementById('profileDisplayProgram').innerText = `${currentUserProfile.educationLevel} — ${currentUserProfile.combination}`;
+        document.getElementById('profileInitial').innerText = currentUserProfile.name.charAt(0).toUpperCase();
+      }
     }
 
     function handleLogout() {
-      localStorage.removeItem('appearich_student_profile');
+      localStorage.removeItem('appearich_user_profile');
       document.getElementById('mainHeader').style.display = 'none';
       document.getElementById('mainNavBar').style.display = 'none';
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -1421,7 +1365,12 @@
     function switchTab(screenId, element) {
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
       document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-      document.getElementById(screenId).classList.add('active');
+      
+      if (currentUserProfile.role === 'teacher' && screenId === 'screen-home') {
+        document.getElementById('screen-teacher-portal').classList.add('active');
+      } else {
+        document.getElementById(screenId).classList.add('active');
+      }
       if (element) element.classList.add('active');
     }
 
@@ -1439,78 +1388,114 @@
       }
     }
 
-    function triggerHeroUploadDialog() {
-      document.getElementById('heroFileInput').click();
+    /* TEACHER HERO PHOTO MANAGEMENT */
+    function triggerTeacherPhotoUpload() {
+      document.getElementById('teacherHeroFileInput').click();
     }
-
-    function handleHeroPhotoUpload(event) {
+    function handleTeacherPhotoUpload(event) {
       const file = event.target.files[0];
       if (!file) return;
       const reader = new FileReader();
       reader.onload = function(e) {
         const url = e.target.result;
-        document.getElementById('heroImageElement').src = url;
-        localStorage.setItem('appearich_custom_hero', url);
+        document.getElementById('teacherHeroImageElement').src = url;
+        localStorage.setItem('appearich_teacher_photo', url);
       };
       reader.readAsDataURL(file);
     }
-
-    function openSectionModal(sectionKey) {
-      currentSectionKey = sectionKey;
-      const data = sectionStores[sectionKey];
-      document.getElementById('modalSectionTitle').innerText = sectionKey;
-
-      let itemsHtml = '';
-      data.items.forEach(item => {
-        itemsHtml += `<div class="content-item-box"><i class="fa-solid fa-circle-dot" style="color: var(--accent-gold); margin-right: 8px;"></i>${item}</div>`;
-      });
-      document.getElementById('modalSectionBody').innerHTML = itemsHtml;
-
-      renderSectionGallery();
-      document.getElementById('sectionContentModal').classList.add('active');
+    function removeTeacherPhoto() {
+      localStorage.removeItem('appearich_teacher_photo');
+      document.getElementById('teacherHeroImageElement').src = "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?q=80&w=800&auto=format&fit=cover";
     }
 
-    function renderSectionGallery() {
-      const data = sectionStores[currentSectionKey];
-      let galleryHtml = '';
-
-      data.photos.forEach(pUrl => {
-        galleryHtml += `
-          <div class="section-photo-thumb">
-            <img src="${pUrl}" alt="Media">
-          </div>
-        `;
-      });
-
-      galleryHtml += `
-        <div class="section-upload-tile" onclick="triggerSectionUploadDialog()">
-          <i class="fa-solid fa-cloud-arrow-up" style="font-size: 1.3rem;"></i>
-          <span style="font-size: 0.68rem; font-weight: 800;">Upload Photo</span>
-        </div>
-      `;
-
-      document.getElementById('modalSectionGallery').innerHTML = galleryHtml;
+    /* UPLOAD MODAL & MANAGEMENT */
+    function openUploadModal(type) {
+      currentUploadType = type;
+      document.getElementById('uploadModalTitle').innerText = `Upload ${type}`;
+      document.getElementById('teacherUploadModal').classList.add('active');
     }
-
-    function triggerSectionUploadDialog() {
-      document.getElementById('sectionMediaInput').click();
+    function closeUploadModal() {
+      document.getElementById('teacherUploadModal').classList.remove('active');
     }
+    function submitTeacherUpload() {
+      const title = document.getElementById('uploadItemTitle').value.trim();
+      const desc = document.getElementById('uploadItemDesc').value.trim();
+      const key = document.getElementById('uploadItemKey').value.trim();
+      
+      if (!title) {
+        alert("Please enter a title.");
+        return;
+      }
 
-    function handleSectionPhotoUpload(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        const url = e.target.result;
-        sectionStores[currentSectionKey].photos.push(url);
-        localStorage.setItem('appearich_section_stores', JSON.stringify(sectionStores));
-        renderSectionGallery();
+      const newItem = {
+        type: currentUploadType,
+        title: title,
+        desc: desc || 'No additional description provided.',
+        key: key || 'GENERAL',
+        teacher: currentUserProfile.name
       };
-      reader.readAsDataURL(file);
+
+      globalUploadsStore.push(newItem);
+      localStorage.setItem('appearich_uploads_store', JSON.stringify(globalUploadsStore));
+      closeUploadModal();
+      renderFeeds();
+      alert(`Successfully published ${currentUploadType} to students!`);
     }
 
-    function closeSectionModal() {
-      document.getElementById('sectionContentModal').classList.remove('active');
+    function renderFeeds() {
+      let teacherHtml = '';
+      let studentHtml = '';
+
+      if (globalUploadsStore.length === 0) {
+        teacherHtml = '<div style="font-size: 0.8rem; color: var(--text-sub); text-align: center; padding: 20px;">No items published yet.</div>';
+      } else {
+        globalUploadsStore.forEach(item => {
+          teacherHtml += `
+            <div class="feed-item">
+              <span class="feed-tag">${item.type} (Key: ${item.key})</span>
+              <div style="font-weight: 800; font-size: 0.9rem; margin-top: 4px;">${item.title}</div>
+              <div style="font-size: 0.8rem; color: var(--text-sub); margin-top: 2px;">${item.desc}</div>
+            </div>
+          `;
+          studentHtml += `
+            <div class="feed-item">
+              <span class="feed-tag">${item.type} — By ${item.teacher}</span>
+              <div style="font-weight: 800; font-size: 0.9rem; margin-top: 4px;">${item.title}</div>
+              <div style="font-size: 0.8rem; color: var(--text-sub); margin-top: 2px;">${item.desc}</div>
+            </div>
+          `;
+        });
+      }
+
+      const tList = document.getElementById('teacherUploadedItemsList');
+      if (tList) tList.innerHTML = teacherHtml;
+
+      const sList = document.getElementById('studentFeedContainer');
+      if (sList) sList.innerHTML = studentHtml;
+    }
+
+    /* ENROLLMENT KEY VERIFICATION */
+    function verifyEnrollmentKey() {
+      const keyInput = document.getElementById('enrollmentKeyInput').value.trim();
+      if (!keyInput) {
+        alert("Please enter a valid enrollment key.");
+        return;
+      }
+      const match = globalUploadsStore.find(i => i.key.toLowerCase() === keyInput.toLowerCase());
+      if (match) {
+        alert(`Successfully joined course/material under key '${match.key}'! Access granted.`);
+      } else {
+        alert("Invalid enrollment key. Please check with your instructor.");
+      }
+    }
+
+    /* COMING SOON MODALS */
+    function showComingSoonModal(featureName) {
+      document.getElementById('comingSoonTitle').innerText = `${featureName} — Coming Soon`;
+      document.getElementById('comingSoonModal').classList.add('active');
+    }
+    function closeComingSoonModal() {
+      document.getElementById('comingSoonModal').classList.remove('active');
     }
 
     function triggerDiscoveryModal(title, desc) {
@@ -1518,19 +1503,8 @@
       document.getElementById('modalDiscoveryDesc').innerText = desc;
       document.getElementById('discoveryModal').classList.add('active');
     }
-
     function closeDiscoveryModal() {
       document.getElementById('discoveryModal').classList.remove('active');
-    }
-
-    function triggerAiAction(actionName) {
-      alert(`Appearich AI Companion initializing protocol: ${actionName}...`);
-    }
-
-    function handleGlobalSearch(query) {
-      if (query.trim().length > 2) {
-        console.log(`Searching academic matrix for: ${query}`);
-      }
     }
   </script>
 </body>
