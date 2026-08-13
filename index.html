@@ -56,9 +56,8 @@
       align-items: center;
       overflow-x: hidden;
     }
-    /* ========================================================= */
-    /* 1. SPLASH SCREEN — LOGO ONLY (PURE WHITE)                 */
-    /* ========================================================= */
+    
+    /* SPLASH SCREEN */
     #cinematic-splash {
       position: fixed;
       inset: 0;
@@ -93,7 +92,7 @@
       80% { opacity: 1; transform: scale(1); filter: blur(0); }
       100% { opacity: 0; transform: scale(1.04); filter: blur(4px); visibility: hidden; }
     }
-    /* APP CONTAINER & SCREENS */
+
     .app-viewport {
       width: 100%;
       max-width: 480px;
@@ -117,9 +116,8 @@
       from { opacity: 0; transform: translateY(8px); }
       to { opacity: 1; transform: translateY(0); }
     }
-    /* ========================================================= */
-    /* 2. AUTHENTICATION & PORTAL SWITCHING SEAMLESS PAGE        */
-    /* ========================================================= */
+
+    /* AUTHENTICATION SCREEN */
     #screen-auth {
       justify-content: center;
       align-items: center;
@@ -152,7 +150,6 @@
       margin-top: 6px;
     }
     
-    /* Role Selector Tabs */
     .role-tabs {
       display: flex;
       background: #f1f5f9;
@@ -177,7 +174,6 @@
       box-shadow: 0 2px 8px rgba(0,0,0,0.06);
     }
 
-    /* Sequential Left-to-Right Entrance Animations */
     .form-group {
       margin-bottom: 16px;
       opacity: 0;
@@ -386,30 +382,6 @@
       margin-top: 4px;
       text-transform: uppercase;
       letter-spacing: 0.5px;
-    }
-
-    /* COMMAND SEARCH BAR */
-    .search-command-bar {
-      position: relative;
-      margin-bottom: 24px;
-    }
-    .search-command-bar input {
-      width: 100%;
-      background: var(--surface-color);
-      border: 1px solid var(--border-color);
-      border-radius: 16px;
-      padding: 14px 16px 14px 44px;
-      color: var(--text-main);
-      font-size: 0.88rem;
-      outline: none;
-    }
-    .search-command-bar i {
-      position: absolute;
-      left: 16px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--text-sub);
-      font-size: 0.95rem;
     }
 
     /* SECTION HEADER STYLE */
@@ -971,42 +943,22 @@
         </div>
         
         <div class="academic-scroll-wrapper">
-          <div class="academic-card" onclick="triggerDiscoveryModal('Assignments Progress', 'Completed assignments contribute directly to your academic progress score.')">
+          <div class="academic-card" onclick="triggerDiscoveryModal('Academic Standing', 'Completed coursework and verified materials contribute directly to your academic progress score.')">
             <div class="academic-card-top">
-              <div class="academic-icon-box"><i class="fa-solid fa-pen-ruler"></i></div>
-              <span class="academic-tag" style="color: #ef4444; border-color: rgba(239, 68, 68, 0.3); background: rgba(239, 68, 68, 0.1);">2 Due Soon</span>
-            </div>
-            <div class="academic-card-mid">
-              <div class="academic-card-title">Assignments</div>
-              <div class="academic-card-sub">Task submissions & score tracking</div>
-            </div>
-            <div class="academic-card-bottom">
-              <div class="academic-progress-info">
-                <span>Progress Contribution</span>
-                <span id="assignmentProgressText">86%</span>
-              </div>
-              <div class="academic-progress-track">
-                <div class="academic-progress-fill" id="assignmentProgressBar" style="width: 86%;"></div>
-              </div>
-            </div>
-          </div>
-
-          <div class="academic-card" onclick="triggerDiscoveryModal('Quizzes Progress', 'Finished quizzes automatically update your overall academic standing.')">
-            <div class="academic-card-top">
-              <div class="academic-icon-box"><i class="fa-solid fa-brain"></i></div>
+              <div class="academic-icon-box"><i class="fa-solid fa-chart-line"></i></div>
               <span class="academic-tag">Active</span>
             </div>
             <div class="academic-card-mid">
-              <div class="academic-card-title">Quizzes</div>
-              <div class="academic-card-sub">Active recall & assessments</div>
+              <div class="academic-card-title">Course Standing</div>
+              <div class="academic-card-sub">Overall completion metrics</div>
             </div>
             <div class="academic-card-bottom">
               <div class="academic-progress-info">
-                <span>Score Average</span>
-                <span id="quizProgressText">92%</span>
+                <span>Progress Score</span>
+                <span id="assignmentProgressText">89%</span>
               </div>
               <div class="academic-progress-track">
-                <div class="academic-progress-fill" id="quizProgressBar" style="width: 92%;"></div>
+                <div class="academic-progress-fill" id="assignmentProgressBar" style="width: 89%;"></div>
               </div>
             </div>
           </div>
@@ -1104,7 +1056,7 @@
       </div>
     </div>
 
-    <!-- SCREEN 1C: TEACHER SUBJECT WORKSPACE (Assignments, Quizzes, Announcements, Tests + PDF/Image Upload) -->
+    <!-- SCREEN 1C: TEACHER SUBJECT WORKSPACE -->
     <div id="screen-teacher-subject-workspace" class="screen">
       <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
         <button onclick="goBackToTeacherClasses()" style="background: var(--surface-color); border: 1px solid var(--border-color); width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-main);">
@@ -1150,7 +1102,7 @@
 
       <!-- Uploaded Feed List for this Subject -->
       <div class="section-header-title">
-        <span><i class="fa-solid fa-folder-open" style="color: var(--accent-gold);"></i> Uploaded Content & Files</span>
+        <span><i class="fa-solid fa-folder-open" style="color: var(--accent-gold);"></i> Uploaded Content & Approval Status</span>
       </div>
       <div class="feed-container" id="workspaceUploadsList">
         <!-- Rendered dynamically -->
@@ -1218,9 +1170,9 @@
         </div>
       </div>
 
-      <!-- Content list for student in this subject -->
+      <!-- Content list for student in this subject (Approved only) -->
       <div class="section-header-title">
-        <span><i class="fa-solid fa-box-archive" style="color: var(--accent-gold);"></i> Published Materials</span>
+        <span><i class="fa-solid fa-box-archive" style="color: var(--accent-gold);"></i> Approved Materials</span>
       </div>
       <div class="feed-container" id="studentWorkspaceContentList">
         <!-- Rendered dynamically -->
@@ -1245,14 +1197,9 @@
       </div>
       <div class="feed-container">
         <div class="feed-item">
-          <div style="font-size: 0.7rem; color: var(--accent-gold); font-weight: 800; text-transform: uppercase;">Completed Assignment</div>
-          <div style="font-size: 0.9rem; font-weight: 800; margin-top: 2px;">Advanced Calculus Problem Set 3</div>
-          <div style="font-size: 0.75rem; color: var(--text-sub); margin-top: 4px;">Contributed +5% to overall academic progress score.</div>
-        </div>
-        <div class="feed-item">
-          <div style="font-size: 0.7rem; color: var(--accent-gold); font-weight: 800; text-transform: uppercase;">Completed Quiz</div>
-          <div style="font-size: 0.9rem; font-weight: 800; margin-top: 2px;">Quantum Physics Module Assessment</div>
-          <div style="font-size: 0.75rem; color: var(--text-sub); margin-top: 4px;">Score: 94% — Successfully updated student profile metrics.</div>
+          <div style="font-size: 0.7rem; color: var(--accent-gold); font-weight: 800; text-transform: uppercase;">Completed Coursework</div>
+          <div style="font-size: 0.9rem; font-weight: 800; margin-top: 2px;">Advanced Academic Modules</div>
+          <div style="font-size: 0.75rem; color: var(--text-sub); margin-top: 4px;">Successfully updated student profile metrics.</div>
         </div>
       </div>
     </div>
@@ -1301,7 +1248,7 @@
     </nav>
   </div>
 
-  <!-- UPLOAD MODAL FOR TEACHERS (Supports PDF & Images for Assignments, Quizzes, Tests, Announcements) -->
+  <!-- UPLOAD MODAL FOR TEACHERS -->
   <div id="teacherUploadModal" class="modal-overlay">
     <div class="modal-sheet">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
@@ -1321,6 +1268,20 @@
         <input type="file" id="uploadFileAsset" accept=".pdf,image/*" style="background: var(--surface-elevated); border: 1px solid var(--border-color); border-radius: 12px; padding: 10px; font-size: 0.85rem;">
       </div>
       <button class="primary-btn" style="opacity: 1; margin-top: 10px;" onclick="submitTeacherUpload()">Publish to Class Subject</button>
+    </div>
+  </div>
+
+  <!-- DOCUMENT VIEWER MODAL FOR STUDENTS -->
+  <div id="studentDocModal" class="modal-overlay">
+    <div class="modal-sheet" style="text-align: center;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <h3 id="viewerDocTitle" style="font-size: 1.1rem; font-weight: 900;">Document Viewer</h3>
+        <i class="fa-solid fa-xmark" style="cursor: pointer; font-size: 1.2rem; color: var(--text-sub);" onclick="closeStudentDocModal()"></i>
+      </div>
+      <div id="viewerDocContent" style="padding: 20px; background: var(--surface-elevated); border-radius: 14px; margin-bottom: 20px; font-size: 0.9rem; color: var(--text-main);">
+        <!-- Document Preview / Content -->
+      </div>
+      <button class="primary-btn" style="opacity: 1;" onclick="closeStudentDocModal()">Close Viewer</button>
     </div>
   </div>
 
@@ -1348,7 +1309,7 @@
     </div>
   </div>
 
-  <!-- APPLICATION LOGIC SCRIPT (With Permanent Persistence) -->
+  <!-- APPLICATION LOGIC SCRIPT -->
   <script>
     let currentAuthRole = 'student';
     let currentUploadType = '';
@@ -1363,9 +1324,9 @@
       combination: "PCB"
     };
 
-    // Permanent Data Store structure
+    // Permanent Data Store structure (Only classes actually created by teachers)
     let teacherPortalData = {
-      classes: [] // Each class: { name: 'Form Three', subjects: ['Biology', 'Chemistry', 'Physics'], uploads: [{type, title, desc, fileUrl, fileName, subject}] }
+      classes: [] 
     };
 
     window.addEventListener('DOMContentLoaded', () => {
@@ -1378,26 +1339,20 @@
         localStorage.setItem('appearich_theme_mode', 'light');
       }
 
-      // Restore permanent data
+      // Restore permanent data securely
       const savedTeacherData = localStorage.getItem('appearich_permanent_teacher_data');
       if (savedTeacherData) {
         teacherPortalData = JSON.parse(savedTeacherData);
       } else {
-        // Default seed data for demonstration
         teacherPortalData = {
           classes: [
             {
               name: "Form Three",
               subjects: ["Biology", "Chemistry", "Physics"],
               uploads: [
-                { type: "Assignment", title: "Cellular Respiration Lab", desc: "Complete problems 1-10", fileName: "lab_sheet.pdf", subject: "Biology" },
-                { type: "Announcement", title: "Mid-Term Review", desc: "Prepare your notes", fileName: "", subject: "Biology" }
+                { type: "Assignment", title: "Cellular Respiration Lab", desc: "Complete problems 1-10", fileName: "lab_sheet.pdf", subject: "Biology", approved: true },
+                { type: "Announcement", title: "Mid-Term Review", desc: "Prepare your notes", fileName: "", subject: "Biology", approved: true }
               ]
-            },
-            {
-              name: "Form Four",
-              subjects: ["Mathematics", "Advanced Physics"],
-              uploads: []
             }
           ]
         };
@@ -1464,9 +1419,9 @@
         currentUserProfile.educationLevel = document.getElementById('eduLevelSelect').value;
         currentUserProfile.combination = document.getElementById('regCombination').value || 'Standard';
       } else {
-        // Teacher custom classes & subjects creation during sign up
         const classesInput = document.getElementById('teacherInputClasses').value.trim();
         const subjectsInput = document.getElementById('teacherInputSubjects').value.trim();
+        const eduLevel = document.getElementById('teacherEduLevel').value;
         
         if (classesInput) {
           const classArr = classesInput.split(',').map(s => s.trim()).filter(Boolean);
@@ -1476,6 +1431,7 @@
             if (!teacherPortalData.classes.some(cl => cl.name.toLowerCase() === cName.toLowerCase())) {
               teacherPortalData.classes.push({
                 name: cName,
+                educationLevel: eduLevel,
                 subjects: [...subjectArr],
                 uploads: []
               });
@@ -1603,7 +1559,7 @@
           selectHtml += `<option value="${cls.name}">${cls.name}</option>`;
           html += `
             <div class="portal-box-card" onclick="openTeacherClass('${cls.name}')">
-              <div class="custom-vector-emblem"><i class="fa-solid fa-graduation-cap"></i></div>
+              <div class="custom-vector-emblem"><i class="fa-solid fa-shield-halved"></i></div>
               <div style="font-weight: 800; font-size: 0.95rem;">${cls.name}</div>
               <div style="font-size: 0.72rem; color: var(--text-sub);">${cls.subjects.length} Subjects</div>
             </div>
@@ -1622,7 +1578,6 @@
 
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
       
-      // Build dynamic view for subjects inside class
       let containerHtml = `
         <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
           <button onclick="goBackToTeacherClasses()" style="background: var(--surface-color); border: 1px solid var(--border-color); width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-main);">
@@ -1639,7 +1594,7 @@
       cls.subjects.forEach(sub => {
         containerHtml += `
           <div class="portal-box-card" onclick="openTeacherSubjectWorkspace('${cls.name}', '${sub}')">
-            <div class="custom-vector-emblem"><i class="fa-solid fa-book-open"></i></div>
+            <div class="custom-vector-emblem"><i class="fa-solid fa-layer-group"></i></div>
             <div style="font-weight: 800; font-size: 0.95rem;">${sub}</div>
             <div style="font-size: 0.72rem; color: var(--text-sub);">Open Workspace</div>
           </div>
@@ -1648,7 +1603,6 @@
 
       containerHtml += `</div>`;
 
-      // We can reuse screen-teacher-subject-workspace or create a container
       let wsScreen = document.getElementById('screen-teacher-subject-workspace');
       wsScreen.innerHTML = containerHtml;
       wsScreen.classList.add('active');
@@ -1710,7 +1664,7 @@
         </div>
 
         <div class="section-header-title">
-          <span><i class="fa-solid fa-folder-open" style="color: var(--accent-gold);"></i> Uploaded Content (${subjectName})</span>
+          <span><i class="fa-solid fa-folder-open" style="color: var(--accent-gold);"></i> Uploaded Content & Approval Status (${subjectName})</span>
         </div>
         <div class="feed-container" id="workspaceUploadsList">
           ${renderSubjectUploadsList(className, subjectName)}
@@ -1725,17 +1679,41 @@
         return '<div style="font-size: 0.8rem; color: var(--text-sub); text-align: center; padding: 20px;">No uploads for this subject yet.</div>';
       }
       let html = '';
-      cls.uploads.filter(u => u.subject === subjectName).forEach(item => {
+      cls.uploads.filter(u => u.subject === subjectName).forEach((item, index) => {
+        const globalIdx = cls.uploads.indexOf(item);
+        const statusBadge = item.approved 
+          ? `<span style="background: rgba(34,197,94,0.15); color: #22c55e; border: 1px solid rgba(34,197,94,0.3); padding: 2px 8px; border-radius: 8px; font-size: 0.65rem; font-weight: 800;">Approved</span>`
+          : `<span style="background: rgba(234,179,8,0.15); color: #eab308; border: 1px solid rgba(234,179,8,0.3); padding: 2px 8px; border-radius: 8px; font-size: 0.65rem; font-weight: 800;">Pending Review</span>`;
+        
+        const actionBtn = item.approved
+          ? `<button onclick="toggleApproval(${globalIdx}, false)" style="background: transparent; border: 1px solid #ef4444; color: #ef4444; padding: 4px 10px; border-radius: 8px; font-size: 0.7rem; font-weight: 700; cursor: pointer;">Revoke</button>`
+          : `<button onclick="toggleApproval(${globalIdx}, true)" style="background: #22c55e; border: none; color: #fff; padding: 4px 10px; border-radius: 8px; font-size: 0.7rem; font-weight: 700; cursor: pointer;">Approve for Students</button>`;
+
         html += `
           <div class="feed-item">
-            <span class="feed-tag">${item.type}</span>
-            <div style="font-weight: 800; font-size: 0.9rem; margin-top: 4px;">${item.title}</div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+              <span class="feed-tag">${item.type}</span>
+              ${statusBadge}
+            </div>
+            <div style="font-weight: 800; font-size: 0.9rem; margin-top: 2px;">${item.title}</div>
             <div style="font-size: 0.8rem; color: var(--text-sub); margin-top: 2px;">${item.desc}</div>
-            ${item.fileName ? `<div style="margin-top: 8px; font-size: 0.75rem; color: var(--accent-gold); font-weight: 700;"><i class="fa-solid fa-paperclip"></i> Attached: ${item.fileName}</div>` : ''}
+            ${item.fileName ? `<div style="margin-top: 6px; font-size: 0.75rem; color: var(--accent-gold); font-weight: 700;"><i class="fa-solid fa-paperclip"></i> Attached: ${item.fileName}</div>` : ''}
+            <div style="margin-top: 10px; display: flex; justify-content: flex-end;">
+              ${actionBtn}
+            </div>
           </div>
         `;
       });
       return html;
+    }
+
+    function toggleApproval(uploadIndex, status) {
+      const cls = teacherPortalData.classes.find(c => c.name === activeSelectedClass);
+      if (cls && cls.uploads[uploadIndex]) {
+        cls.uploads[uploadIndex].approved = status;
+        savePermanentData();
+        openTeacherSubjectWorkspace(activeSelectedClass, activeSelectedSubject);
+      }
     }
 
     /* UPLOAD MODAL */
@@ -1771,7 +1749,8 @@
           title: title,
           desc: desc || 'No description.',
           fileName: fileName,
-          subject: activeSelectedSubject || cls.subjects[0]
+          subject: activeSelectedSubject || cls.subjects[0],
+          approved: false // Requires teacher review/approval step before student viewing
         });
         savePermanentData();
       }
@@ -1781,7 +1760,7 @@
       document.getElementById('uploadItemDesc').value = '';
       document.getElementById('uploadFileAsset').value = '';
 
-      alert(`Successfully published ${currentUploadType} with file attachment!`);
+      alert(`Successfully submitted ${currentUploadType} for review.`);
       openTeacherSubjectWorkspace(activeSelectedClass, activeSelectedSubject);
     }
 
@@ -1791,8 +1770,9 @@
       const grid = document.getElementById('studentClassesGridContainer');
       let html = '';
 
-      if (teacherPortalData.classes.length === 0) {
-        html = '<div style="font-size: 0.8rem; color: var(--text-sub); grid-column: 1/-1; text-align: center; padding: 20px;">No classes available at the moment.</div>';
+      // Only display classes created by teachers (no placeholders or uncreated classes)
+      if (!teacherPortalData.classes || teacherPortalData.classes.length === 0) {
+        html = '<div style="font-size: 0.8rem; color: var(--text-sub); grid-column: 1/-1; text-align: center; padding: 20px;">No created classes available at the moment.</div>';
       } else {
         teacherPortalData.classes.forEach(cls => {
           html += `
@@ -1871,6 +1851,7 @@
           </div>
         </div>
 
+        <!-- Clean 2x2 Layout: Announcements, Assignments, Quizzes, Tests -->
         <div class="grid-2x2-workspace">
           <div class="workspace-section-card" onclick="filterStudentContentList('Announcement')">
             <div class="custom-vector-emblem"><i class="fa-solid fa-bullhorn"></i></div>
@@ -1903,7 +1884,7 @@
         </div>
 
         <div class="section-header-title">
-          <span><i class="fa-solid fa-box-archive" style="color: var(--accent-gold);"></i> All Uploaded Materials</span>
+          <span><i class="fa-solid fa-box-archive" style="color: var(--accent-gold);"></i> Approved Materials</span>
         </div>
         <div class="feed-container" id="studentWorkspaceContentList">
           ${renderStudentSubjectContent(className, subjectName, 'All')}
@@ -1915,15 +1896,18 @@
     function renderStudentSubjectContent(className, subjectName, filterType) {
       const cls = teacherPortalData.classes.find(c => c.name === className);
       if (!cls || !cls.uploads || cls.uploads.length === 0) {
-        return '<div style="font-size: 0.8rem; color: var(--text-sub); text-align: center; padding: 20px;">No published content available yet.</div>';
+        return '<div style="font-size: 0.8rem; color: var(--text-sub); text-align: center; padding: 20px;">No approved materials available yet.</div>';
       }
-      let filtered = cls.uploads.filter(u => u.subject === subjectName);
+      
+      // Ensure only approved documents/materials are visible to students
+      let filtered = cls.uploads.filter(u => u.subject === subjectName && u.approved === true);
       if (filterType && filterType !== 'All') {
         filtered = filtered.filter(u => u.type === filterType);
       }
       if (filtered.length === 0) {
-        return '<div style="font-size: 0.8rem; color: var(--text-sub); text-align: center; padding: 20px;">No items found for this category.</div>';
+        return '<div style="font-size: 0.8rem; color: var(--text-sub); text-align: center; padding: 20px;">No approved items found for this section.</div>';
       }
+      
       let html = '';
       filtered.forEach(item => {
         html += `
@@ -1931,7 +1915,13 @@
             <span class="feed-tag">${item.type}</span>
             <div style="font-weight: 800; font-size: 0.9rem; margin-top: 4px;">${item.title}</div>
             <div style="font-size: 0.8rem; color: var(--text-sub); margin-top: 2px;">${item.desc}</div>
-            ${item.fileName ? `<div style="margin-top: 8px; font-size: 0.75rem; color: var(--accent-gold); font-weight: 700;"><i class="fa-solid fa-paperclip"></i> Attached File: ${item.fileName}</div>` : ''}
+            ${item.fileName ? `
+              <div style="margin-top: 10px;">
+                <button onclick="openStudentDocument('${item.title}', '${item.fileName}')" style="background: var(--accent-gold); color: #fff; border: none; padding: 8px 14px; border-radius: 10px; font-size: 0.75rem; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+                  <i class="fa-solid fa-file-arrow-down"></i> Open ${item.fileName}
+                </button>
+              </div>
+            ` : ''}
           </div>
         `;
       });
@@ -1947,6 +1937,23 @@
 
     function openStudentSectionView(sectionType) {
       filterStudentContentList(sectionType);
+    }
+
+    // Simple and clear document-opening experience for students
+    function openStudentDocument(title, fileName) {
+      document.getElementById('viewerDocTitle').innerText = title;
+      document.getElementById('viewerDocContent').innerHTML = `
+        <div style="font-weight: 800; font-size: 1rem; margin-bottom: 8px;">File: ${fileName}</div>
+        <p style="font-size: 0.85rem; color: var(--text-sub); margin-bottom: 12px;">Verified and approved by instructor.</p>
+        <div style="padding: 30px; background: var(--surface-color); border: 1px dashed var(--border-color); border-radius: 12px; color: var(--text-main); font-weight: 700;">
+          [Document Preview Loaded Successfully]
+        </div>
+      `;
+      document.getElementById('studentDocModal').classList.add('active');
+    }
+
+    function closeStudentDocModal() {
+      document.getElementById('studentDocModal').classList.remove('active');
     }
 
     /* COMING SOON MODALS */
