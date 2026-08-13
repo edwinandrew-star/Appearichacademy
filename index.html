@@ -237,28 +237,6 @@
       background: #ffffff;
       box-shadow: 0 0 0 3px var(--accent-gold-glow);
     }
-    
-    /* Checkbox Group Styles for Multiple Classes/Subjects */
-    .checkbox-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
-      padding: 12px;
-      border-radius: 14px;
-      max-height: 130px;
-      overflow-y: auto;
-    }
-    .checkbox-item {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 0.82rem;
-      font-weight: 600;
-      color: #09090b;
-      cursor: pointer;
-    }
 
     .primary-btn {
       width: 100%;
@@ -408,26 +386,6 @@
       margin-top: 4px;
       text-transform: uppercase;
       letter-spacing: 0.5px;
-    }
-    .hero-controls-group {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      align-items: flex-end;
-    }
-    .hero-control-btn {
-      background: rgba(0, 0, 0, 0.65);
-      backdrop-filter: blur(8px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      color: #ffffff;
-      padding: 6px 12px;
-      border-radius: 20px;
-      font-size: 0.68rem;
-      font-weight: 700;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 6px;
     }
 
     /* COMMAND SEARCH BAR */
@@ -582,6 +540,39 @@
       border-radius: 10px;
     }
 
+    /* 3 HORIZONTAL SCROLLABLE CARDS BELOW ACADEMIC PROGRESS (STUDENT HOME) */
+    .student-dashboard-cards-row {
+      display: flex;
+      gap: 14px;
+      overflow-x: auto;
+      padding: 4px 4px 16px 4px;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      margin-bottom: 24px;
+    }
+    .student-dashboard-cards-row::-webkit-scrollbar {
+      display: none;
+    }
+    .dashboard-mini-card {
+      flex: 0 0 150px;
+      scroll-snap-align: start;
+      background: var(--surface-color);
+      border: 1px solid var(--border-color);
+      border-radius: 18px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      cursor: pointer;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.2s ease;
+    }
+    .dashboard-mini-card:hover {
+      border-color: var(--accent-gold);
+      transform: translateY(-2px);
+    }
+
     /* PHOTO CARDS GRID */
     .photo-grid-2x2 {
       display: grid;
@@ -599,7 +590,6 @@
       cursor: pointer;
       box-shadow: var(--shadow-sm);
       border: 1px solid var(--border-color);
-      opacity: 1;
       transition: transform 0.3s ease;
     }
     .photo-card:hover {
@@ -628,31 +618,72 @@
       text-shadow: 0 2px 6px rgba(0, 0, 0, 0.8);
     }
 
-    /* TEACHER UPLOAD DASHBOARD STYLES */
-    .upload-section-grid {
+    /* TEACHER PORTAL GRIDS (RESPONSIVE CLASS & SUBJECT CARDS) */
+    .responsive-grid-cards {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 14px;
       margin-bottom: 24px;
     }
-    .upload-option-card {
+    .portal-box-card {
+      background: var(--surface-color);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 10px;
+      cursor: pointer;
+      box-shadow: var(--shadow-sm);
+      position: relative;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .portal-box-card:hover {
+      border-color: var(--accent-gold);
+      transform: translateY(-3px);
+      box-shadow: 0 10px 20px var(--accent-gold-glow);
+    }
+    .custom-vector-emblem {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      background: var(--accent-gold-glow);
+      border: 1px solid var(--accent-gold-border);
+      color: var(--accent-gold);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+    }
+
+    /* SUBJECT WORKSPACE 2x2 GRID */
+    .grid-2x2-workspace {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+    .workspace-section-card {
       background: var(--surface-color);
       border: 1px solid var(--border-color);
       border-radius: 18px;
-      padding: 16px;
-      cursor: pointer;
+      padding: 20px;
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      align-items: flex-start;
+      gap: 12px;
+      cursor: pointer;
       box-shadow: var(--shadow-sm);
       transition: all 0.2s ease;
     }
-    .upload-option-card:hover {
+    .workspace-section-card:hover {
       border-color: var(--accent-gold);
       transform: translateY(-2px);
     }
 
-    /* FEED STYLES FOR STUDENTS */
+    /* FEED STYLES */
     .feed-container {
       display: flex;
       flex-direction: column;
@@ -676,25 +707,6 @@
       color: var(--accent-gold);
       display: inline-block;
       margin-bottom: 6px;
-    }
-
-    /* TEACHER DIRECTORY LISTING STYLES */
-    .teacher-directory-list {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      margin-bottom: 24px;
-    }
-    .teacher-dir-item {
-      background: var(--surface-color);
-      border: 1px solid var(--border-color);
-      border-radius: 14px;
-      padding: 14px 16px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 0.88rem;
-      font-weight: 700;
     }
 
     /* BOTTOM NAVIGATION */
@@ -858,26 +870,32 @@
           <input type="password" id="authPassword" placeholder="••••••••••••">
         </div>
 
-        <!-- Teacher Specific Multi-Select Fields -->
+        <!-- Confirm Password Field -->
+        <div class="form-group">
+          <label>Confirm Password</label>
+          <input type="password" id="authConfirmPassword" placeholder="••••••••••••">
+        </div>
+
+        <!-- Teacher Specific Dynamic Creation Fields -->
         <div id="teacherDetailsFields" style="display: none;">
           <div class="form-group">
-            <label>Select Class(es)</label>
-            <div class="checkbox-grid">
-              <label class="checkbox-item"><input type="checkbox" name="teacherClass" value="Form 3"> Form 3</label>
-              <label class="checkbox-item"><input type="checkbox" name="teacherClass" value="Form 4"> Form 4</label>
-              <label class="checkbox-item"><input type="checkbox" name="teacherClass" value="Lower Secondary"> Lower Sec</label>
-              <label class="checkbox-item"><input type="checkbox" name="teacherClass" value="Upper Secondary"> Upper Sec</label>
-            </div>
+            <label>Education Level</label>
+            <select id="teacherEduLevel">
+              <option value="Lower Primary">Lower Primary</option>
+              <option value="Upper Primary">Upper Primary</option>
+              <option value="Lower Secondary">Lower Secondary</option>
+              <option value="Upper Secondary">Upper Secondary</option>
+            </select>
           </div>
 
           <div class="form-group">
-            <label>Select Subject(s)</label>
-            <div class="checkbox-grid">
-              <label class="checkbox-item"><input type="checkbox" name="teacherSubject" value="Mathematics"> Mathematics</label>
-              <label class="checkbox-item"><input type="checkbox" name="teacherSubject" value="Physics"> Physics</label>
-              <label class="checkbox-item"><input type="checkbox" name="teacherSubject" value="Chemistry"> Chemistry</label>
-              <label class="checkbox-item"><input type="checkbox" name="teacherSubject" value="Biology"> Biology</label>
-            </div>
+            <label>Create Class(es) (Comma separated)</label>
+            <input type="text" id="teacherInputClasses" placeholder="e.g. Form Three, Form Four">
+          </div>
+
+          <div class="form-group">
+            <label>Create Subject(s) (Comma separated)</label>
+            <input type="text" id="teacherInputSubjects" placeholder="e.g. Biology, Chemistry, Physics">
           </div>
         </div>
 
@@ -886,10 +904,10 @@
           <div class="form-group">
             <label>Education Level</label>
             <select id="eduLevelSelect" onchange="handleEduLevelChange()">
-              <option value="Primary">Primary</option>
+              <option value="Lower Primary">Lower Primary</option>
+              <option value="Upper Primary">Upper Primary</option>
               <option value="Lower Secondary">Lower Secondary</option>
               <option value="Upper Secondary">Upper Secondary</option>
-              <option value="Higher-level">Higher-level / Advanced (e.g. PCB)</option>
             </select>
           </div>
 
@@ -904,7 +922,7 @@
           <a href="#" onclick="alert('Password reset link sent to your email.'); return false;">Forgot password?</a>
         </div>
         
-        <button class="primary-btn" id="authActionBtn" onclick="handleAuthSubmit()">Login</button>
+        <button class="primary-btn" id="authActionBtn" onclick="handleAuthSubmit()">Login / Register</button>
         
         <div class="auth-switch-text" onclick="toggleAuthMode()">
           <span id="authSwitchPrompt">Don't have an account? <span>Sign Up</span></span>
@@ -943,44 +961,6 @@
             <h2 class="hero-greeting" id="dynamicGreeting">WELCOME, SCHOLAR</h2>
             <div class="hero-msg" id="dynamicSubGreeting">Enrolled: General Course</div>
           </div>
-        </div>
-      </div>
-
-      <!-- ENROLLMENT KEY VERIFICATION BANNER -->
-      <div style="background: var(--surface-color); border: 1px solid var(--border-color); border-radius: 16px; padding: 16px; margin-bottom: 20px; box-shadow: var(--shadow-sm);">
-        <div class="section-header-title" style="margin-bottom: 8px;">
-          <span><i class="fa-solid fa-key" style="color: var(--accent-gold);"></i> Course Enrollment Key</span>
-        </div>
-        <div style="display: flex; gap: 8px;">
-          <input type="text" id="enrollmentKeyInput" placeholder="Enter course enrollment key..." style="flex:1; background: var(--surface-elevated); border: 1px solid var(--border-color); border-radius: 10px; padding: 10px; color: var(--text-main); font-size: 0.85rem; outline: none;">
-          <button onclick="verifyEnrollmentKey()" style="background: var(--accent-gold); border: none; padding: 0 16px; border-radius: 10px; font-weight: 800; font-size: 0.8rem; cursor: pointer; color: #fff;">Join</button>
-        </div>
-      </div>
-
-      <!-- TEACHER INFORMATION DISPLAYED TO STUDENTS -->
-      <div class="section-header-title">
-        <span><i class="fa-solid fa-chalkboard-user" style="color: var(--accent-gold);"></i> Your Instructors & Subjects</span>
-      </div>
-      <div class="teacher-directory-list" id="studentTeacherDirectory">
-        <div class="teacher-dir-item">
-          <span>Mathematics</span>
-          <span style="color: var(--text-sub);">Mr. Kelvin Vance</span>
-        </div>
-        <div class="teacher-dir-item">
-          <span>Physics</span>
-          <span style="color: var(--text-sub);">Dr. Alistair Thorne</span>
-        </div>
-      </div>
-
-      <!-- LIVE STUDENT FEED FOR TEACHER UPLOADS -->
-      <div class="section-header-title">
-        <span><i class="fa-solid fa-bell" style="color: var(--accent-gold);"></i> Class Updates & Materials</span>
-      </div>
-      <div class="feed-container" id="studentFeedContainer">
-        <div class="feed-item">
-          <span class="feed-tag">Announcement</span>
-          <div style="font-weight: 800; font-size: 0.9rem; margin-bottom: 4px;">Welcome to Upper Secondary Term 2</div>
-          <div style="font-size: 0.8rem; color: var(--text-sub);">Please ensure you review the syllabus before our live session tomorrow morning.</div>
         </div>
       </div>
 
@@ -1033,6 +1013,28 @@
         </div>
       </div>
 
+      <!-- THREE CARDS BELOW ACADEMIC PROGRESS: CLASS, PROGRESS, ACTIVITY -->
+      <div class="section-header-title">
+        <span><i class="fa-solid fa-layer-group" style="color: var(--accent-gold);"></i> Quick Navigation</span>
+      </div>
+      <div class="student-dashboard-cards-row">
+        <div class="dashboard-mini-card" onclick="openStudentClassesView()">
+          <div class="academic-icon-box"><i class="fa-solid fa-school"></i></div>
+          <div style="font-weight: 800; font-size: 0.9rem;">Class</div>
+          <div style="font-size: 0.7rem; color: var(--text-sub);">View your classes & subjects</div>
+        </div>
+        <div class="dashboard-mini-card" onclick="switchTab('screen-activity', document.querySelectorAll('.nav-item')[2])">
+          <div class="academic-icon-box"><i class="fa-solid fa-chart-line"></i></div>
+          <div style="font-weight: 800; font-size: 0.9rem;">Progress</div>
+          <div style="font-size: 0.7rem; color: var(--text-sub);">Academic progression</div>
+        </div>
+        <div class="dashboard-mini-card" onclick="switchTab('screen-activity', document.querySelectorAll('.nav-item')[2])">
+          <div class="academic-icon-box"><i class="fa-solid fa-clock-rotate-left"></i></div>
+          <div style="font-weight: 800; font-size: 0.9rem;">Activity</div>
+          <div style="font-size: 0.7rem; color: var(--text-sub);">Recent submissions</div>
+        </div>
+      </div>
+
       <!-- PHOTOGRAPHIC GRID WITH COMING SOON POPUPS -->
       <div class="photo-grid-2x2">
         <div class="photo-card" onclick="showComingSoonModal('Events')">
@@ -1057,7 +1059,7 @@
     <!-- SCREEN 1B: TEACHER PORTAL -->
     <div id="screen-teacher-portal" class="screen">
       
-      <!-- TEACHER HERO SECTION WITH CUSTOMIZABLE PHOTO AREA -->
+      <!-- TEACHER HERO SECTION -->
       <div class="hero-container" id="teacherHeroContainer">
         <img src="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?q=80&w=800&auto=format&fit=cover" alt="Teacher Hero" class="hero-bg-image" id="teacherHeroImageElement">
         <div class="hero-gradient-overlay"></div>
@@ -1070,53 +1072,158 @@
         <div class="hero-content">
           <div>
             <h2 class="hero-greeting" id="teacherPortalGreeting">PROFESSOR PORTAL</h2>
-            <div class="hero-msg">Manage Content & Student Access</div>
-          </div>
-          <div class="hero-controls-group">
-            <button class="hero-control-btn" onclick="triggerTeacherPhotoUpload()">
-              <i class="fa-solid fa-camera"></i> Change Photo
-            </button>
-            <button class="hero-control-btn" onclick="removeTeacherPhoto()" style="color: #ef4444;">
-              <i class="fa-solid fa-trash"></i> Remove
-            </button>
+            <div class="hero-msg">Manage Created Classes & Subjects</div>
           </div>
         </div>
       </div>
-      <input type="file" id="teacherHeroFileInput" accept="image/*" style="display: none;" onchange="handleTeacherPhotoUpload(event)">
 
-      <!-- TEACHER UPLOAD SECTION (4 MAIN OPTIONS) -->
-      <div class="section-header-title">
-        <span><i class="fa-solid fa-cloud-arrow-up" style="color: var(--accent-gold);"></i> Content Management Hub</span>
-      </div>
-      <div class="upload-section-grid">
-        <div class="upload-option-card" onclick="openUploadModal('Assignment')">
-          <div class="academic-icon-box"><i class="fa-solid fa-file-pen"></i></div>
-          <div style="font-weight: 800; font-size: 0.9rem;">Assignments</div>
-          <div style="font-size: 0.72rem; color: var(--text-sub);">Upload tasks & deadlines</div>
+      <!-- TEACHER CREATION BAR -->
+      <div style="background: var(--surface-color); border: 1px solid var(--border-color); border-radius: 18px; padding: 16px; margin-bottom: 24px; box-shadow: var(--shadow-sm);">
+        <div class="section-header-title" style="margin-bottom: 10px;">
+          <span><i class="fa-solid fa-plus-circle" style="color: var(--accent-gold);"></i> Add New Class or Subject</span>
         </div>
-        <div class="upload-option-card" onclick="openUploadModal('Announcement')">
-          <div class="academic-icon-box"><i class="fa-solidbullhorn fa-bullhorn"></i></div>
-          <div style="font-weight: 800; font-size: 0.9rem;">Announcements</div>
-          <div style="font-size: 0.72rem; color: var(--text-sub);">Broadcast news to class</div>
+        <div style="display: flex; gap: 8px; margin-bottom: 10px;">
+          <input type="text" id="newClassInput" placeholder="New Class Name..." style="flex:1; background: var(--surface-elevated); border: 1px solid var(--border-color); border-radius: 12px; padding: 12px; color: var(--text-main); font-size: 0.85rem; outline: none;">
+          <button onclick="teacherAddNewClass()" style="background: var(--accent-gold); border: none; padding: 0 16px; border-radius: 12px; font-weight: 800; font-size: 0.8rem; cursor: pointer; color: #fff;">Add Class</button>
         </div>
-        <div class="upload-option-card" onclick="openUploadModal('Quiz')">
-          <div class="academic-icon-box"><i class="fa-solid fa-brain"></i></div>
-          <div style="font-weight: 800; font-size: 0.9rem;">Quizzes</div>
-          <div style="font-size: 0.72rem; color: var(--text-sub);">Publish active recall tests</div>
-        </div>
-        <div class="upload-option-card" onclick="openUploadModal('Other Learning Material')">
-          <div class="academic-icon-box"><i class="fa-solid fa-folder-open"></i></div>
-          <div style="font-weight: 800; font-size: 0.9rem;">Learning Materials</div>
-          <div style="font-size: 0.72rem; color: var(--text-sub);">Upload notes & syllabi</div>
+        <div style="display: flex; gap: 8px;">
+          <select id="targetClassSelect" style="flex:1; background: var(--surface-elevated); border: 1px solid var(--border-color); border-radius: 12px; padding: 12px; color: var(--text-main); font-size: 0.85rem; outline: none;">
+            <option value="">Select Target Class for Subject...</option>
+          </select>
+          <input type="text" id="newSubjectInput" placeholder="New Subject Name..." style="flex:1; background: var(--surface-elevated); border: 1px solid var(--border-color); border-radius: 12px; padding: 12px; color: var(--text-main); font-size: 0.85rem; outline: none;">
+          <button onclick="teacherAddNewSubject()" style="background: var(--accent-gold); border: none; padding: 0 16px; border-radius: 12px; font-weight: 800; font-size: 0.8rem; cursor: pointer; color: #fff;">Add Subject</button>
         </div>
       </div>
 
-      <!-- ACTIVE UPLOADS LIST FOR TEACHER -->
+      <!-- TEACHER CREATED CLASSES RESPONSIVE GRID -->
       <div class="section-header-title">
-        <span><i class="fa-solid fa-list-check" style="color: var(--accent-gold);"></i> Your Published Uploads</span>
+        <span><i class="fa-solid fa-shapes" style="color: var(--accent-gold);"></i> Your Classes</span>
       </div>
-      <div class="feed-container" id="teacherUploadedItemsList">
-        <div style="font-size: 0.8rem; color: var(--text-sub); text-align: center; padding: 20px;">No items published yet. Use the cards above to upload items.</div>
+      <div class="responsive-grid-cards" id="teacherClassesGridContainer">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+
+    <!-- SCREEN 1C: TEACHER SUBJECT WORKSPACE (Assignments, Quizzes, Announcements, Tests + PDF/Image Upload) -->
+    <div id="screen-teacher-subject-workspace" class="screen">
+      <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
+        <button onclick="goBackToTeacherClasses()" style="background: var(--surface-color); border: 1px solid var(--border-color); width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-main);">
+          <i class="fa-solid fa-arrow-left"></i>
+        </button>
+        <div>
+          <h2 id="workspaceSubjectTitle" style="font-size: 1.2rem; font-weight: 900;">Subject Workspace</h2>
+          <div id="workspaceSubjectSub" style="font-size: 0.75rem; color: var(--text-sub);">Manage course content & uploads</div>
+        </div>
+      </div>
+
+      <!-- 4 Sections: Assignments, Quizzes, Announcements, Tests -->
+      <div class="grid-2x2-workspace">
+        <div class="workspace-section-card" onclick="openUploadModal('Assignment')">
+          <div class="custom-vector-emblem"><i class="fa-solid fa-file-pen"></i></div>
+          <div>
+            <div style="font-weight: 800; font-size: 0.95rem;">Assignments</div>
+            <div style="font-size: 0.72rem; color: var(--text-sub); margin-top: 2px;">Upload PDFs / Images</div>
+          </div>
+        </div>
+        <div class="workspace-section-card" onclick="openUploadModal('Quiz')">
+          <div class="custom-vector-emblem"><i class="fa-solid fa-brain"></i></div>
+          <div>
+            <div style="font-weight: 800; font-size: 0.95rem;">Quizzes</div>
+            <div style="font-size: 0.72rem; color: var(--text-sub); margin-top: 2px;">Upload PDFs / Images</div>
+          </div>
+        </div>
+        <div class="workspace-section-card" onclick="openUploadModal('Announcement')">
+          <div class="custom-vector-emblem"><i class="fa-solid fa-bullhorn"></i></div>
+          <div>
+            <div style="font-weight: 800; font-size: 0.95rem;">Announcements</div>
+            <div style="font-size: 0.72rem; color: var(--text-sub); margin-top: 2px;">Broadcast updates</div>
+          </div>
+        </div>
+        <div class="workspace-section-card" onclick="openUploadModal('Test')">
+          <div class="custom-vector-emblem"><i class="fa-solid fa-file-shield"></i></div>
+          <div>
+            <div style="font-weight: 800; font-size: 0.95rem;">Tests</div>
+            <div style="font-size: 0.72rem; color: var(--text-sub); margin-top: 2px;">Upload exam papers</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Uploaded Feed List for this Subject -->
+      <div class="section-header-title">
+        <span><i class="fa-solid fa-folder-open" style="color: var(--accent-gold);"></i> Uploaded Content & Files</span>
+      </div>
+      <div class="feed-container" id="workspaceUploadsList">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+
+    <!-- SCREEN 1D: STUDENT CLASS & SUBJECT VIEW -->
+    <div id="screen-student-classes" class="screen">
+      <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
+        <button onclick="goBackToStudentHome()" style="background: var(--surface-color); border: 1px solid var(--border-color); width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-main);">
+          <i class="fa-solid fa-arrow-left"></i>
+        </button>
+        <div>
+          <h2 style="font-size: 1.2rem; font-weight: 900;">Enrolled Classes</h2>
+          <div style="font-size: 0.75rem; color: var(--text-sub);">Select a class to view subjects</div>
+        </div>
+      </div>
+
+      <div class="responsive-grid-cards" id="studentClassesGridContainer">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+
+    <!-- SCREEN 1E: STUDENT SUBJECT 2x2 WORKSPACE -->
+    <div id="screen-student-subject-workspace" class="screen">
+      <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
+        <button onclick="goBackToStudentClasses()" style="background: var(--surface-color); border: 1px solid var(--border-color); width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-main);">
+          <i class="fa-solid fa-arrow-left"></i>
+        </button>
+        <div>
+          <h2 id="studentWorkspaceTitle" style="font-size: 1.2rem; font-weight: 900;">Subject Workspace</h2>
+          <div id="studentWorkspaceSub" style="font-size: 0.75rem; color: var(--text-sub);">Course materials & assessments</div>
+        </div>
+      </div>
+
+      <!-- 2x2 grid for student: Announcements, Assignments, Quizzes, Tests -->
+      <div class="grid-2x2-workspace">
+        <div class="workspace-section-card" onclick="openStudentSectionView('Announcement')">
+          <div class="custom-vector-emblem"><i class="fa-solid fa-bullhorn"></i></div>
+          <div>
+            <div style="font-weight: 800; font-size: 0.95rem;">Announcements</div>
+            <div style="font-size: 0.72rem; color: var(--text-sub); margin-top: 2px;">View notices</div>
+          </div>
+        </div>
+        <div class="workspace-section-card" onclick="openStudentSectionView('Assignment')">
+          <div class="custom-vector-emblem"><i class="fa-solid fa-file-pen"></i></div>
+          <div>
+            <div style="font-weight: 800; font-size: 0.95rem;">Assignments</div>
+            <div style="font-size: 0.72rem; color: var(--text-sub); margin-top: 2px;">View & submit tasks</div>
+          </div>
+        </div>
+        <div class="workspace-section-card" onclick="openStudentSectionView('Quiz')">
+          <div class="custom-vector-emblem"><i class="fa-solid fa-brain"></i></div>
+          <div>
+            <div style="font-weight: 800; font-size: 0.95rem;">Quizzes</div>
+            <div style="font-size: 0.72rem; color: var(--text-sub); margin-top: 2px;">Take quizzes</div>
+          </div>
+        </div>
+        <div class="workspace-section-card" onclick="openStudentSectionView('Test')">
+          <div class="custom-vector-emblem"><i class="fa-solid fa-file-shield"></i></div>
+          <div>
+            <div style="font-weight: 800; font-size: 0.95rem;">Tests</div>
+            <div style="font-size: 0.72rem; color: var(--text-sub); margin-top: 2px;">View exam files</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Content list for student in this subject -->
+      <div class="section-header-title">
+        <span><i class="fa-solid fa-box-archive" style="color: var(--accent-gold);"></i> Published Materials</span>
+      </div>
+      <div class="feed-container" id="studentWorkspaceContentList">
+        <!-- Rendered dynamically -->
       </div>
     </div>
 
@@ -1194,7 +1301,7 @@
     </nav>
   </div>
 
-  <!-- UPLOAD MODAL FOR TEACHERS -->
+  <!-- UPLOAD MODAL FOR TEACHERS (Supports PDF & Images for Assignments, Quizzes, Tests, Announcements) -->
   <div id="teacherUploadModal" class="modal-overlay">
     <div class="modal-sheet">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
@@ -1210,10 +1317,10 @@
         <input type="text" id="uploadItemDesc" placeholder="Enter details or instructions for students...">
       </div>
       <div class="form-group" style="opacity: 1;">
-        <label>Enrollment Key (To secure access)</label>
-        <input type="text" id="uploadItemKey" placeholder="e.g. CHEM2026">
+        <label>Attach PDF or Image File</label>
+        <input type="file" id="uploadFileAsset" accept=".pdf,image/*" style="background: var(--surface-elevated); border: 1px solid var(--border-color); border-radius: 12px; padding: 10px; font-size: 0.85rem;">
       </div>
-      <button class="primary-btn" style="opacity: 1; margin-top: 10px;" onclick="submitTeacherUpload()">Publish to Students</button>
+      <button class="primary-btn" style="opacity: 1; margin-top: 10px;" onclick="submitTeacherUpload()">Publish to Class Subject</button>
     </div>
   </div>
 
@@ -1241,10 +1348,12 @@
     </div>
   </div>
 
-  <!-- APPLICATION LOGIC SCRIPT -->
+  <!-- APPLICATION LOGIC SCRIPT (With Permanent Persistence) -->
   <script>
     let currentAuthRole = 'student';
     let currentUploadType = '';
+    let activeSelectedClass = null;
+    let activeSelectedSubject = null;
     
     let currentUserProfile = {
       role: 'student',
@@ -1254,8 +1363,10 @@
       combination: "PCB"
     };
 
-    let globalUploadsStore = [];
-    let teacherCustomPhoto = null;
+    // Permanent Data Store structure
+    let teacherPortalData = {
+      classes: [] // Each class: { name: 'Form Three', subjects: ['Biology', 'Chemistry', 'Physics'], uploads: [{type, title, desc, fileUrl, fileName, subject}] }
+    };
 
     window.addEventListener('DOMContentLoaded', () => {
       const savedTheme = localStorage.getItem('appearich_theme_mode');
@@ -1267,16 +1378,36 @@
         localStorage.setItem('appearich_theme_mode', 'light');
       }
 
+      // Restore permanent data
+      const savedTeacherData = localStorage.getItem('appearich_permanent_teacher_data');
+      if (savedTeacherData) {
+        teacherPortalData = JSON.parse(savedTeacherData);
+      } else {
+        // Default seed data for demonstration
+        teacherPortalData = {
+          classes: [
+            {
+              name: "Form Three",
+              subjects: ["Biology", "Chemistry", "Physics"],
+              uploads: [
+                { type: "Assignment", title: "Cellular Respiration Lab", desc: "Complete problems 1-10", fileName: "lab_sheet.pdf", subject: "Biology" },
+                { type: "Announcement", title: "Mid-Term Review", desc: "Prepare your notes", fileName: "", subject: "Biology" }
+              ]
+            },
+            {
+              name: "Form Four",
+              subjects: ["Mathematics", "Advanced Physics"],
+              uploads: []
+            }
+          ]
+        };
+        savePermanentData();
+      }
+
       const storedUser = localStorage.getItem('appearich_user_profile');
       if (storedUser) {
         currentUserProfile = JSON.parse(storedUser);
         launchDashboardBasedOnRole();
-      }
-
-      const storedUploads = localStorage.getItem('appearich_uploads_store');
-      if (storedUploads) {
-        globalUploadsStore = JSON.parse(storedUploads);
-        renderFeeds();
       }
 
       setTimeout(() => {
@@ -1285,12 +1416,16 @@
       }, 1500);
     });
 
+    function savePermanentData() {
+      localStorage.setItem('appearich_permanent_teacher_data', JSON.stringify(teacherPortalData));
+    }
+
     function switchAuthRole(role) {
       currentAuthRole = role;
       document.getElementById('tabRoleStudent').className = role === 'student' ? 'role-tab active' : 'role-tab';
       document.getElementById('tabRoleTeacher').className = role === 'teacher' ? 'role-tab active' : 'role-tab';
       
-      document.getElementById('nameGroup').style.display = role === 'teacher' ? 'block' : 'block';
+      document.getElementById('nameGroup').style.display = 'block';
       document.getElementById('teacherDetailsFields').style.display = role === 'teacher' ? 'block' : 'none';
       document.getElementById('studentDetailsFields').style.display = role === 'student' ? 'block' : 'none';
       document.getElementById('regName').placeholder = role === 'teacher' ? 'e.g. Dr. Kelvin Vance' : 'e.g. Alistair Sterling';
@@ -1299,7 +1434,7 @@
     function handleEduLevelChange() {
       const level = document.getElementById('eduLevelSelect').value;
       const combGroup = document.getElementById('combinationGroup');
-      combGroup.style.display = (level === 'Higher-level' || level === 'Upper Secondary') ? 'block' : 'none';
+      combGroup.style.display = (level === 'Upper Secondary' || level === 'Lower Secondary') ? 'block' : 'none';
     }
 
     function toggleAuthMode() {
@@ -1309,18 +1444,45 @@
     function handleAuthSubmit() {
       const email = document.getElementById('authEmail').value.trim();
       const name = document.getElementById('regName').value.trim();
-      if (!email) {
-        alert("Please enter a valid email.");
+      const pwd = document.getElementById('authPassword').value;
+      const cpwd = document.getElementById('authConfirmPassword').value;
+
+      if (!email || !pwd) {
+        alert("Please enter email and password.");
+        return;
+      }
+      if (pwd !== cpwd) {
+        alert("Passwords do not match. Please confirm your password.");
         return;
       }
       
       currentUserProfile.role = currentAuthRole;
       currentUserProfile.email = email;
-      currentUserProfile.name = name || (currentAuthRole === 'teacher' ? 'Dr. Teacher' : 'Scholar');
+      currentUserProfile.name = name || (currentAuthRole === 'teacher' ? 'Professor' : 'Scholar');
       
       if (currentAuthRole === 'student') {
         currentUserProfile.educationLevel = document.getElementById('eduLevelSelect').value;
         currentUserProfile.combination = document.getElementById('regCombination').value || 'Standard';
+      } else {
+        // Teacher custom classes & subjects creation during sign up
+        const classesInput = document.getElementById('teacherInputClasses').value.trim();
+        const subjectsInput = document.getElementById('teacherInputSubjects').value.trim();
+        
+        if (classesInput) {
+          const classArr = classesInput.split(',').map(s => s.trim()).filter(Boolean);
+          const subjectArr = subjectsInput ? subjectsInput.split(',').map(s => s.trim()).filter(Boolean) : ['General Subject'];
+          
+          classArr.forEach(cName => {
+            if (!teacherPortalData.classes.some(cl => cl.name.toLowerCase() === cName.toLowerCase())) {
+              teacherPortalData.classes.push({
+                name: cName,
+                subjects: [...subjectArr],
+                uploads: []
+              });
+            }
+          });
+          savePermanentData();
+        }
       }
 
       localStorage.setItem('appearich_user_profile', JSON.stringify(currentUserProfile));
@@ -1336,16 +1498,12 @@
         document.getElementById('screen-teacher-portal').classList.add('active');
         document.getElementById('headerBrandTitle').innerText = 'Appearich Teacher Portal';
         document.getElementById('teacherPortalGreeting').innerText = `WELCOME, ${currentUserProfile.name.toUpperCase()}`;
-        
-        const savedPhoto = localStorage.getItem('appearich_teacher_photo');
-        if (savedPhoto) {
-          document.getElementById('teacherHeroImageElement').src = savedPhoto;
-        }
+        renderTeacherClassesGrid();
       } else {
         document.getElementById('screen-home').classList.add('active');
         document.getElementById('headerBrandTitle').innerText = 'Appearich Student Portal';
         document.getElementById('dynamicGreeting').innerText = `WELCOME, ${currentUserProfile.name.toUpperCase()}`;
-        document.getElementById('dynamicSubGreeting').innerText = `Level: ${currentUserProfile.educationLevel} (${currentUserProfile.combination})`;
+        document.getElementById('dynamicSubGreeting').innerText = `Level: ${currentUserProfile.educationLevel}`;
         
         document.getElementById('profileDisplayName').innerText = currentUserProfile.name;
         document.getElementById('profileDisplayEmail').innerText = currentUserProfile.email;
@@ -1388,105 +1546,407 @@
       }
     }
 
-    /* TEACHER HERO PHOTO MANAGEMENT */
-    function triggerTeacherPhotoUpload() {
-      document.getElementById('teacherHeroFileInput').click();
-    }
-    function handleTeacherPhotoUpload(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        const url = e.target.result;
-        document.getElementById('teacherHeroImageElement').src = url;
-        localStorage.setItem('appearich_teacher_photo', url);
-      };
-      reader.readAsDataURL(file);
-    }
-    function removeTeacherPhoto() {
-      localStorage.removeItem('appearich_teacher_photo');
-      document.getElementById('teacherHeroImageElement').src = "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?q=80&w=800&auto=format&fit=cover";
+    /* TEACHER PORTAL CLASS & SUBJECT MANAGEMENT */
+    function teacherAddNewClass() {
+      const className = document.getElementById('newClassInput').value.trim();
+      if (!className) {
+        alert("Please enter a class name.");
+        return;
+      }
+      if (teacherPortalData.classes.some(c => c.name.toLowerCase() === className.toLowerCase())) {
+        alert("Class already exists.");
+        return;
+      }
+      teacherPortalData.classes.push({
+        name: className,
+        subjects: ["General Study"],
+        uploads: []
+      });
+      savePermanentData();
+      document.getElementById('newClassInput').value = '';
+      renderTeacherClassesGrid();
+      alert(`Class '${className}' created successfully!`);
     }
 
-    /* UPLOAD MODAL & MANAGEMENT */
+    function teacherAddNewSubject() {
+      const selectClass = document.getElementById('targetClassSelect').value;
+      const subName = document.getElementById('newSubjectInput').value.trim();
+      if (!selectClass || !subName) {
+        alert("Please select a class and enter a subject name.");
+        return;
+      }
+      const targetCl = teacherPortalData.classes.find(c => c.name === selectClass);
+      if (targetCl) {
+        if (!targetCl.subjects.includes(subName)) {
+          targetCl.subjects.push(subName);
+          savePermanentData();
+          document.getElementById('newSubjectInput').value = '';
+          renderTeacherClassesGrid();
+          alert(`Subject '${subName}' added to class '${selectClass}'!`);
+        } else {
+          alert("Subject already exists in this class.");
+        }
+      }
+    }
+
+    function renderTeacherClassesGrid() {
+      const gridContainer = document.getElementById('teacherClassesGridContainer');
+      const targetSelect = document.getElementById('targetClassSelect');
+      
+      let html = '';
+      let selectHtml = '<option value="">Select Target Class for Subject...</option>';
+
+      if (teacherPortalData.classes.length === 0) {
+        html = '<div style="font-size: 0.8rem; color: var(--text-sub); grid-column: 1/-1; text-align: center; padding: 20px;">No classes created yet. Add a class above.</div>';
+      } else {
+        teacherPortalData.classes.forEach(cls => {
+          selectHtml += `<option value="${cls.name}">${cls.name}</option>`;
+          html += `
+            <div class="portal-box-card" onclick="openTeacherClass('${cls.name}')">
+              <div class="custom-vector-emblem"><i class="fa-solid fa-graduation-cap"></i></div>
+              <div style="font-weight: 800; font-size: 0.95rem;">${cls.name}</div>
+              <div style="font-size: 0.72rem; color: var(--text-sub);">${cls.subjects.length} Subjects</div>
+            </div>
+          `;
+        });
+      }
+
+      gridContainer.innerHTML = html;
+      targetSelect.innerHTML = selectHtml;
+    }
+
+    function openTeacherClass(className) {
+      activeSelectedClass = className;
+      const cls = teacherPortalData.classes.find(c => c.name === className);
+      if (!cls) return;
+
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      
+      // Build dynamic view for subjects inside class
+      let containerHtml = `
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
+          <button onclick="goBackToTeacherClasses()" style="background: var(--surface-color); border: 1px solid var(--border-color); width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-main);">
+            <i class="fa-solid fa-arrow-left"></i>
+          </button>
+          <div>
+            <h2 style="font-size: 1.2rem; font-weight: 900;">${cls.name} — Subjects</h2>
+            <div style="font-size: 0.75rem; color: var(--text-sub);">Select a subject to access workspace</div>
+          </div>
+        </div>
+        <div class="responsive-grid-cards">
+      `;
+
+      cls.subjects.forEach(sub => {
+        containerHtml += `
+          <div class="portal-box-card" onclick="openTeacherSubjectWorkspace('${cls.name}', '${sub}')">
+            <div class="custom-vector-emblem"><i class="fa-solid fa-book-open"></i></div>
+            <div style="font-weight: 800; font-size: 0.95rem;">${sub}</div>
+            <div style="font-size: 0.72rem; color: var(--text-sub);">Open Workspace</div>
+          </div>
+        `;
+      });
+
+      containerHtml += `</div>`;
+
+      // We can reuse screen-teacher-subject-workspace or create a container
+      let wsScreen = document.getElementById('screen-teacher-subject-workspace');
+      wsScreen.innerHTML = containerHtml;
+      wsScreen.classList.add('active');
+    }
+
+    function goBackToTeacherClasses() {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById('screen-teacher-portal').classList.add('active');
+      renderTeacherClassesGrid();
+    }
+
+    function openTeacherSubjectWorkspace(className, subjectName) {
+      activeSelectedClass = className;
+      activeSelectedSubject = subjectName;
+
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      let wsScreen = document.getElementById('screen-teacher-subject-workspace');
+      
+      wsScreen.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
+          <button onclick="openTeacherClass('${className}')" style="background: var(--surface-color); border: 1px solid var(--border-color); width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-main);">
+            <i class="fa-solid fa-arrow-left"></i>
+          </button>
+          <div>
+            <h2 style="font-size: 1.2rem; font-weight: 900;">${subjectName}</h2>
+            <div style="font-size: 0.75rem; color: var(--text-sub);">Class: ${className}</div>
+          </div>
+        </div>
+
+        <div class="grid-2x2-workspace">
+          <div class="workspace-section-card" onclick="openUploadModal('Assignment')">
+            <div class="custom-vector-emblem"><i class="fa-solid fa-file-pen"></i></div>
+            <div>
+              <div style="font-weight: 800; font-size: 0.95rem;">Assignments</div>
+              <div style="font-size: 0.72rem; color: var(--text-sub); margin-top: 2px;">PDF & Image Uploads</div>
+            </div>
+          </div>
+          <div class="workspace-section-card" onclick="openUploadModal('Quiz')">
+            <div class="custom-vector-emblem"><i class="fa-solid fa-brain"></i></div>
+            <div>
+              <div style="font-weight: 800; font-size: 0.95rem;">Quizzes</div>
+              <div style="font-size: 0.72rem; color: var(--text-sub); margin-top: 2px;">PDF & Image Uploads</div>
+            </div>
+          </div>
+          <div class="workspace-section-card" onclick="openUploadModal('Announcement')">
+            <div class="custom-vector-emblem"><i class="fa-solid fa-bullhorn"></i></div>
+            <div>
+              <div style="font-weight: 800; font-size: 0.95rem;">Announcements</div>
+              <div style="font-size: 0.72rem; color: var(--text-sub); margin-top: 2px;">Broadcast updates</div>
+            </div>
+          </div>
+          <div class="workspace-section-card" onclick="openUploadModal('Test')">
+            <div class="custom-vector-emblem"><i class="fa-solid fa-file-shield"></i></div>
+            <div>
+              <div style="font-weight: 800; font-size: 0.95rem;">Tests</div>
+              <div style="font-size: 0.72rem; color: var(--text-sub); margin-top: 2px;">PDF & Image Uploads</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-header-title">
+          <span><i class="fa-solid fa-folder-open" style="color: var(--accent-gold);"></i> Uploaded Content (${subjectName})</span>
+        </div>
+        <div class="feed-container" id="workspaceUploadsList">
+          ${renderSubjectUploadsList(className, subjectName)}
+        </div>
+      `;
+      wsScreen.classList.add('active');
+    }
+
+    function renderSubjectUploadsList(className, subjectName) {
+      const cls = teacherPortalData.classes.find(c => c.name === className);
+      if (!cls || !cls.uploads || cls.uploads.filter(u => u.subject === subjectName).length === 0) {
+        return '<div style="font-size: 0.8rem; color: var(--text-sub); text-align: center; padding: 20px;">No uploads for this subject yet.</div>';
+      }
+      let html = '';
+      cls.uploads.filter(u => u.subject === subjectName).forEach(item => {
+        html += `
+          <div class="feed-item">
+            <span class="feed-tag">${item.type}</span>
+            <div style="font-weight: 800; font-size: 0.9rem; margin-top: 4px;">${item.title}</div>
+            <div style="font-size: 0.8rem; color: var(--text-sub); margin-top: 2px;">${item.desc}</div>
+            ${item.fileName ? `<div style="margin-top: 8px; font-size: 0.75rem; color: var(--accent-gold); font-weight: 700;"><i class="fa-solid fa-paperclip"></i> Attached: ${item.fileName}</div>` : ''}
+          </div>
+        `;
+      });
+      return html;
+    }
+
+    /* UPLOAD MODAL */
     function openUploadModal(type) {
       currentUploadType = type;
-      document.getElementById('uploadModalTitle').innerText = `Upload ${type}`;
+      document.getElementById('uploadModalTitle').innerText = `Upload ${type} (${activeSelectedSubject || 'General'})`;
       document.getElementById('teacherUploadModal').classList.add('active');
     }
     function closeUploadModal() {
       document.getElementById('teacherUploadModal').classList.remove('active');
     }
+
     function submitTeacherUpload() {
       const title = document.getElementById('uploadItemTitle').value.trim();
       const desc = document.getElementById('uploadItemDesc').value.trim();
-      const key = document.getElementById('uploadItemKey').value.trim();
+      const fileInput = document.getElementById('uploadFileAsset');
       
       if (!title) {
         alert("Please enter a title.");
         return;
       }
 
-      const newItem = {
-        type: currentUploadType,
-        title: title,
-        desc: desc || 'No additional description provided.',
-        key: key || 'GENERAL',
-        teacher: currentUserProfile.name
-      };
+      let fileName = '';
+      if (fileInput.files && fileInput.files[0]) {
+        fileName = fileInput.files[0].name;
+      }
 
-      globalUploadsStore.push(newItem);
-      localStorage.setItem('appearich_uploads_store', JSON.stringify(globalUploadsStore));
+      const cls = teacherPortalData.classes.find(c => c.name === activeSelectedClass);
+      if (cls) {
+        if (!cls.uploads) cls.uploads = [];
+        cls.uploads.push({
+          type: currentUploadType,
+          title: title,
+          desc: desc || 'No description.',
+          fileName: fileName,
+          subject: activeSelectedSubject || cls.subjects[0]
+        });
+        savePermanentData();
+      }
+
       closeUploadModal();
-      renderFeeds();
-      alert(`Successfully published ${currentUploadType} to students!`);
+      document.getElementById('uploadItemTitle').value = '';
+      document.getElementById('uploadItemDesc').value = '';
+      document.getElementById('uploadFileAsset').value = '';
+
+      alert(`Successfully published ${currentUploadType} with file attachment!`);
+      openTeacherSubjectWorkspace(activeSelectedClass, activeSelectedSubject);
     }
 
-    function renderFeeds() {
-      let teacherHtml = '';
-      let studentHtml = '';
+    /* STUDENT WORKFLOW */
+    function openStudentClassesView() {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      const grid = document.getElementById('studentClassesGridContainer');
+      let html = '';
 
-      if (globalUploadsStore.length === 0) {
-        teacherHtml = '<div style="font-size: 0.8rem; color: var(--text-sub); text-align: center; padding: 20px;">No items published yet.</div>';
+      if (teacherPortalData.classes.length === 0) {
+        html = '<div style="font-size: 0.8rem; color: var(--text-sub); grid-column: 1/-1; text-align: center; padding: 20px;">No classes available at the moment.</div>';
       } else {
-        globalUploadsStore.forEach(item => {
-          teacherHtml += `
-            <div class="feed-item">
-              <span class="feed-tag">${item.type} (Key: ${item.key})</span>
-              <div style="font-weight: 800; font-size: 0.9rem; margin-top: 4px;">${item.title}</div>
-              <div style="font-size: 0.8rem; color: var(--text-sub); margin-top: 2px;">${item.desc}</div>
-            </div>
-          `;
-          studentHtml += `
-            <div class="feed-item">
-              <span class="feed-tag">${item.type} — By ${item.teacher}</span>
-              <div style="font-weight: 800; font-size: 0.9rem; margin-top: 4px;">${item.title}</div>
-              <div style="font-size: 0.8rem; color: var(--text-sub); margin-top: 2px;">${item.desc}</div>
+        teacherPortalData.classes.forEach(cls => {
+          html += `
+            <div class="portal-box-card" onclick="openStudentSubjectsForClass('${cls.name}')">
+              <div class="custom-vector-emblem"><i class="fa-solid fa-school"></i></div>
+              <div style="font-weight: 800; font-size: 0.95rem;">${cls.name}</div>
+              <div style="font-size: 0.72rem; color: var(--text-sub);">${cls.subjects.length} Subjects</div>
             </div>
           `;
         });
       }
-
-      const tList = document.getElementById('teacherUploadedItemsList');
-      if (tList) tList.innerHTML = teacherHtml;
-
-      const sList = document.getElementById('studentFeedContainer');
-      if (sList) sList.innerHTML = studentHtml;
+      grid.innerHTML = html;
+      document.getElementById('screen-student-classes').classList.add('active');
     }
 
-    /* ENROLLMENT KEY VERIFICATION */
-    function verifyEnrollmentKey() {
-      const keyInput = document.getElementById('enrollmentKeyInput').value.trim();
-      if (!keyInput) {
-        alert("Please enter a valid enrollment key.");
-        return;
+    function goBackToStudentHome() {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById('screen-home').classList.add('active');
+    }
+
+    function openStudentSubjectsForClass(className) {
+      activeSelectedClass = className;
+      const cls = teacherPortalData.classes.find(c => c.name === className);
+      if (!cls) return;
+
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      let screenEl = document.getElementById('screen-student-classes');
+      
+      let html = `
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
+          <button onclick="openStudentClassesView()" style="background: var(--surface-color); border: 1px solid var(--border-color); width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-main);">
+            <i class="fa-solid fa-arrow-left"></i>
+          </button>
+          <div>
+            <h2 style="font-size: 1.2rem; font-weight: 900;">${cls.name} — Subjects</h2>
+            <div style="font-size: 0.75rem; color: var(--text-sub);">Select a subject workspace</div>
+          </div>
+        </div>
+        <div class="responsive-grid-cards">
+      `;
+
+      cls.subjects.forEach(sub => {
+        html += `
+          <div class="portal-box-card" onclick="openStudentSubjectWorkspace('${cls.name}', '${sub}')">
+            <div class="custom-vector-emblem"><i class="fa-solid fa-book-bookmark"></i></div>
+            <div style="font-weight: 800; font-size: 0.95rem;">${sub}</div>
+            <div style="font-size: 0.72rem; color: var(--text-sub);">Open Workspace</div>
+          </div>
+        `;
+      });
+
+      html += `</div>`;
+      screenEl.innerHTML = html;
+      screenEl.classList.add('active');
+    }
+
+    function goBackToStudentClasses() {
+      openStudentClassesView();
+    }
+
+    function openStudentSubjectWorkspace(className, subjectName) {
+      activeSelectedClass = className;
+      activeSelectedSubject = subjectName;
+
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      let wsScreen = document.getElementById('screen-student-subject-workspace');
+      
+      wsScreen.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
+          <button onclick="openStudentSubjectsForClass('${className}')" style="background: var(--surface-color); border: 1px solid var(--border-color); width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-main);">
+            <i class="fa-solid fa-arrow-left"></i>
+          </button>
+          <div>
+            <h2 style="font-size: 1.2rem; font-weight: 900;">${subjectName}</h2>
+            <div style="font-size: 0.75rem; color: var(--text-sub);">Class: ${className}</div>
+          </div>
+        </div>
+
+        <div class="grid-2x2-workspace">
+          <div class="workspace-section-card" onclick="filterStudentContentList('Announcement')">
+            <div class="custom-vector-emblem"><i class="fa-solid fa-bullhorn"></i></div>
+            <div>
+              <div style="font-weight: 800; font-size: 0.95rem;">Announcements</div>
+              <div style="font-size: 0.72rem; color: var(--text-sub); margin-top: 2px;">View notices</div>
+            </div>
+          </div>
+          <div class="workspace-section-card" onclick="filterStudentContentList('Assignment')">
+            <div class="custom-vector-emblem"><i class="fa-solid fa-file-pen"></i></div>
+            <div>
+              <div style="font-weight: 800; font-size: 0.95rem;">Assignments</div>
+              <div style="font-size: 0.72rem; color: var(--text-sub); margin-top: 2px;">PDFs & submissions</div>
+            </div>
+          </div>
+          <div class="workspace-section-card" onclick="filterStudentContentList('Quiz')">
+            <div class="custom-vector-emblem"><i class="fa-solid fa-brain"></i></div>
+            <div>
+              <div style="font-weight: 800; font-size: 0.95rem;">Quizzes</div>
+              <div style="font-size: 0.72rem; color: var(--text-sub); margin-top: 2px;">Take quizzes</div>
+            </div>
+          </div>
+          <div class="workspace-section-card" onclick="filterStudentContentList('Test')">
+            <div class="custom-vector-emblem"><i class="fa-solid fa-file-shield"></i></div>
+            <div>
+              <div style="font-weight: 800; font-size: 0.95rem;">Tests</div>
+              <div style="font-size: 0.72rem; color: var(--text-sub); margin-top: 2px;">Exam files</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-header-title">
+          <span><i class="fa-solid fa-box-archive" style="color: var(--accent-gold);"></i> All Uploaded Materials</span>
+        </div>
+        <div class="feed-container" id="studentWorkspaceContentList">
+          ${renderStudentSubjectContent(className, subjectName, 'All')}
+        </div>
+      `;
+      wsScreen.classList.add('active');
+    }
+
+    function renderStudentSubjectContent(className, subjectName, filterType) {
+      const cls = teacherPortalData.classes.find(c => c.name === className);
+      if (!cls || !cls.uploads || cls.uploads.length === 0) {
+        return '<div style="font-size: 0.8rem; color: var(--text-sub); text-align: center; padding: 20px;">No published content available yet.</div>';
       }
-      const match = globalUploadsStore.find(i => i.key.toLowerCase() === keyInput.toLowerCase());
-      if (match) {
-        alert(`Successfully joined course/material under key '${match.key}'! Access granted.`);
-      } else {
-        alert("Invalid enrollment key. Please check with your instructor.");
+      let filtered = cls.uploads.filter(u => u.subject === subjectName);
+      if (filterType && filterType !== 'All') {
+        filtered = filtered.filter(u => u.type === filterType);
       }
+      if (filtered.length === 0) {
+        return '<div style="font-size: 0.8rem; color: var(--text-sub); text-align: center; padding: 20px;">No items found for this category.</div>';
+      }
+      let html = '';
+      filtered.forEach(item => {
+        html += `
+          <div class="feed-item">
+            <span class="feed-tag">${item.type}</span>
+            <div style="font-weight: 800; font-size: 0.9rem; margin-top: 4px;">${item.title}</div>
+            <div style="font-size: 0.8rem; color: var(--text-sub); margin-top: 2px;">${item.desc}</div>
+            ${item.fileName ? `<div style="margin-top: 8px; font-size: 0.75rem; color: var(--accent-gold); font-weight: 700;"><i class="fa-solid fa-paperclip"></i> Attached File: ${item.fileName}</div>` : ''}
+          </div>
+        `;
+      });
+      return html;
+    }
+
+    function filterStudentContentList(type) {
+      const listEl = document.getElementById('studentWorkspaceContentList');
+      if (listEl) {
+        listEl.innerHTML = renderStudentSubjectContent(activeSelectedClass, activeSelectedSubject, type);
+      }
+    }
+
+    function openStudentSectionView(sectionType) {
+      filterStudentContentList(sectionType);
     }
 
     /* COMING SOON MODALS */
