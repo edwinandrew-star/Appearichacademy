@@ -925,34 +925,34 @@
       <div class="auth-card">
         <div class="auth-brand-header">
           <h1 class="auth-title" id="authTitleText">Welcome back</h1>
-          <p class="auth-subtitle" id="authSubText">Select your portal and enter your credentials</p>
+          <p class="auth-subtitle" id="authSubText">Enter your credentials. Your portal will be selected automatically.</p>
         </div>
-        <!-- Role Selector (Student vs Teacher) -->
-        <div class="role-tabs">
-          <div class="role-tab active" id="tabRoleStudent" onclick="switchAuthRole('student')">Student</div>
-          <div class="role-tab" id="tabRoleTeacher" onclick="switchAuthRole('teacher')">Teacher</div>
-        </div>
-        
-        <div class="form-group" id="nameGroup" style="display: none;">
-          <label>Full Name</label>
-          <input type="text" id="regName" placeholder="e.g. Dr. Jane Doe / Alistair Sterling">
-        </div>
-        
-        <div class="form-group">
-          <label id="emailLabel">Email / Student ID</label>
-          <input type="email" id="authEmail" placeholder="scholar@appearich.ac.uk">
-        </div>
-        
-        <div class="form-group">
-          <label>Password</label>
-          <input type="password" id="authPassword" placeholder="••••••••••••">
-        </div>
-        <!-- Confirm Password Field -->
-        <div class="form-group" id="confirmPasswordGroup" style="display: none;">
-          <label>Confirm Password</label>
-          <input type="password" id="authConfirmPassword" placeholder="••••••••••••">
-        </div>
-        <!-- Student Education Level & Combination Selection -->
+      <!-- There is intentionally NO role selector here.
+           A user cannot choose "teacher" or "staff" from the browser.
+           The role is read from the protected profiles table after Supabase Auth login. -->
+      <div style="padding:10px 12px; margin-bottom:14px; border:1px solid var(--accent-gold-border); border-radius:12px; background:var(--accent-gold-glow); color:var(--text-main); font-size:0.78rem;">
+        Your portal is selected automatically from your account permissions.
+      </div>
+
+      <div class="form-group" id="nameGroup" style="display: none;">
+        <label>Full Name</label>
+        <input type="text" id="regName" placeholder="Your full name" autocomplete="name">
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="authEmail" placeholder="you@example.com" autocomplete="email">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="authPassword" placeholder="••••••••••••" autocomplete="current-password">
+      </div>
+      <div class="form-group" id="confirmPasswordGroup" style="display: none;">
+        <label>Confirm Password</label>
+        <input type="password" id="authConfirmPassword" placeholder="••••••••••••" autocomplete="new-password">
+      </div>
+
+      <!-- Student details are collected only during self-signup. Teacher/staff roles are assigned by an authorised administrator. -->
+      <!-- Student Education Level & Combination Selection -->
         <div id="studentDetailsFields" style="display: none;">
           <div class="form-group">
             <label>Education Level</label>
@@ -1327,19 +1327,29 @@
     </div>
   </div>
 
+  <!-- Supabase browser SDK. The publishable/anon key is safe to expose in frontend code ONLY when RLS is correctly configured. -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <!-- APPLICATION LOGIC SCRIPT -->
   <script>
-    let currentAuthRole = 'student';
+    // ============================= SECURITY / SUPABASE SETUP =============================
+    // This is the public browser key, NOT a service-role key.
+    // Never put a service-role key, database password, or secret key in this file.
+    const SUPABASE_URL = "https://ccrxhifqtdhnkmxbafks.supabase.co";
+    const SUPABASE_PUBLISHABLE_KEY = "REPLACE_WITH_YOUR_SUPABASE_PUBLISHABLE_KEY";
+
+    const { createClient } = window.supabase;
+    const db = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+
     let authMode = 'login';
     let selectedTeacherLevels = [];
     let teacherPortalData = { classes: [] };
-    let userAccountsDB = [];
     let currentUserProfile = null;
-
     let activeSelectedClassObj = null;
     let currentFoldContentType = null;
 
-    window.addEventListener('DOMContentLoaded', () => {
+    window.addEventListener('DOMContentLoaded', async () => {
+      // Theme is UI preference, so localStorage is fine for this.
       const savedTheme = localStorage.getItem('appearich_theme_mode');
       if (savedTheme) {
         document.documentElement.setAttribute('data-theme', savedTheme);
@@ -1349,51 +1359,69 @@
         localStorage.setItem('appearich_theme_mode', 'light');
       }
 
-      const savedAccounts = localStorage.getItem('appearich_accounts_db');
-      if (savedAccounts) userAccountsDB = JSON.parse(savedAccounts);
-
-      const savedTeacherData = localStorage.getItem('appearich_permanent_teacher_data');
-      if (savedTeacherData) {
-        teacherPortalData = JSON.parse(savedTeacherData);
-      } else {
-        savePermanentData();
+      // Check Supabase Auth instead of trusting a localStorage login.
+      // The access token/session is managed by Supabase's auth client.
+      const { data: { session } } = await db.auth.getSession();
+      if (session?.user) {
+        await loadAuthenticatedProfile(session.user);
       }
 
-      const storedUser = localStorage.getItem('appearich_user_profile');
-      if (storedUser) {
-        currentUserProfile = JSON.parse(storedUser);
-        launchDashboardBasedOnRole();
-      }
-
+      // Keep the existing splash animation.
       setTimeout(() => {
         const splash = document.getElementById('cinematic-splash');
         if (splash) splash.style.display = 'none';
       }, 1200);
+
+      // If Auth changes in another tab, update this page too.
+      db.auth.onAuthStateChange(async (event, session) => {
+        if (event === 'SIGNED_OUT') {
+          currentUserProfile = null;
+          showAuthScreen();
+        }
+      });
     });
 
-    function savePermanentData() {
-      localStorage.setItem('appearich_permanent_teacher_data', JSON.stringify(teacherPortalData));
-    }
-    function saveAccountsDB() {
-      localStorage.setItem('appearich_accounts_db', JSON.stringify(userAccountsDB));
+    function showAuthScreen() {
+      document.getElementById('screen-auth').classList.add('active');
+      document.getElementById('mainHeader').style.display = 'none';
+      document.getElementById('mainNavBar').style.display = 'none';
+      document.querySelectorAll('.screen').forEach(s => {
+        if (s.id !== 'screen-auth') s.classList.remove('active');
+      });
     }
 
-    function switchAuthRole(role) {
-      currentAuthRole = role;
-      document.getElementById('tabRoleStudent').className = role === 'student' ? 'role-tab active' : 'role-tab';
-      document.getElementById('tabRoleTeacher').className = role === 'teacher' ? 'role-tab active' : 'role-tab';
-      
-      if (authMode === 'signup') {
-        document.getElementById('nameGroup').style.display = 'block';
-        document.getElementById('confirmPasswordGroup').style.display = 'block';
-        document.getElementById('studentDetailsFields').style.display = role === 'student' ? 'block' : 'none';
-      } else {
-        document.getElementById('nameGroup').style.display = 'none';
-        document.getElementById('confirmPasswordGroup').style.display = 'none';
-        document.getElementById('studentDetailsFields').style.display = 'none';
+    async function loadAuthenticatedProfile(user) {
+      // IMPORTANT: the role comes from the database, not from the login form.
+      const { data: profile, error } = await db
+        .from('profiles')
+        .select('id, full_name, role, education_level')
+        .eq('id', user.id)
+        .single();
+
+      if (error || !profile) {
+        await db.auth.signOut();
+        alert('Your account profile has not been set up. Please contact an administrator.');
+        showAuthScreen();
+        return;
       }
-      
-      document.getElementById('regName').placeholder = role === 'teacher' ? 'e.g. Dr. Kelvin Vance' : 'e.g. Alistair Sterling';
+
+      // Reject unknown/unapproved roles instead of guessing a portal.
+      if (!['student', 'teacher', 'staff'].includes(profile.role)) {
+        await db.auth.signOut();
+        alert('Your account is not yet authorised for a portal.');
+        showAuthScreen();
+        return;
+      }
+
+      currentUserProfile = {
+        id: profile.id,
+        email: user.email,
+        name: profile.full_name,
+        role: profile.role,
+        educationLevel: profile.education_level
+      };
+
+      launchDashboardBasedOnRole();
     }
 
     function handleEduLevelChange() {
@@ -1403,94 +1431,113 @@
     }
 
     function toggleAuthMode() {
-      if (authMode === 'login') {
-        authMode = 'signup';
-        document.getElementById('authTitleText').innerText = 'Create Account';
-        document.getElementById('authSubText').innerText = 'Register for access to Appearich';
-        document.getElementById('authActionBtn').innerText = 'Sign Up';
-        document.getElementById('authSwitchPrompt').innerHTML = 'Already have an account? <span>Sign In</span>';
-        document.getElementById('nameGroup').style.display = 'block';
-        document.getElementById('confirmPasswordGroup').style.display = 'block';
-        if (currentAuthRole === 'student') document.getElementById('studentDetailsFields').style.display = 'block';
-      } else {
-        authMode = 'login';
-        document.getElementById('authTitleText').innerText = 'Welcome back';
-        document.getElementById('authSubText').innerText = 'Select your portal and enter your credentials';
-        document.getElementById('authActionBtn').innerText = 'Login';
-        document.getElementById('authSwitchPrompt').innerHTML = "Don't have an account? <span>Sign Up</span>";
-        document.getElementById('nameGroup').style.display = 'none';
-        document.getElementById('confirmPasswordGroup').style.display = 'none';
-        document.getElementById('studentDetailsFields').style.display = 'none';
-      }
+      authMode = authMode === 'login' ? 'signup' : 'login';
+
+      document.getElementById('authTitleText').innerText = authMode === 'login' ? 'Welcome back' : 'Create Student Account';
+      document.getElementById('authSubText').innerText = authMode === 'login'
+        ? 'Enter your credentials. Your portal will be selected automatically.'
+        : 'Create a student account. Teacher and staff roles are assigned by an authorised administrator.';
+      document.getElementById('authActionBtn').innerText = authMode === 'login' ? 'Login' : 'Sign Up';
+      document.getElementById('authSwitchPrompt').innerHTML = authMode === 'login'
+        ? "Don't have an account? <span>Sign Up</span>"
+        : 'Already have an account? <span>Sign In</span>';
+      document.getElementById('nameGroup').style.display = authMode === 'signup' ? 'block' : 'none';
+      document.getElementById('confirmPasswordGroup').style.display = authMode === 'signup' ? 'block' : 'none';
+      document.getElementById('studentDetailsFields').style.display = authMode === 'signup' ? 'block' : 'none';
     }
 
-    function handleAuthSubmit() {
-      const email = document.getElementById('authEmail').value.trim();
+    async function handleAuthSubmit() {
+      const email = document.getElementById('authEmail').value.trim().toLowerCase();
       const pwd = document.getElementById('authPassword').value;
+
       if (!email || !pwd) {
-        alert("Please enter email and password.");
+        alert('Please enter your email and password.');
         return;
       }
 
-      if (authMode === 'signup') {
-        const name = document.getElementById('regName').value.trim();
-        const cpwd = document.getElementById('authConfirmPassword').value;
-        if (pwd !== cpwd) {
-          alert("Passwords do not match.");
+      const button = document.getElementById('authActionBtn');
+      button.disabled = true;
+
+      try {
+        if (authMode === 'signup') {
+          const name = document.getElementById('regName').value.trim();
+          const cpwd = document.getElementById('authConfirmPassword').value;
+          const educationLevel = document.getElementById('eduLevelSelect').value;
+
+          if (!name) throw new Error('Please enter your full name.');
+          if (pwd.length < 8) throw new Error('Password must contain at least 8 characters.');
+          if (pwd !== cpwd) throw new Error('Passwords do not match.');
+
+          // SECURITY: self-signup NEVER sends role='teacher' or role='staff'.
+          // A malicious browser can edit JavaScript, so the database/RLS must also
+          // enforce that users can only create their own student profile.
+          const { data, error } = await db.auth.signUp({
+            email,
+            password: pwd
+          });
+
+          if (error) throw error;
+          if (!data.user) throw new Error('Account creation did not return a user.');
+
+          // Create only a student profile. Teacher/staff accounts should be
+          // provisioned/approved by an authorised administrator.
+          const { error: profileError } = await db.from('profiles').insert({
+            id: data.user.id,
+            full_name: name,
+            role: 'student',
+            education_level: educationLevel
+          });
+
+          if (profileError) {
+            // If profile creation fails, do not pretend signup succeeded.
+            // The Auth account may need admin cleanup if this is a database/RLS issue.
+            throw profileError;
+          }
+
+          alert('Account created. Please verify your email if your Supabase project requires email confirmation, then log in.');
+          authMode = 'login';
+          toggleAuthMode();
+          document.getElementById('authEmail').value = email;
+          document.getElementById('authPassword').value = '';
           return;
         }
 
-        const newUser = {
-          role: currentAuthRole,
-          email: email,
-          password: pwd,
-          name: name || (currentAuthRole === 'teacher' ? 'Professor' : 'Scholar'),
-          selectedLevels: []
-        };
-        if (currentAuthRole === 'student') {
-          newUser.educationLevel = document.getElementById('eduLevelSelect').value;
-          newUser.combination = document.getElementById('regCombination').value || 'Standard';
-        }
-        userAccountsDB.push(newUser);
-        saveAccountsDB();
-        currentUserProfile = newUser;
-      } else {
-        const foundAccount = userAccountsDB.find(a => a.email.toLowerCase() === email.toLowerCase() && a.password === pwd);
-        if (foundAccount) {
-          if (foundAccount.role !== currentAuthRole) {
-            alert(`This account is registered as a ${foundAccount.role}.`);
-            return;
-          }
-          currentUserProfile = foundAccount;
-        } else {
-          currentUserProfile = {
-            role: currentAuthRole,
-            email: email,
-            name: currentAuthRole === 'teacher' ? 'Professor' : 'Scholar',
-            educationLevel: 'Upper Secondary',
-            selectedLevels: []
-          };
-        }
+        // LOGIN: Supabase verifies the password. We never compare passwords ourselves.
+        const { data: authData, error: authError } = await db.auth.signInWithPassword({
+          email,
+          password: pwd
+        });
+
+        if (authError) throw new Error('Invalid email or password.');
+        if (!authData.user) throw new Error('Login failed.');
+
+        await loadAuthenticatedProfile(authData.user);
+      } catch (error) {
+        console.error('Authentication error:', error);
+        alert(error.message || 'Something went wrong. Please try again.');
+      } finally {
+        button.disabled = false;
       }
-      localStorage.setItem('appearich_user_profile', JSON.stringify(currentUserProfile));
-      launchDashboardBasedOnRole();
     }
 
     function launchDashboardBasedOnRole() {
       document.getElementById('screen-auth').classList.remove('active');
       document.getElementById('mainHeader').style.display = 'flex';
       document.getElementById('mainNavBar').style.display = 'flex';
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
 
       if (currentUserProfile.role === 'teacher') {
         document.getElementById('screen-teacher-portal').classList.add('active');
         document.getElementById('headerBrandTitle').innerText = 'Appearich Teacher Portal';
         document.getElementById('teacherPortalGreeting').innerText = `WELCOME, ${(currentUserProfile.name || 'PROFESSOR').toUpperCase()}`;
-        
-        if (teacherPortalData.classes && teacherPortalData.classes.length > 0) {
-          showTeacherClassesGrid();
-        } else {
-          resetTeacherWorkflow();
-        }
+        resetTeacherWorkflow();
+      } else if (currentUserProfile.role === 'staff') {
+        // The current project has no separate staff screen yet.
+        // Use the existing portal shell for now; database RLS still controls what staff can do.
+        document.getElementById('screen-teacher-portal').classList.add('active');
+        document.getElementById('headerBrandTitle').innerText = 'Appearich Staff Portal';
+        document.getElementById('teacherPortalGreeting').innerText = `WELCOME, ${(currentUserProfile.name || 'STAFF').toUpperCase()}`;
+        resetTeacherWorkflow();
       } else {
         document.getElementById('screen-home').classList.add('active');
         document.getElementById('headerBrandTitle').innerText = 'Appearich Student Portal';
@@ -1503,19 +1550,18 @@
       }
     }
 
-    function handleLogout() {
-      localStorage.removeItem('appearich_user_profile');
+    async function handleLogout() {
+      // Sign out from Supabase so the session is invalidated.
+      const { error } = await db.auth.signOut();
+      if (error) console.error('Logout error:', error);
       currentUserProfile = null;
-      document.getElementById('mainHeader').style.display = 'none';
-      document.getElementById('mainNavBar').style.display = 'none';
-      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-      document.getElementById('screen-auth').classList.add('active');
+      showAuthScreen();
     }
 
     function switchTab(screenId, element) {
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
       document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-      if (currentUserProfile.role === 'teacher' && screenId === 'screen-home') {
+      if ((currentUserProfile.role === 'teacher' || currentUserProfile.role === 'staff') && screenId === 'screen-home') {
         document.getElementById('screen-teacher-portal').classList.add('active');
       } else {
         document.getElementById(screenId).classList.add('active');
@@ -1960,5 +2006,11 @@
       document.getElementById('comingSoonModal').classList.remove('active');
     }
   </script>
+<!--
+  SECURITY NOTE:
+  - Never trust role values from HTML, JavaScript, localStorage, or URL parameters.
+  - Supabase Auth verifies identity. PostgreSQL RLS verifies permissions.
+  - The frontend only decides which screen to show; it is NOT the security boundary.
+-->
 </body>
 </html>
