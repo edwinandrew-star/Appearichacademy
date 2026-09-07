@@ -1390,38 +1390,28 @@
       });
     }
 
-async function ensureStudentProfile(user) {
-      // The browser may be authenticated without having a profiles row yet.
-      // This can happen when Supabase email confirmation is enabled because
-      // signUp() may return a user with no active session.
+    async function ensureStudentProfile(user) {
       const { data: existingProfile, error: readError } = await db
         .from('profiles')
-        .select('id, full_name, role, education_level')
+        .select('id, username, email, phone, role, updated_at')
         .eq('id', user.id)
         .maybeSingle();
 
       if (readError) throw readError;
       if (existingProfile) return existingProfile;
 
-      // Only self-create a student profile. Teacher/staff accounts must be
-      // provisioned by an authorised administrator.
       const metadata = user.user_metadata || {};
-      const fullName = String(metadata.full_name || '').trim();
-      const educationLevel = String(metadata.education_level || 'Lower Primary').trim();
-
-      if (!fullName) {
-        throw new Error('Your student profile is missing your full name. Please contact an administrator.');
-      }
+      const username = String(metadata.full_name || metadata.username || user.email?.split('@')[0] || 'Student').trim();
 
       const { data: createdProfile, error: insertError } = await db
         .from('profiles')
         .insert({
           id: user.id,
-          full_name: fullName,
-          role: 'student',
-          education_level: educationLevel
+          username,
+          email: user.email || null,
+          role: 'student'
         })
-        .select('id, full_name, role, education_level')
+        .select('id, username, email, phone, role, updated_at')
         .single();
 
       if (insertError) throw insertError;
@@ -1429,10 +1419,10 @@ async function ensureStudentProfile(user) {
     }
 
     async function loadAuthenticatedProfile(user) {
-      // IMPORTANT: the role comes from the database, not from the login form.
+      // IMPORTANT: role comes from the protected database profile, never from the browser.
       let { data: profile, error } = await db
         .from('profiles')
-        .select('id, full_name, role, education_level')
+        .select('id, username, email, phone, role, updated_at')
         .eq('id', user.id)
         .maybeSingle();
 
@@ -1444,22 +1434,19 @@ async function ensureStudentProfile(user) {
         return;
       }
 
-      // If a newly registered student has no profile yet, create it while
-      // authenticated. This works even when email confirmation delayed the
-      // session returned by signUp().
+      // A newly signed-in student may not have a profile yet. Create it while authenticated.
       if (!profile) {
         try {
           profile = await ensureStudentProfile(user);
         } catch (profileError) {
           console.error('Profile creation error:', profileError);
           await db.auth.signOut();
-          alert(profileError.message || 'Your account profile could not be created.');
+          alert(profileError.message || 'Your student profile could not be created.');
           showAuthScreen();
           return;
         }
       }
 
-      // Reject unknown/unapproved roles instead of guessing a portal.
       if (!['student', 'teacher', 'staff'].includes(profile.role)) {
         await db.auth.signOut();
         alert('Your account is not yet authorised for a portal.');
@@ -1467,17 +1454,18 @@ async function ensureStudentProfile(user) {
         return;
       }
 
+      const metadata = user.user_metadata || {};
       currentUserProfile = {
         id: profile.id,
-        email: user.email,
-        name: profile.full_name,
+        email: profile.email || user.email,
+        name: profile.username || metadata.full_name || 'Student',
         role: profile.role,
-        educationLevel: profile.education_level
+        educationLevel: metadata.education_level || 'General'
       };
 
       launchDashboardBasedOnRole();
     }
-    
+
     function handleEduLevelChange() {
       const level = document.getElementById('eduLevelSelect').value;
       const combGroup = document.getElementById('combinationGroup');
@@ -1513,51 +1501,49 @@ async function ensureStudentProfile(user) {
       button.disabled = true;
 
       try {
-if (authMode === 'signup') {
-        const name = document.getElementById('regName').value.trim();
-        const cpwd = document.getElementById('authConfirmPassword').value;
-        const educationLevel = document.getElementById('eduLevelSelect').value;
+        if (authMode === 'signup') {
+          const name = document.getElementById('regName').value.trim();
+          const cpwd = document.getElementById('authConfirmPassword').value;
+          const educationLevel = document.getElementById('eduLevelSelect').value;
 
-        if (!name) throw new Error('Please enter your full name.');
-        if (pwd.length < 8) throw new Error('Password must contain at least 8 characters.');
-        if (pwd !== cpwd) throw new Error('Passwords do not match.');
+          if (!name) throw new Error('Please enter your full name.');
+          if (pwd.length < 8) throw new Error('Password must contain at least 8 characters.');
+          if (pwd !== cpwd) throw new Error('Passwords do not match.');
 
-        // SECURITY: self-signup never chooses teacher/staff.
-        // Store student profile information in Auth metadata temporarily.
-        // ensureStudentProfile() creates the protected profiles row only
-        // after an authenticated session exists.
-        const { data, error } = await db.auth.signUp({
-          email,
-          password: pwd,
-          options: {
-            data: {
-              full_name: name,
-              education_level: educationLevel,
-              requested_role: 'student'
+          // Store the extra signup information in Supabase Auth metadata.
+          // The profiles table stores only the columns that actually exist:
+          // id, username, email, phone, role, updated_at.
+          const { data, error } = await db.auth.signUp({
+            email,
+            password: pwd,
+            options: {
+              data: {
+                full_name: name,
+                education_level: educationLevel
+              }
             }
+          });
+
+          if (error) throw error;
+          if (!data.user) throw new Error('Account creation did not return a user.');
+
+          // If email confirmation is disabled, Supabase returns a session and we can
+          // immediately create the profile. If confirmation is enabled, wait until
+          // the user logs in, then create it as an authenticated user.
+          if (data.session) {
+            await ensureStudentProfile(data.user);
+            await loadAuthenticatedProfile(data.user);
+            return;
           }
-        });
 
-        if (error) throw error;
-        if (!data.user) throw new Error('Account creation did not return a user.');
-
-        // If email confirmation is disabled, a session exists immediately and
-        // the profile can be created now. If confirmation is enabled, the
-        // profile will be created automatically after the user logs in.
-        if (data.session) {
-          await ensureStudentProfile(data.user);
-          await loadAuthenticatedProfile(data.user);
+          alert('Account created. Please verify your email, then log in. Your student profile will be created automatically after login.');
+          authMode = 'login';
+          toggleAuthMode();
+          document.getElementById('authEmail').value = email;
+          document.getElementById('authPassword').value = '';
           return;
         }
 
-        alert('Account created. Please verify your email, then log in. Your student profile will be created automatically after login.');
-        authMode = 'login';
-        toggleAuthMode();
-        document.getElementById('authEmail').value = email;
-        document.getElementById('authPassword').value = '';
-        return;
-      }
-      
         // LOGIN: Supabase verifies the password. We never compare passwords ourselves.
         const { data: authData, error: authError } = await db.auth.signInWithPassword({
           email,
