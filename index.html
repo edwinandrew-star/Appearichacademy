@@ -1510,18 +1510,52 @@ window.addEventListener("DOMContentLoaded", async () => {
 
 async function bootstrapAuthenticatedUser(user) {
   currentUser = user;
-  // The authenticated Supabase user ID is the identity source.
-  // Never trust a user ID supplied by HTML or JavaScript.
-  const { data: profile, error } = await sb.from("profiles")
-    .select("id, full_name, role, education_level, combination")
-    .eq("id", user.id).single();
 
-  if (error || !profile) {
-    toast("Your account profile is not ready yet. Please try again.", "error");
+  // Always use the authenticated Supabase user ID.
+  // If the profile trigger did not create a row, repair the profile from
+  // the user's Auth metadata instead of leaving the user stuck after login.
+  let { data: profile, error: profileError } = await sb.from("profiles")
+    .select("id, full_name, role, education_level, combination, email")
+    .eq("id", user.id).maybeSingle();
+
+  if (!profile && !profileError) {
+    const meta = user.user_metadata || {};
+    const requestedRole = meta.requested_role === "teacher" ? "teacher" : "student";
+    const repairProfile = {
+      id: user.id,
+      full_name: meta.full_name || user.email?.split("@")[0] || "User",
+      role: requestedRole,
+      email: user.email || null,
+      education_level: requestedRole === "student" ? (meta.education_level || null) : null,
+      combination: requestedRole === "student" ? (meta.combination || null) : null
+    };
+
+    const { error: insertError } = await sb.from("profiles").upsert(repairProfile, { onConflict: "id" });
+    if (!insertError) {
+      const result = await sb.from("profiles")
+        .select("id, full_name, role, education_level, combination, email")
+        .eq("id", user.id).maybeSingle();
+      profile = result.data;
+      profileError = result.error;
+    } else {
+      profileError = insertError;
+    }
+  }
+
+  if (!profile) {
+    console.error("Profile bootstrap failed:", profileError);
+    toast("Login succeeded, but your profile could not be loaded. Check the profiles table policies/triggers in Supabase.", "error");
     return;
   }
+
+  // If the profile has no email but Auth does, keep the profile complete.
+  if (!profile.email && user.email) {
+    await sb.from("profiles").update({ email: user.email }).eq("id", user.id);
+    profile.email = user.email;
+  }
+
   currentUserProfile = profile;
-  launchDashboardBasedOnRole();
+  await launchDashboardBasedOnRole();
 }
 
 function showAuthScreen() {
@@ -1549,9 +1583,19 @@ async function handleAuthSubmit() {
       education_level: currentAuthRole === "student" ? document.getElementById("eduLevelSelect").value : null,
       combination: currentAuthRole === "student" ? (document.getElementById("regCombination").value || null) : null
     };
-    const { error } = await sb.auth.signUp({ email, password: pwd, options: { data: metadata } });
+    const { data: signUpData, error } = await sb.auth.signUp({ email, password: pwd, options: { data: metadata } });
     if (error) return toast(error.message, "error");
-    toast("Account created. Check your email if confirmation is enabled.", "success");
+
+    // When email confirmation is disabled, Supabase returns a session and
+    // the normal auth-state listener will bootstrap the profile.
+    // When confirmation is enabled, no session exists yet; the profile will
+    // be repaired automatically on the first successful login.
+    if (signUpData?.user && signUpData?.session) {
+      await bootstrapAuthenticatedUser(signUpData.user);
+    }
+    toast(signUpData?.session
+      ? "Account created and signed in successfully."
+      : "Account created. Confirm your email, then sign in.", "success");
     return;
   }
 
