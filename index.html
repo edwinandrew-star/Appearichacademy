@@ -1428,8 +1428,8 @@
    Replace these two values with your project's public values.
    NEVER put the Supabase service-role key in this file.
 */
-const SUPABASE_URL = "https://ccrxhifqtdhnkmxbafks.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNjcnhoaWZxdGRobmtteGJhZmtzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg3NTQ2MzksImV4cCI6MjEwNDMzMDYzOX0.g3YiiUNwdvsuwkF2E0HuzFm4xSOobueKTAzYAU-Vt4g";
+const SUPABASE_URL = "YOUR_SUPABASE_PROJECT_URL";
+const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY";
 const sb = (window.supabase && SUPABASE_URL.startsWith("http"))
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
   : null;
