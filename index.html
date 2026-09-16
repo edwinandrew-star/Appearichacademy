@@ -1428,8 +1428,8 @@
    Replace these two values with your project's public values.
    NEVER put the Supabase service-role key in this file.
 */
-const SUPABASE_URL = "https://ccrxhifqtdhnkmxbafks.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNjcnhoaWZxdGRobmtteGJhZmtzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg3NTQ2MzksImV4cCI6MjEwNDMzMDYzOX0.g3YiiUNwdvsuwkF2E0HuzFm4xSOobueKTAzYAU-Vt4g";
+const SUPABASE_URL = "YOUR_SUPABASE_PROJECT_URL";
+const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY";
 const sb = (window.supabase && SUPABASE_URL.startsWith("http"))
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
   : null;
@@ -1509,31 +1509,34 @@ window.addEventListener("DOMContentLoaded", async () => {
 });
 
 async function bootstrapAuthenticatedUser(user) {
+  // =============================================================
+  // AUTHENTICATION FLOW
+  // Supabase Auth gives us the trusted user ID. We then load the
+  // matching public.profiles row. The frontend never invents a role.
+  // =============================================================
   currentUser = user;
-  // The authenticated Supabase user ID is the identity source.
-  // Never trust a user ID supplied by HTML or JavaScript.
+
   const { data: profile, error } = await sb
-  .from("profiles")
-  .select("id, full_name, role, email")
-  .eq("id", user.id)
-  .single();
+    .from("profiles")
+    .select("id, full_name, role, email")
+    .eq("id", user.id)
+    .single();
 
-if (error) {
-  console.error("Profile loading error:", error);
-  toast("Could not load your profile. Please try again.", "error");
-  return;
-}
-
-if (!profile) {
-  toast("Your account profile is not ready yet. Please try again.", "error");
-  return;
-}
-
-// Profile successfully loaded
-console.log("Logged-in profile:", profile);
+  if (error) {
+    console.error("Profile loading error:", error);
+    toast(`Could not load your profile: ${error.message}`, "error");
+    return;
   }
+
+  if (!profile) {
+    console.error("No profile found for authenticated user:", user.id);
+    toast("Your account profile is not ready yet. Please try again.", "error");
+    return;
+  }
+
   currentUserProfile = profile;
-  launchDashboardBasedOnRole();
+  console.log("Logged-in profile:", currentUserProfile);
+  await launchDashboardBasedOnRole();
 }
 
 function showAuthScreen() {
@@ -1594,11 +1597,11 @@ async function launchDashboardBasedOnRole() {
     document.getElementById("dynamicGreeting").innerText =
       `WELCOME, ${(currentUserProfile.full_name || "SCHOLAR").toUpperCase()}`;
     document.getElementById("dynamicSubGreeting").innerText =
-      `Level: ${currentUserProfile.education_level || "General"}`;
+      `Welcome to your academic workspace`;
     document.getElementById("profileDisplayName").innerText = currentUserProfile.full_name || "Scholar";
     document.getElementById("profileDisplayEmail").innerText = currentUser.email;
     document.getElementById("profileDisplayProgram").innerText =
-      currentUserProfile.combination || currentUserProfile.education_level || "Academic Programme";
+      "Academic Programme";
     document.getElementById("profileInitial").innerText =
       (currentUserProfile.full_name || "S").charAt(0).toUpperCase();
   }
@@ -1749,8 +1752,9 @@ async function openStudentSubjectWorkspace(subjectId) {
       .eq("subject_id", subjectId).eq("is_published", true).eq("is_archived", false).order("published_at",{ascending:false}).range(0,19),
     sb.from("assignments").select("id,title,instructions,published_at,due_at,max_marks")
       .eq("subject_id", subjectId).eq("is_archived", false).order("due_at",{ascending:true}).range(0,19),
-    sb.from("exams").select("id,title,instructions,start_at,end_at,duration_minutes,max_marks")
-      .eq("subject_id", subjectId).eq("is_archived", false).order("start_at",{ascending:false}).range(0,19)
+    sb.from("exams").select("id,title,description,start_time,end_time,duration_minutes,total_marks,status,class_id,subject")
+      .eq("subject_id", subjectId).eq("class_id", activeStudentClass.id).eq("status", "OPEN")
+      .order("created_at",{ascending:false}).range(0,19)
   ]);
 
   switchScreen("screen-student-subject-workspace");
@@ -1769,8 +1773,8 @@ async function openStudentSubjectWorkspace(subjectId) {
       <div class="lms-small">Due: ${a.due_at ? new Date(a.due_at).toLocaleString() : "No deadline"} • ${a.max_marks ?? ""} marks</div>
       <div class="lms-item-actions"><button class="primary-btn" style="opacity:1" onclick="openAssignmentSubmission('${a.id}')">Submit</button></div>`)}
     ${sectionHtml("Exams", "fa-file-shield", exams, e => `
-      <strong>${escapeHtml(e.title)}</strong><div class="lms-small">${escapeHtml(e.instructions || "")}</div>
-      <div class="lms-small">${e.start_at ? new Date(e.start_at).toLocaleString() : "Open"} → ${e.end_at ? new Date(e.end_at).toLocaleString() : "No end"}</div>
+      <strong>${escapeHtml(e.title)}</strong><div class="lms-small">${escapeHtml(e.description || "")}</div>
+      <div class="lms-small">${e.start_time ? new Date(e.start_time).toLocaleString() : "Open"} → ${e.end_time ? new Date(e.end_time).toLocaleString() : "No end"}</div>
       <div class="lms-item-actions"><button class="primary-btn" style="opacity:1" onclick="startExam('${e.id}')">Start / Continue</button></div>`)}
   `;
 }
@@ -1838,89 +1842,178 @@ async function submitAssignment(assignmentId) {
    is only a visual display and cannot extend an attempt.
 */
 async function startExam(examId) {
-  if (!sb) return;
-  const { data, error } = await sb.rpc("start_exam_attempt", { p_exam_id: examId });
+  if (!sb || !currentUser) return;
+
+  // Server-side RPC verifies that the student belongs to the exam's class
+  // and creates/returns the authoritative attempt. The browser cannot
+  // manufacture an allowed attempt by itself.
+  const { data, error } = await sb.rpc("start_exam", { p_exam_id: examId });
   if (error) return toast(error.message, "error");
-  currentExamAttempt = data;
+
+  currentExamAttempt = data?.attempt || data;
+  if (!currentExamAttempt?.id) {
+    console.error("Unexpected start_exam response:", data);
+    return toast("The exam attempt could not be started.", "error");
+  }
+
   await renderExamAttempt();
 }
+
 async function renderExamAttempt() {
   if (!currentExamAttempt) return;
-  const { data: exam, error } = await sb.from("exams")
-    .select("id,title,duration_minutes,instructions,max_marks").eq("id", currentExamAttempt.exam_id).single();
-  const { data: questions } = await sb.from("exam_questions")
-    .select("id,question_text,question_type,options,marks,position")
-    .eq("exam_id", currentExamAttempt.exam_id).order("position");
-  if (error) return toast("Exam could not be loaded.", "error");
 
-  const { data: answers } = await sb.from("exam_answers")
-    .select("question_id,answer_text").eq("attempt_id", currentExamAttempt.id);
-  pendingAnswerState = new Map((answers||[]).map(a=>[a.question_id,a.answer_text]));
+  const examId = currentExamAttempt.exam_id;
+  const [{ data: exam, error: examError }, { data: questions, error: qError }, { data: answers, error: aError }] = await Promise.all([
+    sb.from("exams")
+      .select("id,title,subject,description,duration_minutes,total_marks,start_time,end_time,status")
+      .eq("id", examId).single(),
+    sb.from("exam_questions")
+      .select("id,question_text,points,question_order,question_type")
+      .eq("exam_id", examId).order("question_order", { ascending:true }),
+    sb.from("exam_answers")
+      .select("question_id,selected_option_id,answer_text")
+      .eq("attempt_id", currentExamAttempt.id)
+  ]);
+
+  if (examError || qError || aError) {
+    console.error({examError,qError,aError});
+    return toast("Exam could not be loaded.", "error");
+  }
+
+  // Options are stored in exam_options, not inside exam_questions.options.
+  const questionIds = (questions || []).map(q => q.id);
+  let options = [];
+  if (questionIds.length) {
+    const { data, error } = await sb.from("exam_options")
+      .select("id,question_id,option_text,option_order")
+      .in("question_id", questionIds)
+      .order("option_order", { ascending:true });
+    if (error) return toast("Exam options could not be loaded.", "error");
+    options = data || [];
+  }
+
+  const optionsByQuestion = new Map();
+  for (const option of options) {
+    if (!optionsByQuestion.has(option.question_id)) optionsByQuestion.set(option.question_id, []);
+    optionsByQuestion.get(option.question_id).push(option);
+  }
+
+  pendingAnswerState = new Map();
+  for (const answer of answers || []) {
+    pendingAnswerState.set(answer.question_id, {
+      selected_option_id: answer.selected_option_id || "",
+      answer_text: answer.answer_text || ""
+    });
+  }
 
   const root = document.getElementById("screen-student-subject-workspace");
   switchScreen("screen-student-subject-workspace");
   root.innerHTML = `
     <div class="exam-timer" id="examTimer">Calculating time…</div>
-    <div style="margin:14px 0 20px"><h2 style="font-weight:900">${escapeHtml(exam.title)}</h2>
-    <p class="lms-small">${escapeHtml(exam.instructions||"")}</p></div>
-    <form id="examForm" onsubmit="event.preventDefault(); submitExamAttempt();">
-      ${(questions||[]).map((q,i)=>renderQuestion(q,i)).join("")}
+    <div style="margin:14px 0 20px">
+      <h2 style="font-weight:900">${escapeHtml(exam.title)}</h2>
+      <p class="lms-small">${escapeHtml(exam.description || "")}</p>
+      <div class="lms-small" style="margin-top:6px">${escapeHtml(exam.subject || "")}</div>
+    </div>
+    <form id="examForm" onsubmit="event.preventDefault(); submitExamAttempt(false);">
+      ${(questions || []).map((q,i)=>renderQuestion(q,i,optionsByQuestion.get(q.id)||[])).join("")}
       <button class="primary-btn" style="opacity:1">Submit Exam</button>
     </form>`;
+
   updateExamTimer();
 }
-function renderQuestion(q,i) {
-  const existing = pendingAnswerState.get(q.id) || "";
-  const opts = Array.isArray(q.options) ? q.options : [];
+
+function renderQuestion(q, i, options=[]) {
+  const existing = pendingAnswerState.get(q.id) || {selected_option_id:"", answer_text:""};
   let control = "";
+
   if (q.question_type === "multiple_choice" || q.question_type === "true_false") {
-    control = opts.map(o => `<label class="exam-option"><input type="radio" name="q_${q.id}" value="${escapeHtml(o)}" ${existing===o?"checked":""} onchange="queueAnswerSave('${q.id}',this.value)"> ${escapeHtml(o)}</label>`).join("");
+    control = options.map(o => `
+      <label class="exam-option">
+        <input type="radio" name="q_${q.id}" value="${escapeHtml(o.id)}"
+          ${existing.selected_option_id === o.id ? "checked" : ""}
+          onchange="queueAnswerSave('${q.id}', '', '${o.id}')">
+        ${escapeHtml(o.option_text)}
+      </label>`).join("");
   } else {
-    control = `<textarea class="lms-textarea" data-question="${q.id}" onchange="queueAnswerSave('${q.id}',this.value)">${escapeHtml(existing)}</textarea>`;
+    control = `<textarea class="lms-textarea" data-question="${q.id}"
+      onchange="queueAnswerSave('${q.id}', this.value, '')">${escapeHtml(existing.answer_text)}</textarea>`;
   }
-  return `<div class="exam-question"><strong>${i+1}. ${escapeHtml(q.question_text)}</strong>
-    <div class="lms-small" style="margin:6px 0 10px">${q.marks ?? 1} mark(s)</div>${control}</div>`;
+
+  return `<div class="exam-question">
+    <strong>${i+1}. ${escapeHtml(q.question_text)}</strong>
+    <div class="lms-small" style="margin:6px 0 10px">${q.points ?? 1} mark(s)</div>
+    ${control || '<div class="lms-small">No options configured for this question.</div>'}
+  </div>`;
 }
+
 function updateExamTimer() {
   clearInterval(examTimerHandle);
   const tick = async () => {
     if (!currentExamAttempt) return;
-    const end = new Date(currentExamAttempt.locked_at).getTime();
+
+    // expires_at is server-authoritative. The countdown is only visual.
+    const expiresAt = currentExamAttempt.expires_at || currentExamAttempt.locked_at;
+    const end = expiresAt ? new Date(expiresAt).getTime() : Date.now();
     const remain = Math.max(0, end - Date.now());
     const el = document.getElementById("examTimer");
     if (el) el.textContent = `Time remaining: ${formatDuration(remain)}`;
+
     if (remain <= 0) {
       clearInterval(examTimerHandle);
       await submitExamAttempt(true);
     }
   };
-  tick(); examTimerHandle = setInterval(tick, 1000);
+  tick();
+  examTimerHandle = setInterval(tick, 1000);
 }
+
 function formatDuration(ms) {
   const s = Math.floor(ms/1000), h=Math.floor(s/3600), m=Math.floor((s%3600)/60), sec=s%60;
   return `${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}:${String(sec).padStart(2,"0")}`;
 }
-function queueAnswerSave(questionId, answer) {
-  pendingAnswerState.set(questionId, answer);
+
+function queueAnswerSave(questionId, answerText="", selectedOptionId="") {
+  pendingAnswerState.set(questionId, {
+    selected_option_id: selectedOptionId || "",
+    answer_text: answerText || ""
+  });
   clearTimeout(answerSaveTimers.get(questionId));
-  answerSaveTimers.set(questionId, setTimeout(() => saveExamAnswer(questionId, answer), 600));
+  answerSaveTimers.set(questionId, setTimeout(() => saveExamAnswer(questionId), 600));
 }
-async function saveExamAnswer(questionId, answer) {
+
+async function saveExamAnswer(questionId) {
   if (!sb || !currentExamAttempt) return;
-  const { error } = await sb.from("exam_answers").upsert({
-    attempt_id: currentExamAttempt.id, question_id: questionId,
-    answer_text: answer, updated_at:new Date().toISOString()
-  }, { onConflict:"attempt_id,question_id" });
-  if (error) toast("Answer save failed; retrying when possible.", "error");
+  const state = pendingAnswerState.get(questionId) || {selected_option_id:"", answer_text:""};
+  const payload = {
+    attempt_id: currentExamAttempt.id,
+    question_id: questionId,
+    selected_option_id: state.selected_option_id || null,
+    answer_text: state.answer_text || null,
+    updated_at: new Date().toISOString()
+  };
+
+  // IMPORTANT: is_correct and points_awarded are intentionally NOT sent.
+  // They are server-authoritative and are calculated by submit_exam().
+  const { error } = await sb.from("exam_answers").upsert(payload, {
+    onConflict:"attempt_id,question_id"
+  });
+  if (error) toast("Answer save failed; please try again.", "error");
 }
+
 async function submitExamAttempt(auto=false) {
   if (!sb || !currentExamAttempt) return;
-  for (const [qid, ans] of pendingAnswerState.entries()) await saveExamAnswer(qid, ans);
-  const { data, error } = await sb.rpc("submit_exam_attempt", { p_attempt_id: currentExamAttempt.id, p_auto_submit:auto });
+
+  for (const qid of pendingAnswerState.keys()) await saveExamAnswer(qid);
+
+  const { data, error } = await sb.rpc("submit_exam", {
+    p_attempt_id: currentExamAttempt.id
+  });
   if (error) return toast(error.message, "error");
+
   clearInterval(examTimerHandle);
   currentExamAttempt = null;
-  toast(auto ? "Exam expired and was submitted." : "Exam submitted.", "success");
+  toast(auto ? "Exam expired and was submitted." : `Exam submitted${data?.score != null ? ` — Score: ${data.score}` : ""}.`, "success");
   switchTab("screen-activity", document.querySelectorAll(".nav-item")[2]);
 }
 
@@ -1933,7 +2026,7 @@ function recordSecurityEvent(eventType, metadata={}) {
     attempt_id: currentExamAttempt.id,
     student_id: currentUser.id,
     exam_id: currentExamAttempt.exam_id,
-    event_type:eventType, metadata
+    event_type:eventType, event_data:metadata
   }).then(()=>{});
 }
 document.addEventListener("visibilitychange", () => {
