@@ -1512,13 +1512,25 @@ async function bootstrapAuthenticatedUser(user) {
   currentUser = user;
   // The authenticated Supabase user ID is the identity source.
   // Never trust a user ID supplied by HTML or JavaScript.
-  const { data: profile, error } = await sb.from("profiles")
-    .select("id, full_name, role, education_level, combination")
-    .eq("id", user.id).single();
+  const { data: profile, error } = await sb
+  .from("profiles")
+  .select("id, full_name, role, email")
+  .eq("id", user.id)
+  .single();
 
-  if (error || !profile) {
-    toast("Your account profile is not ready yet. Please try again.", "error");
-    return;
+if (error) {
+  console.error("Profile loading error:", error);
+  toast("Could not load your profile. Please try again.", "error");
+  return;
+}
+
+if (!profile) {
+  toast("Your account profile is not ready yet. Please try again.", "error");
+  return;
+}
+
+// Profile successfully loaded
+console.log("Logged-in profile:", profile);
   }
   currentUserProfile = profile;
   launchDashboardBasedOnRole();
