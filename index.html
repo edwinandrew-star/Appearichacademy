@@ -909,7 +909,87 @@
       margin-top: 8px;
       animation: screenFadeIn 0.3s ease forwards;
     }
-  </style>
+  
+/* ============================================================
+   APPEARICH LMS RESPONSIVE + PRODUCTION OVERRIDES
+   Keeps the existing visual identity while allowing the app
+   to use phones, tablets, laptops and desktop screens.
+   ============================================================ */
+.app-viewport {
+  width: 100%;
+  max-width: none;
+  min-height: 100vh;
+  padding-bottom: 90px;
+}
+.screen {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+.bottom-nav {
+  max-width: none;
+}
+@media (min-width: 700px) {
+  .screen { padding-left: 28px; padding-right: 28px; }
+  .hero-container { height: 280px; }
+}
+@media (min-width: 1100px) {
+  .screen { padding-left: 42px; padding-right: 42px; }
+  .academic-scroll-wrapper { display: grid; grid-template-columns: repeat(4, 1fr); overflow: visible; }
+  .academic-card { width: auto; }
+  .student-dashboard-cards-row { display: grid; grid-template-columns: repeat(3, 1fr); overflow: visible; }
+  .dashboard-mini-card { width: auto; }
+}
+@media (min-width: 1500px) {
+  .screen { max-width: 1500px; }
+}
+.lms-status {
+  position: fixed; right: 16px; bottom: 84px; z-index: 10001;
+  padding: 8px 12px; border-radius: 999px; font-size: .72rem;
+  font-weight: 800; background: var(--surface-color);
+  border: 1px solid var(--border-color); box-shadow: var(--shadow-sm);
+}
+.lms-modal {
+  position: fixed; inset: 0; z-index: 10000; display: none;
+  align-items: center; justify-content: center; padding: 18px;
+  background: rgba(0,0,0,.62); backdrop-filter: blur(8px);
+}
+.lms-modal.open { display:flex; }
+.lms-modal-card {
+  width:min(900px,100%); max-height:90vh; overflow:auto;
+  background:var(--surface-color); color:var(--text-main);
+  border:1px solid var(--border-color); border-radius:22px;
+  padding:22px; box-shadow:var(--shadow-lg);
+}
+.lms-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:14px; }
+.lms-list { display:flex; flex-direction:column; gap:10px; }
+.lms-item { padding:14px; border:1px solid var(--border-color); border-radius:16px; background:var(--surface-color); }
+.lms-item-actions { display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
+.lms-input,.lms-select,.lms-textarea {
+  width:100%; padding:12px 14px; border-radius:12px;
+  border:1px solid var(--border-color); background:var(--surface-elevated);
+  color:var(--text-main); outline:none;
+}
+.lms-textarea { min-height:110px; resize:vertical; }
+.lms-form { display:grid; gap:12px; }
+.lms-small { font-size:.72rem; color:var(--text-sub); }
+.lms-pill { display:inline-flex; align-items:center; gap:5px; padding:4px 8px;
+  border-radius:999px; background:var(--accent-gold-glow);
+  color:var(--accent-gold); font-size:.65rem; font-weight:800; }
+.lms-toolbar { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:14px; }
+.lms-danger { color:#b91c1c; }
+.lms-success { color:#15803d; }
+.document-frame { width:100%; height:70vh; border:0; border-radius:14px; background:#fff; }
+.exam-option { display:flex; gap:8px; align-items:flex-start; padding:10px; border:1px solid var(--border-color); border-radius:12px; }
+.exam-question { padding:16px; border:1px solid var(--border-color); border-radius:16px; margin-bottom:12px; }
+.exam-timer { position:sticky; top:8px; z-index:20; padding:10px 14px; border-radius:12px;
+  background:var(--surface-color); border:1px solid var(--accent-gold-border);
+  color:var(--accent-gold); font-weight:900; text-align:center; }
+
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 </head>
 <body>
   <!-- 1. SPLASH SCREEN -->
@@ -970,7 +1050,7 @@
         </div>
         <div class="auth-row-options" id="authOptionsRow">
           <label><input type="checkbox" checked style="accent-color: var(--accent-gold);"> Remember me</label>
-          <a href="#" onclick="alert('Password reset link sent to your email.'); return false;">Forgot password?</a>
+          <a href="#" onclick="sendPasswordReset(); return false;">Forgot password?</a>
         </div>
         
         <button class="primary-btn" id="authActionBtn" onclick="handleAuthSubmit()">Login</button>
@@ -1328,637 +1408,697 @@
   </div>
 
   <!-- APPLICATION LOGIC SCRIPT -->
-  <script>
-    let currentAuthRole = 'student';
-    let authMode = 'login';
-    let selectedTeacherLevels = [];
-    let teacherPortalData = { classes: [] };
-    let userAccountsDB = [];
-    let currentUserProfile = null;
+  
 
-    let activeSelectedClassObj = null;
-    let currentFoldContentType = null;
+<script>
+/* ============================================================
+   APPEARICH LMS — SUPABASE CONTROLLER
+   ------------------------------------------------------------
+   Architecture:
+   Browser UI -> Supabase Auth -> authenticated user/profile
+              -> class membership -> subjects -> content
+              -> submissions/exam attempts/notifications.
 
-    window.addEventListener('DOMContentLoaded', () => {
-      const savedTheme = localStorage.getItem('appearich_theme_mode');
-      if (savedTheme) {
-        document.documentElement.setAttribute('data-theme', savedTheme);
-        document.getElementById('themeIcon').className = savedTheme === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
-      } else {
-        document.documentElement.setAttribute('data-theme', 'light');
-        localStorage.setItem('appearich_theme_mode', 'light');
-      }
+   The browser is never treated as the security authority.
+   PostgreSQL RLS and SECURITY DEFINER RPC functions enforce
+   authorization. localStorage is used only for theme/UI state.
+   ============================================================ */
 
-      const savedAccounts = localStorage.getItem('appearich_accounts_db');
-      if (savedAccounts) userAccountsDB = JSON.parse(savedAccounts);
+/* ---------- 0. SUPABASE CONFIGURATION ----------
+   Replace these two values with your project's public values.
+   NEVER put the Supabase service-role key in this file.
+*/
+const SUPABASE_URL = "YOUR_SUPABASE_PROJECT_URL";
+const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY";
+const sb = (window.supabase && SUPABASE_URL.startsWith("http"))
+  ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+  : null;
 
-      const savedTeacherData = localStorage.getItem('appearich_permanent_teacher_data');
-      if (savedTeacherData) {
-        teacherPortalData = JSON.parse(savedTeacherData);
-      } else {
-        savePermanentData();
-      }
+let currentAuthRole = "student";
+let authMode = "login";
+let currentUser = null;
+let currentUserProfile = null;
+let activeSelectedClassObj = null;
+let activeStudentClass = null;
+let activeStudentSubject = null;
+let currentExamAttempt = null;
+let examTimerHandle = null;
+let answerSaveTimers = new Map();
+let pendingAnswerState = new Map();
+let selectedTeacherLevels = [];
+let teacherPortalData = { classes: [] };
+let currentFoldContentType = null;
 
-      const storedUser = localStorage.getItem('appearich_user_profile');
-      if (storedUser) {
-        currentUserProfile = JSON.parse(storedUser);
-        launchDashboardBasedOnRole();
-      }
+function escapeHtml(value) {
+  return String(value ?? "").replace(/[&<>"']/g, c => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+  }[c]));
+}
+function toast(message, kind="info") {
+  let el = document.getElementById("lmsStatus");
+  if (!el) {
+    el = document.createElement("div");
+    el.id = "lmsStatus";
+    el.className = "lms-status";
+    document.body.appendChild(el);
+  }
+  el.textContent = message;
+  el.classList.toggle("lms-success", kind === "success");
+  el.classList.toggle("lms-danger", kind === "error");
+  clearTimeout(el._t);
+  el._t = setTimeout(() => el.remove(), 3500);
+}
+function requireBackend() {
+  if (!sb) {
+    toast("Supabase is not configured. Add your project URL and anon key.", "error");
+    return false;
+  }
+  return true;
+}
+async function getSessionUser() {
+  if (!requireBackend()) return null;
+  const { data, error } = await sb.auth.getUser();
+  if (error) return null;
+  return data.user;
+}
 
-      setTimeout(() => {
-        const splash = document.getElementById('cinematic-splash');
-        if (splash) splash.style.display = 'none';
-      }, 1200);
+/* ---------- 1. STARTUP / AUTHENTICATION ----------
+   Application opens -> check Supabase session -> profile/role ->
+   load only authorized data -> appropriate dashboard.
+*/
+window.addEventListener("DOMContentLoaded", async () => {
+  const savedTheme = localStorage.getItem("appearich_theme_mode") || "light";
+  document.documentElement.setAttribute("data-theme", savedTheme);
+  const icon = document.getElementById("themeIcon");
+  if (icon) icon.className = savedTheme === "dark" ? "fa-solid fa-sun" : "fa-solid fa-moon";
+
+  setTimeout(() => {
+    const splash = document.getElementById("cinematic-splash");
+    if (splash) splash.style.display = "none";
+  }, 1200);
+
+  if (!sb) return;
+
+  const user = await getSessionUser();
+  if (user) await bootstrapAuthenticatedUser(user);
+
+  sb.auth.onAuthStateChange(async (_event, session) => {
+    if (session?.user) await bootstrapAuthenticatedUser(session.user);
+    else showAuthScreen();
+  });
+});
+
+async function bootstrapAuthenticatedUser(user) {
+  currentUser = user;
+  // The authenticated Supabase user ID is the identity source.
+  // Never trust a user ID supplied by HTML or JavaScript.
+  const { data: profile, error } = await sb.from("profiles")
+    .select("id, full_name, role, education_level, combination")
+    .eq("id", user.id).single();
+
+  if (error || !profile) {
+    toast("Your account profile is not ready yet. Please try again.", "error");
+    return;
+  }
+  currentUserProfile = profile;
+  launchDashboardBasedOnRole();
+}
+
+function showAuthScreen() {
+  currentUser = null; currentUserProfile = null;
+  document.getElementById("mainHeader").style.display = "none";
+  document.getElementById("mainNavBar").style.display = "none";
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  document.getElementById("screen-auth").classList.add("active");
+}
+
+async function handleAuthSubmit() {
+  if (!requireBackend()) return;
+  const email = document.getElementById("authEmail").value.trim();
+  const pwd = document.getElementById("authPassword").value;
+  if (!email || !pwd) return toast("Enter email and password.", "error");
+
+  if (authMode === "signup") {
+    const name = document.getElementById("regName").value.trim();
+    const cpwd = document.getElementById("authConfirmPassword").value;
+    if (!name || pwd !== cpwd) return toast("Check your name and password confirmation.", "error");
+
+    const metadata = {
+      full_name: name,
+      requested_role: currentAuthRole,
+      education_level: currentAuthRole === "student" ? document.getElementById("eduLevelSelect").value : null,
+      combination: currentAuthRole === "student" ? (document.getElementById("regCombination").value || null) : null
+    };
+    const { error } = await sb.auth.signUp({ email, password: pwd, options: { data: metadata } });
+    if (error) return toast(error.message, "error");
+    toast("Account created. Check your email if confirmation is enabled.", "success");
+    return;
+  }
+
+  const { error } = await sb.auth.signInWithPassword({ email, password: pwd });
+  if (error) return toast("Login failed. Check your credentials.", "error");
+}
+
+async function handleLogout() {
+  if (sb) await sb.auth.signOut();
+  showAuthScreen();
+}
+
+async function launchDashboardBasedOnRole() {
+  document.getElementById("screen-auth").classList.remove("active");
+  document.getElementById("mainHeader").style.display = "flex";
+  document.getElementById("mainNavBar").style.display = "flex";
+
+  const role = currentUserProfile?.role;
+  if (role === "teacher" || role === "admin") {
+    document.getElementById("screen-teacher-portal").classList.add("active");
+    document.getElementById("headerBrandTitle").innerText = role === "admin" ? "Appearich Admin Portal" : "Appearich Teacher Portal";
+    document.getElementById("teacherPortalGreeting").innerText =
+      `WELCOME, ${(currentUserProfile.full_name || "TEACHER").toUpperCase()}`;
+    await loadTeacherClasses();
+  } else {
+    document.getElementById("screen-home").classList.add("active");
+    document.getElementById("headerBrandTitle").innerText = "Appearich Student Portal";
+    document.getElementById("dynamicGreeting").innerText =
+      `WELCOME, ${(currentUserProfile.full_name || "SCHOLAR").toUpperCase()}`;
+    document.getElementById("dynamicSubGreeting").innerText =
+      `Level: ${currentUserProfile.education_level || "General"}`;
+    document.getElementById("profileDisplayName").innerText = currentUserProfile.full_name || "Scholar";
+    document.getElementById("profileDisplayEmail").innerText = currentUser.email;
+    document.getElementById("profileDisplayProgram").innerText =
+      currentUserProfile.combination || currentUserProfile.education_level || "Academic Programme";
+    document.getElementById("profileInitial").innerText =
+      (currentUserProfile.full_name || "S").charAt(0).toUpperCase();
+  }
+  await refreshNotifications();
+}
+
+function switchAuthRole(role) {
+  currentAuthRole = role;
+  document.getElementById("tabRoleStudent").className = role === "student" ? "role-tab active" : "role-tab";
+  document.getElementById("tabRoleTeacher").className = role === "teacher" ? "role-tab active" : "role-tab";
+  const signup = authMode === "signup";
+  document.getElementById("nameGroup").style.display = signup ? "block" : "none";
+  document.getElementById("confirmPasswordGroup").style.display = signup ? "block" : "none";
+  document.getElementById("studentDetailsFields").style.display = signup && role === "student" ? "block" : "none";
+  document.getElementById("regName").placeholder = role === "teacher" ? "e.g. Dr. Kelvin Vance" : "e.g. Student Name";
+}
+function handleEduLevelChange() {
+  const level = document.getElementById("eduLevelSelect").value;
+  document.getElementById("combinationGroup").style.display =
+    (level === "Upper Secondary" || level === "Lower Secondary") ? "block" : "none";
+}
+function toggleAuthMode() {
+  authMode = authMode === "login" ? "signup" : "login";
+  document.getElementById("authTitleText").innerText = authMode === "login" ? "Welcome back" : "Create Account";
+  document.getElementById("authSubText").innerText = authMode === "login"
+    ? "Select your portal and enter your credentials" : "Register for access to Appearich";
+  document.getElementById("authActionBtn").innerText = authMode === "login" ? "Login" : "Sign Up";
+  document.getElementById("authSwitchPrompt").innerHTML =
+    authMode === "login" ? "Don't have an account? <span>Sign Up</span>" : "Already have an account? <span>Sign In</span>";
+  switchAuthRole(currentAuthRole);
+}
+async function sendPasswordReset() {
+  if (!requireBackend()) return;
+  const email = document.getElementById("authEmail").value.trim();
+  if (!email) return toast("Enter your email first.", "error");
+  const { error } = await sb.auth.resetPasswordForEmail(email, {
+    redirectTo: location.origin + location.pathname
+  });
+  if (error) toast(error.message, "error"); else toast("Password reset email sent.", "success");
+}
+
+/* ---------- 2. NAVIGATION / THEME ---------- */
+function switchTab(screenId, element) {
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active"));
+  if (currentUserProfile?.role === "teacher" && screenId === "screen-home")
+    document.getElementById("screen-teacher-portal").classList.add("active");
+  else document.getElementById(screenId)?.classList.add("active");
+  element?.classList.add("active");
+  if (screenId === "screen-student-classes") loadStudentClasses();
+}
+function toggleThemeMode() {
+  const root = document.documentElement;
+  const next = root.getAttribute("data-theme") === "dark" ? "light" : "dark";
+  root.setAttribute("data-theme", next);
+  localStorage.setItem("appearich_theme_mode", next);
+  const icon = document.getElementById("themeIcon");
+  if (icon) icon.className = next === "dark" ? "fa-solid fa-sun" : "fa-solid fa-moon";
+}
+
+/* ---------- 3. STUDENT CLASS MEMBERSHIP ----------
+   Teacher creates one class key. Student joins once. Membership,
+   not a material-specific code, controls all subsequent access.
+*/
+async function openStudentClassesView() {
+  switchTab("screen-student-classes", document.getElementById("navHomeBtn"));
+  await loadStudentClasses();
+}
+async function loadStudentClasses() {
+  if (!sb || !currentUser) return;
+  const box = document.getElementById("studentClassesGridContainer");
+  box.innerHTML = `<div class="lms-item">Loading your classes...</div>`;
+
+  const { data, error } = await sb.from("class_members")
+    .select("class_id, joined_at, classes(id,name,education_level,academic_year,description)")
+    .eq("student_id", currentUser.id)
+    .order("joined_at", { ascending: false })
+    .range(0, 19); // pagination: first 20; fetch more on demand later
+
+  if (error) return box.innerHTML = `<div class="lms-item lms-danger">${escapeHtml(error.message)}</div>`;
+  const rows = data || [];
+  box.innerHTML = rows.length ? rows.map((r, i) => {
+    const c = r.classes;
+    return `<div class="portal-box-card" onclick="openStudentSubjectsForClass('${c.id}')">
+      <div class="custom-vector-emblem"><i class="fa-solid fa-school"></i></div>
+      <strong>${escapeHtml(c.name)}</strong>
+      <span class="lms-small">${escapeHtml(c.education_level || "")} • ${escapeHtml(c.academic_year || "")}</span>
+      <span class="lms-pill">Enrolled</span>
+    </div>`;
+  }).join("") : `
+    <div class="lms-item">
+      <strong>No classes yet.</strong>
+      <p class="lms-small" style="margin-top:6px;">Join a class using the enrollment key supplied by your teacher.</p>
+      <button class="primary-btn" style="opacity:1" onclick="openJoinClassModal()">Join Class</button>
+    </div>`;
+}
+function openJoinClassModal() {
+  openLmsModal("Join Class", `
+    <form class="lms-form" onsubmit="event.preventDefault(); joinClassWithKey();">
+      <label>Enrollment Key</label>
+      <input class="lms-input" id="joinClassKey" autocomplete="off" placeholder="e.g. EE2-2026-AP" required>
+      <button class="primary-btn" style="opacity:1">Join Class</button>
+    </form>`);
+}
+async function joinClassWithKey() {
+  const key = document.getElementById("joinClassKey").value.trim();
+  if (!key || !sb) return;
+  // Secure validation is performed by the PostgreSQL RPC, not by comparing
+  // the entered key against a key exposed to the browser.
+  const { data, error } = await sb.rpc("join_class_by_enrollment_key", { p_key: key });
+  if (error) return toast(error.message, "error");
+  closeLmsModal();
+  toast(data?.message || "Class joined.", "success");
+  await loadStudentClasses();
+}
+
+/* ---------- 4. STUDENT SUBJECTS / CONTENT ---------- */
+async function openStudentSubjectsForClass(classId) {
+  if (!sb) return;
+  activeStudentClass = { id: classId };
+  const { data: c } = await sb.from("classes").select("id,name,education_level,academic_year").eq("id", classId).single();
+  const { data: subjects, error } = await sb.from("subjects")
+    .select("id,name,description")
+    .eq("class_id", classId).eq("is_archived", false).order("name");
+  if (error) return toast(error.message, "error");
+
+  switchScreen("screen-student-subject-workspace");
+  const root = document.getElementById("screen-student-subject-workspace");
+  root.innerHTML = `
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
+      <button onclick="openStudentClassesView()" style="background:var(--surface-color);border:1px solid var(--border-color);width:36px;height:36px;border-radius:50%;cursor:pointer;"><i class="fa-solid fa-arrow-left"></i></button>
+      <div><h2 style="font-size:1.2rem;font-weight:900;">${escapeHtml(c?.name || "Class")}</h2>
+      <div class="lms-small">Subjects and published academic content</div></div>
+    </div>
+    <div class="responsive-grid-cards">
+      ${(subjects||[]).map(s => `<div class="portal-box-card" onclick="openStudentSubjectWorkspace('${s.id}')">
+        <div class="custom-vector-emblem"><i class="fa-solid fa-book"></i></div>
+        <strong>${escapeHtml(s.name)}</strong><span class="lms-small">${escapeHtml(s.description || "")}</span>
+      </div>`).join("") || `<div class="lms-item">No subjects published for this class yet.</div>`}
+    </div>`;
+}
+async function openStudentSubjectWorkspace(subjectId) {
+  if (!sb || !activeStudentClass) return;
+  activeStudentSubject = { id: subjectId };
+  const { data: subject } = await sb.from("subjects").select("id,name,class_id").eq("id", subjectId).single();
+  const [{ data: materials }, { data: assignments }, { data: exams }] = await Promise.all([
+    sb.from("materials").select("id,title,description,file_type,storage_path,published_at,available_at,due_at")
+      .eq("subject_id", subjectId).eq("is_published", true).eq("is_archived", false).order("published_at",{ascending:false}).range(0,19),
+    sb.from("assignments").select("id,title,instructions,published_at,due_at,max_marks")
+      .eq("subject_id", subjectId).eq("is_archived", false).order("due_at",{ascending:true}).range(0,19),
+    sb.from("exams").select("id,title,instructions,start_at,end_at,duration_minutes,max_marks")
+      .eq("subject_id", subjectId).eq("is_archived", false).order("start_at",{ascending:false}).range(0,19)
+  ]);
+
+  switchScreen("screen-student-subject-workspace");
+  const root = document.getElementById("screen-student-subject-workspace");
+  root.innerHTML = `
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
+      <button onclick="openStudentSubjectsForClass('${activeStudentClass.id}')" style="background:var(--surface-color);border:1px solid var(--border-color);width:36px;height:36px;border-radius:50%;cursor:pointer;"><i class="fa-solid fa-arrow-left"></i></button>
+      <div><h2 style="font-size:1.2rem;font-weight:900;">${escapeHtml(subject?.name || "Subject")}</h2>
+      <div class="lms-small">Published materials, assignments and exams</div></div>
+    </div>
+    ${sectionHtml("Materials", "fa-book-open", materials, m => `
+      <strong>${escapeHtml(m.title)}</strong><div class="lms-small">${escapeHtml(m.description || "")}</div>
+      <div class="lms-item-actions"><button class="primary-btn" style="opacity:1" onclick="openStudentDocument('${m.id}')">Open</button></div>`)}
+    ${sectionHtml("Assignments", "fa-file-pen", assignments, a => `
+      <strong>${escapeHtml(a.title)}</strong><div class="lms-small">${escapeHtml(a.instructions || "")}</div>
+      <div class="lms-small">Due: ${a.due_at ? new Date(a.due_at).toLocaleString() : "No deadline"} • ${a.max_marks ?? ""} marks</div>
+      <div class="lms-item-actions"><button class="primary-btn" style="opacity:1" onclick="openAssignmentSubmission('${a.id}')">Submit</button></div>`)}
+    ${sectionHtml("Exams", "fa-file-shield", exams, e => `
+      <strong>${escapeHtml(e.title)}</strong><div class="lms-small">${escapeHtml(e.instructions || "")}</div>
+      <div class="lms-small">${e.start_at ? new Date(e.start_at).toLocaleString() : "Open"} → ${e.end_at ? new Date(e.end_at).toLocaleString() : "No end"}</div>
+      <div class="lms-item-actions"><button class="primary-btn" style="opacity:1" onclick="startExam('${e.id}')">Start / Continue</button></div>`)}
+  `;
+}
+function sectionHtml(title, icon, rows, renderer) {
+  return `<div style="margin-bottom:22px;"><div class="academic-core-header"><i class="fa-solid ${icon}"></i><h3>${title}</h3></div>
+    <div class="lms-list">${(rows||[]).map(renderer).map(x=>`<div class="lms-item">${x}</div>`).join("") || `<div class="lms-item"><span class="lms-small">Nothing published here yet.</span></div>`}</div></div>`;
+}
+function switchScreen(id) {
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  document.getElementById(id)?.classList.add("active");
+}
+
+/* ---------- 5. DOCUMENT VIEWER ----------
+   Files live in Supabase Storage; metadata lives in PostgreSQL.
+   The viewer obtains an authorized URL and renders it in-app.
+*/
+async function openStudentDocument(materialId) {
+  if (!sb) return;
+  const { data: m, error } = await sb.from("materials")
+    .select("id,title,file_type,storage_path").eq("id", materialId).single();
+  if (error || !m) return toast("Material could not be opened.", "error");
+  const { data: signed, error: signError } = await sb.storage
+    .from("academic-materials").createSignedUrl(m.storage_path, 600);
+  if (signError) return toast("You are not authorized to open this file.", "error");
+
+  const url = signed.signedUrl;
+  const content = m.file_type === "application/pdf" || /\.pdf$/i.test(m.storage_path)
+    ? `<iframe class="document-frame" src="${escapeHtml(url)}#toolbar=1&navpanes=0"></iframe>`
+    : `<img src="${escapeHtml(url)}" alt="" style="max-width:100%;max-height:72vh;object-fit:contain;border-radius:14px;">`;
+  openLmsModal(m.title, content);
+}
+function closeStudentDocModal() { closeLmsModal(); }
+
+/* ---------- 6. ASSIGNMENTS ---------- */
+function openAssignmentSubmission(assignmentId) {
+  openLmsModal("Submit Assignment", `
+    <form class="lms-form" onsubmit="event.preventDefault(); submitAssignment('${assignmentId}')">
+      <label>Select file</label><input class="lms-input" type="file" id="assignmentFile" required>
+      <button class="primary-btn" style="opacity:1">Upload & Submit</button>
+    </form>`);
+}
+async function submitAssignment(assignmentId) {
+  if (!sb || !currentUser) return;
+  const file = document.getElementById("assignmentFile")?.files?.[0];
+  if (!file) return;
+  if (file.size > 20 * 1024 * 1024) return toast("File is too large (20 MB limit).", "error");
+  const safe = file.name.replace(/[^a-zA-Z0-9._-]/g,"_");
+  const path = `${currentUser.id}/${assignmentId}/${crypto.randomUUID()}-${safe}`;
+  const { error: uploadError } = await sb.storage.from("assignment-submissions").upload(path, file, { upsert:false });
+  if (uploadError) return toast(uploadError.message, "error");
+  const { error } = await sb.from("assignment_submissions").insert({
+    assignment_id: assignmentId, student_id: currentUser.id, file_path: path,
+    status:"submitted", submitted_at:new Date().toISOString()
+  });
+  if (error) {
+    // Avoid orphaned Storage files when metadata insertion fails.
+    await sb.storage.from("assignment-submissions").remove([path]);
+    return toast(error.message, "error");
+  }
+  closeLmsModal(); toast("Assignment submitted.", "success");
+}
+
+/* ---------- 7. SERVER-AUTHORITATIVE EXAMS ----------
+   Start/expiry is calculated in PostgreSQL. The browser countdown
+   is only a visual display and cannot extend an attempt.
+*/
+async function startExam(examId) {
+  if (!sb) return;
+  const { data, error } = await sb.rpc("start_exam_attempt", { p_exam_id: examId });
+  if (error) return toast(error.message, "error");
+  currentExamAttempt = data;
+  await renderExamAttempt();
+}
+async function renderExamAttempt() {
+  if (!currentExamAttempt) return;
+  const { data: exam, error } = await sb.from("exams")
+    .select("id,title,duration_minutes,instructions,max_marks").eq("id", currentExamAttempt.exam_id).single();
+  const { data: questions } = await sb.from("exam_questions")
+    .select("id,question_text,question_type,options,marks,position")
+    .eq("exam_id", currentExamAttempt.exam_id).order("position");
+  if (error) return toast("Exam could not be loaded.", "error");
+
+  const { data: answers } = await sb.from("exam_answers")
+    .select("question_id,answer_text").eq("attempt_id", currentExamAttempt.id);
+  pendingAnswerState = new Map((answers||[]).map(a=>[a.question_id,a.answer_text]));
+
+  const root = document.getElementById("screen-student-subject-workspace");
+  switchScreen("screen-student-subject-workspace");
+  root.innerHTML = `
+    <div class="exam-timer" id="examTimer">Calculating time…</div>
+    <div style="margin:14px 0 20px"><h2 style="font-weight:900">${escapeHtml(exam.title)}</h2>
+    <p class="lms-small">${escapeHtml(exam.instructions||"")}</p></div>
+    <form id="examForm" onsubmit="event.preventDefault(); submitExamAttempt();">
+      ${(questions||[]).map((q,i)=>renderQuestion(q,i)).join("")}
+      <button class="primary-btn" style="opacity:1">Submit Exam</button>
+    </form>`;
+  updateExamTimer();
+}
+function renderQuestion(q,i) {
+  const existing = pendingAnswerState.get(q.id) || "";
+  const opts = Array.isArray(q.options) ? q.options : [];
+  let control = "";
+  if (q.question_type === "multiple_choice" || q.question_type === "true_false") {
+    control = opts.map(o => `<label class="exam-option"><input type="radio" name="q_${q.id}" value="${escapeHtml(o)}" ${existing===o?"checked":""} onchange="queueAnswerSave('${q.id}',this.value)"> ${escapeHtml(o)}</label>`).join("");
+  } else {
+    control = `<textarea class="lms-textarea" data-question="${q.id}" onchange="queueAnswerSave('${q.id}',this.value)">${escapeHtml(existing)}</textarea>`;
+  }
+  return `<div class="exam-question"><strong>${i+1}. ${escapeHtml(q.question_text)}</strong>
+    <div class="lms-small" style="margin:6px 0 10px">${q.marks ?? 1} mark(s)</div>${control}</div>`;
+}
+function updateExamTimer() {
+  clearInterval(examTimerHandle);
+  const tick = async () => {
+    if (!currentExamAttempt) return;
+    const end = new Date(currentExamAttempt.locked_at).getTime();
+    const remain = Math.max(0, end - Date.now());
+    const el = document.getElementById("examTimer");
+    if (el) el.textContent = `Time remaining: ${formatDuration(remain)}`;
+    if (remain <= 0) {
+      clearInterval(examTimerHandle);
+      await submitExamAttempt(true);
+    }
+  };
+  tick(); examTimerHandle = setInterval(tick, 1000);
+}
+function formatDuration(ms) {
+  const s = Math.floor(ms/1000), h=Math.floor(s/3600), m=Math.floor((s%3600)/60), sec=s%60;
+  return `${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}:${String(sec).padStart(2,"0")}`;
+}
+function queueAnswerSave(questionId, answer) {
+  pendingAnswerState.set(questionId, answer);
+  clearTimeout(answerSaveTimers.get(questionId));
+  answerSaveTimers.set(questionId, setTimeout(() => saveExamAnswer(questionId, answer), 600));
+}
+async function saveExamAnswer(questionId, answer) {
+  if (!sb || !currentExamAttempt) return;
+  const { error } = await sb.from("exam_answers").upsert({
+    attempt_id: currentExamAttempt.id, question_id: questionId,
+    answer_text: answer, updated_at:new Date().toISOString()
+  }, { onConflict:"attempt_id,question_id" });
+  if (error) toast("Answer save failed; retrying when possible.", "error");
+}
+async function submitExamAttempt(auto=false) {
+  if (!sb || !currentExamAttempt) return;
+  for (const [qid, ans] of pendingAnswerState.entries()) await saveExamAnswer(qid, ans);
+  const { data, error } = await sb.rpc("submit_exam_attempt", { p_attempt_id: currentExamAttempt.id, p_auto_submit:auto });
+  if (error) return toast(error.message, "error");
+  clearInterval(examTimerHandle);
+  currentExamAttempt = null;
+  toast(auto ? "Exam expired and was submitted." : "Exam submitted.", "success");
+  switchTab("screen-activity", document.querySelectorAll(".nav-item")[2]);
+}
+
+/* ---------- 8. SECURITY EVENTS ----------
+   These are observations, not automatic proof of misconduct.
+*/
+function recordSecurityEvent(eventType, metadata={}) {
+  if (!sb || !currentExamAttempt) return;
+  sb.from("security_events").insert({
+    attempt_id: currentExamAttempt.id,
+    student_id: currentUser.id,
+    exam_id: currentExamAttempt.exam_id,
+    event_type:eventType, metadata
+  }).then(()=>{});
+}
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) recordSecurityEvent("tab_hidden");
+});
+window.addEventListener("blur", () => recordSecurityEvent("window_blur"));
+document.addEventListener("fullscreenchange", () => {
+  if (document.fullscreenElement === null) recordSecurityEvent("fullscreen_exited");
+});
+document.addEventListener("copy", () => recordSecurityEvent("copy_attempt"));
+document.addEventListener("paste", () => recordSecurityEvent("paste_attempt"));
+document.addEventListener("contextmenu", () => recordSecurityEvent("context_menu_attempt"));
+window.addEventListener("beforeprint", () => recordSecurityEvent("print_attempt"));
+
+/* ---------- 9. TEACHER CLASS MANAGEMENT ----------
+   Teacher creates class -> one enrollment key -> students join.
+*/
+async function loadTeacherClasses() {
+  if (!sb || !currentUser) return;
+  const { data, error } = await sb.from("classes")
+    .select("id,name,education_level,academic_year,description,is_archived")
+    .eq("teacher_id", currentUser.id).eq("is_archived", false)
+    .order("created_at",{ascending:false}).range(0,19);
+  if (error) return toast(error.message, "error");
+  teacherPortalData.classes = data || [];
+  showTeacherClassesGrid();
+}
+function showTeacherClassesGrid() {
+  const sec = document.getElementById("teacherClassesGridSection");
+  const grid = document.getElementById("teacherClassesGrid");
+  sec.style.display = "block";
+  grid.innerHTML = (teacherPortalData.classes||[]).map(c => `
+    <div class="portal-box-card" onclick="openSelectedClassView('${c.id}')">
+      <div class="custom-vector-emblem"><i class="fa-solid fa-school"></i></div>
+      <strong>${escapeHtml(c.name)}</strong>
+      <span class="lms-small">${escapeHtml(c.education_level||"")} • ${escapeHtml(c.academic_year||"")}</span>
+    </div>`).join("") || `<div class="lms-item">No classes created yet.</div>`;
+}
+async function createClassDirect() {
+  const name=document.getElementById("newClassName")?.value.trim();
+  const level=document.getElementById("newClassLevel")?.value;
+  const year=document.getElementById("newClassYear")?.value.trim();
+  const description=document.getElementById("newClassDescription")?.value.trim();
+  if (!name || !level || !year) return toast("Complete the class details.", "error");
+  const { data, error } = await sb.rpc("create_class_with_enrollment_key", {
+    p_name:name,p_education_level:level,p_academic_year:year,p_description:description||null
+  });
+  if (error) return toast(error.message,"error");
+  closeLmsModal(); toast(`Class created. Enrollment key: ${data.enrollment_key}`,"success");
+  await loadTeacherClasses();
+}
+function openCreateClassModal() {
+  openLmsModal("Create Class", `
+    <form class="lms-form" onsubmit="event.preventDefault();createClassDirect()">
+      <input class="lms-input" id="newClassName" placeholder="Class name" required>
+      <select class="lms-select" id="newClassLevel" required>
+        <option value="">Education level</option><option>Lower Primary</option><option>Upper Primary</option>
+        <option>Lower Secondary</option><option>Upper Secondary</option>
+      </select>
+      <input class="lms-input" id="newClassYear" placeholder="Academic year" required>
+      <textarea class="lms-textarea" id="newClassDescription" placeholder="Description"></textarea>
+      <button class="primary-btn" style="opacity:1">Create Class & Generate Key</button>
+    </form>`);
+}
+async function openSelectedClassView(classId) {
+  activeSelectedClassObj = {id:classId};
+  const {data:c,error}=await sb.from("classes").select("*").eq("id",classId).single();
+  if(error)return toast(error.message,"error");
+  document.getElementById("teacherClassesGridSection").style.display="none";
+  document.getElementById("teacherWorkflowContainer").style.display="none";
+  document.getElementById("selectedClassViewSection").style.display="block";
+  document.getElementById("selectedClassNameHeading").textContent=c.name;
+  document.getElementById("selectedClassMetaSub").textContent=`${c.education_level||""} • ${c.academic_year||""}`;
+}
+async function goBackToClassGrid() {
+  document.getElementById("selectedClassViewSection").style.display="none";
+  document.getElementById("teacherWorkflowContainer").style.display="block";
+  await loadTeacherClasses();
+}
+function resetTeacherWorkflow() {
+  document.getElementById("teacherWorkflowContainer").style.display="block";
+  document.getElementById("teacherClassesGridSection").style.display="none";
+}
+function editCreationFlow() { openCreateClassModal(); }
+function confirmLevelsAndFold() { openCreateClassModal(); }
+function renderClassCreationSection(){}
+function addClassToLevel(){ openCreateClassModal(); }
+function confirmClassesAndFold(){ openCreateClassModal(); }
+function addSubjectToClass(){ openSubjectModal(activeSelectedClassObj?.id); }
+function finishCreationFlow(){ loadTeacherClasses(); }
+function toggleTeacherLevelSelection(level, el){ if(selectedTeacherLevels.includes(level)){selectedTeacherLevels=selectedTeacherLevels.filter(x=>x!==level);el.classList.remove("selected")}else{selectedTeacherLevels.push(level);el.classList.add("selected")} }
+function toggleFoldSection(id){document.getElementById(id)?.classList.toggle("collapsed");}
+function toggleFoldDownContent(type){currentFoldContentType=type;const a=document.getElementById("activeContentFoldArea");a.style.display="block";a.innerHTML=`<div class="lms-item"><strong>${escapeHtml(type)}</strong><p class="lms-small">Use the production content tools below to create and publish class-scoped ${type.toLowerCase()}.</p><div class="lms-item-actions"><button class="primary-btn" style="opacity:1" onclick="openContentCreation('${type}')">Create</button></div></div>`;}
+function deleteFoldDownContent(){}
+
+/* ---------- 10. TEACHER SUBJECTS / MATERIALS / ASSIGNMENTS ---------- */
+async function openSubjectModal(classId) {
+  openLmsModal("Create Subject", `<form class="lms-form" onsubmit="event.preventDefault();createSubject('${classId}')">
+    <input class="lms-input" id="subjectName" placeholder="Subject name" required>
+    <textarea class="lms-textarea" id="subjectDesc" placeholder="Description"></textarea>
+    <button class="primary-btn" style="opacity:1">Create Subject</button></form>`);
+}
+async function createSubject(classId) {
+  const {error}=await sb.from("subjects").insert({class_id:classId,name:document.getElementById("subjectName").value.trim(),description:document.getElementById("subjectDesc").value.trim()||null});
+  if(error)return toast(error.message,"error");closeLmsModal();toast("Subject created.","success");
+}
+function openContentCreation(type) {
+  if(!activeSelectedClassObj)return toast("Select a class first.","error");
+  openLmsModal(`Create ${type}`, `<form class="lms-form" onsubmit="event.preventDefault();createContent('${type}')">
+    <select class="lms-select" id="contentSubject" required><option value="">Loading subjects…</option></select>
+    <input class="lms-input" id="contentTitleInput" placeholder="Title" required>
+    <textarea class="lms-textarea" id="contentDescInput" placeholder="Description / instructions"></textarea>
+    <input class="lms-input" id="contentFileInput" type="file">
+    <label class="lms-small"><input type="checkbox" id="contentPublish"> Publish immediately</label>
+    <input class="lms-input" id="contentDue" type="datetime-local" placeholder="Deadline">
+    <button class="primary-btn" style="opacity:1">Save ${escapeHtml(type)}</button></form>`);
+  sb.from("subjects").select("id,name").eq("class_id",activeSelectedClassObj.id).eq("is_archived",false).order("name").then(({data})=>{
+    const s=document.getElementById("contentSubject"); if(s)s.innerHTML=(data||[]).map(x=>`<option value="${x.id}">${escapeHtml(x.name)}</option>`).join("")||`<option value="">Create a subject first</option>`;
+  });
+}
+async function createContent(type) {
+  const subjectId=document.getElementById("contentSubject").value;
+  const title=document.getElementById("contentTitleInput").value.trim();
+  const desc=document.getElementById("contentDescInput").value.trim();
+  const file=document.getElementById("contentFileInput").files[0];
+  const publish=document.getElementById("contentPublish").checked;
+  if(!subjectId||!title)return toast("Select a subject and title.","error");
+
+  if(type==="Materials") {
+    if(!file)return toast("Select a file.","error");
+    if(file.size>50*1024*1024)return toast("Maximum material size is 50 MB.","error");
+    const safe=file.name.replace(/[^a-zA-Z0-9._-]/g,"_");
+    const path=`${currentUser.id}/${activeSelectedClassObj.id}/${subjectId}/${crypto.randomUUID()}-${safe}`;
+    const up=await sb.storage.from("academic-materials").upload(path,file,{upsert:false});
+    if(up.error)return toast(up.error.message,"error");
+    const ins=await sb.from("materials").insert({
+      teacher_id:currentUser.id,class_id:activeSelectedClassObj.id,subject_id:subjectId,
+      title,description:desc||null,storage_path:path,file_type:file.type,file_size:file.size,
+      is_published:publish,published_at:publish?new Date().toISOString():null
     });
+    if(ins.error){await sb.storage.from("academic-materials").remove([path]);return toast(ins.error.message,"error");}
+  } else if(type==="Assignments") {
+    let path=null;
+    if(file){const safe=file.name.replace(/[^a-zA-Z0-9._-]/g,"_");path=`${currentUser.id}/${activeSelectedClassObj.id}/${subjectId}/${crypto.randomUUID()}-${safe}`;
+      const up=await sb.storage.from("academic-materials").upload(path,file,{upsert:false});if(up.error)return toast(up.error.message,"error");}
+    const ins=await sb.from("assignments").insert({teacher_id:currentUser.id,class_id:activeSelectedClassObj.id,subject_id:subjectId,title,instructions:desc||null,attachment_path:path,is_published:publish,published_at:publish?new Date().toISOString():null,due_at:document.getElementById("contentDue").value?new Date(document.getElementById("contentDue").value).toISOString():null});
+    if(ins.error)return toast(ins.error.message,"error");
+  } else {
+    toast(`${type} creation is reserved for the exam/question builder.`, "info");
+  }
+  closeLmsModal();toast(`${type} saved.`,"success");
+}
+async function publishFoldDownContent(type){openContentCreation(type);}
+function openLmsModal(title, body) {
+  let modal=document.getElementById("lmsGenericModal");
+  if(!modal){modal=document.createElement("div");modal.id="lmsGenericModal";modal.className="lms-modal";modal.innerHTML='<div class="lms-modal-card"><div style="display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:14px"><h3 id="lmsModalTitle"></h3><button onclick="closeLmsModal()" class="icon-btn">×</button></div><div id="lmsModalBody"></div></div>';document.body.appendChild(modal);}
+  document.getElementById("lmsModalTitle").textContent=title;document.getElementById("lmsModalBody").innerHTML=body;modal.classList.add("open");
+}
+function closeLmsModal(){document.getElementById("lmsGenericModal")?.classList.remove("open");}
+function showComingSoonModal(name){openLmsModal(name,`<p class="lms-small">This Appearich module is not enabled yet.</p>`);}
+function closeComingSoonModal(){closeLmsModal();}
+function goBackToStudentHome(){switchTab("screen-home",document.getElementById("navHomeBtn"));}
 
-    function savePermanentData() {
-      localStorage.setItem('appearich_permanent_teacher_data', JSON.stringify(teacherPortalData));
-    }
-    function saveAccountsDB() {
-      localStorage.setItem('appearich_accounts_db', JSON.stringify(userAccountsDB));
-    }
+/* ---------- 11. DATABASE-BACKED NOTIFICATIONS ----------
+   Notifications are created server-side/RPC-triggered. The browser
+   only reads notifications for the authenticated user.
+*/
+async function refreshNotifications() {
+  if(!sb||!currentUser)return;
+  const {data}=await sb.from("notifications").select("id,title,message,type,created_at,is_read")
+    .eq("user_id",currentUser.id).order("created_at",{ascending:false}).range(0,19);
+  // Keep existing UI unchanged; surface a compact unread indicator if useful.
+  const unread=(data||[]).filter(n=>!n.is_read).length;
+  const badge=document.getElementById("heroBadgeLabel");
+  if(badge && currentUserProfile?.role==="student") badge.textContent=unread?`Student Portal • ${unread} new`:"Student Portal";
+}
+</script>
 
-    function switchAuthRole(role) {
-      currentAuthRole = role;
-      document.getElementById('tabRoleStudent').className = role === 'student' ? 'role-tab active' : 'role-tab';
-      document.getElementById('tabRoleTeacher').className = role === 'teacher' ? 'role-tab active' : 'role-tab';
-      
-      if (authMode === 'signup') {
-        document.getElementById('nameGroup').style.display = 'block';
-        document.getElementById('confirmPasswordGroup').style.display = 'block';
-        document.getElementById('studentDetailsFields').style.display = role === 'student' ? 'block' : 'none';
-      } else {
-        document.getElementById('nameGroup').style.display = 'none';
-        document.getElementById('confirmPasswordGroup').style.display = 'none';
-        document.getElementById('studentDetailsFields').style.display = 'none';
-      }
-      
-      document.getElementById('regName').placeholder = role === 'teacher' ? 'e.g. Dr. Kelvin Vance' : 'e.g. Alistair Sterling';
-    }
-
-    function handleEduLevelChange() {
-      const level = document.getElementById('eduLevelSelect').value;
-      const combGroup = document.getElementById('combinationGroup');
-      combGroup.style.display = (level === 'Upper Secondary' || level === 'Lower Secondary') ? 'block' : 'none';
-    }
-
-    function toggleAuthMode() {
-      if (authMode === 'login') {
-        authMode = 'signup';
-        document.getElementById('authTitleText').innerText = 'Create Account';
-        document.getElementById('authSubText').innerText = 'Register for access to Appearich';
-        document.getElementById('authActionBtn').innerText = 'Sign Up';
-        document.getElementById('authSwitchPrompt').innerHTML = 'Already have an account? <span>Sign In</span>';
-        document.getElementById('nameGroup').style.display = 'block';
-        document.getElementById('confirmPasswordGroup').style.display = 'block';
-        if (currentAuthRole === 'student') document.getElementById('studentDetailsFields').style.display = 'block';
-      } else {
-        authMode = 'login';
-        document.getElementById('authTitleText').innerText = 'Welcome back';
-        document.getElementById('authSubText').innerText = 'Select your portal and enter your credentials';
-        document.getElementById('authActionBtn').innerText = 'Login';
-        document.getElementById('authSwitchPrompt').innerHTML = "Don't have an account? <span>Sign Up</span>";
-        document.getElementById('nameGroup').style.display = 'none';
-        document.getElementById('confirmPasswordGroup').style.display = 'none';
-        document.getElementById('studentDetailsFields').style.display = 'none';
-      }
-    }
-
-    function handleAuthSubmit() {
-      const email = document.getElementById('authEmail').value.trim();
-      const pwd = document.getElementById('authPassword').value;
-      if (!email || !pwd) {
-        alert("Please enter email and password.");
-        return;
-      }
-
-      if (authMode === 'signup') {
-        const name = document.getElementById('regName').value.trim();
-        const cpwd = document.getElementById('authConfirmPassword').value;
-        if (pwd !== cpwd) {
-          alert("Passwords do not match.");
-          return;
-        }
-
-        const newUser = {
-          role: currentAuthRole,
-          email: email,
-          password: pwd,
-          name: name || (currentAuthRole === 'teacher' ? 'Professor' : 'Scholar'),
-          selectedLevels: []
-        };
-        if (currentAuthRole === 'student') {
-          newUser.educationLevel = document.getElementById('eduLevelSelect').value;
-          newUser.combination = document.getElementById('regCombination').value || 'Standard';
-        }
-        userAccountsDB.push(newUser);
-        saveAccountsDB();
-        currentUserProfile = newUser;
-      } else {
-        const foundAccount = userAccountsDB.find(a => a.email.toLowerCase() === email.toLowerCase() && a.password === pwd);
-        if (foundAccount) {
-          if (foundAccount.role !== currentAuthRole) {
-            alert(`This account is registered as a ${foundAccount.role}.`);
-            return;
-          }
-          currentUserProfile = foundAccount;
-        } else {
-          currentUserProfile = {
-            role: currentAuthRole,
-            email: email,
-            name: currentAuthRole === 'teacher' ? 'Professor' : 'Scholar',
-            educationLevel: 'Upper Secondary',
-            selectedLevels: []
-          };
-        }
-      }
-      localStorage.setItem('appearich_user_profile', JSON.stringify(currentUserProfile));
-      launchDashboardBasedOnRole();
-    }
-
-    function launchDashboardBasedOnRole() {
-      document.getElementById('screen-auth').classList.remove('active');
-      document.getElementById('mainHeader').style.display = 'flex';
-      document.getElementById('mainNavBar').style.display = 'flex';
-
-      if (currentUserProfile.role === 'teacher') {
-        document.getElementById('screen-teacher-portal').classList.add('active');
-        document.getElementById('headerBrandTitle').innerText = 'Appearich Teacher Portal';
-        document.getElementById('teacherPortalGreeting').innerText = `WELCOME, ${(currentUserProfile.name || 'PROFESSOR').toUpperCase()}`;
-        
-        if (teacherPortalData.classes && teacherPortalData.classes.length > 0) {
-          showTeacherClassesGrid();
-        } else {
-          resetTeacherWorkflow();
-        }
-      } else {
-        document.getElementById('screen-home').classList.add('active');
-        document.getElementById('headerBrandTitle').innerText = 'Appearich Student Portal';
-        document.getElementById('dynamicGreeting').innerText = `WELCOME, ${(currentUserProfile.name || 'SCHOLAR').toUpperCase()}`;
-        document.getElementById('dynamicSubGreeting').innerText = `Level: ${currentUserProfile.educationLevel || 'General'}`;
-        document.getElementById('profileDisplayName').innerText = currentUserProfile.name || 'Scholar';
-        document.getElementById('profileDisplayEmail').innerText = currentUserProfile.email;
-        document.getElementById('profileDisplayProgram').innerText = `${currentUserProfile.educationLevel || 'Secondary'}`;
-        document.getElementById('profileInitial').innerText = (currentUserProfile.name || 'S').charAt(0).toUpperCase();
-      }
-    }
-
-    function handleLogout() {
-      localStorage.removeItem('appearich_user_profile');
-      currentUserProfile = null;
-      document.getElementById('mainHeader').style.display = 'none';
-      document.getElementById('mainNavBar').style.display = 'none';
-      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-      document.getElementById('screen-auth').classList.add('active');
-    }
-
-    function switchTab(screenId, element) {
-      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-      if (currentUserProfile.role === 'teacher' && screenId === 'screen-home') {
-        document.getElementById('screen-teacher-portal').classList.add('active');
-      } else {
-        document.getElementById(screenId).classList.add('active');
-      }
-      if (element) element.classList.add('active');
-    }
-
-    function toggleThemeMode() {
-      const htmlEl = document.documentElement;
-      const icon = document.getElementById('themeIcon');
-      if (htmlEl.getAttribute('data-theme') === 'dark') {
-        htmlEl.setAttribute('data-theme', 'light');
-        localStorage.setItem('appearich_theme_mode', 'light');
-        icon.className = 'fa-solid fa-moon';
-      } else {
-        htmlEl.setAttribute('data-theme', 'dark');
-        localStorage.setItem('appearich_theme_mode', 'dark');
-        icon.className = 'fa-solid fa-sun';
-      }
-    }
-
-    /* -------------------------------------------------------------
-       SIMPLIFIED CREATION & FOLDABLE FLOW (REQUIREMENTS 1 - 11)
-    ------------------------------------------------------------- */
-    function toggleFoldSection(sectionId) {
-      const sec = document.getElementById(sectionId);
-      if (sec) sec.classList.toggle('collapsed');
-    }
-
-    function toggleTeacherLevelSelection(level, chipEl) {
-      if (selectedTeacherLevels.includes(level)) {
-        selectedTeacherLevels = selectedTeacherLevels.filter(l => l !== level);
-        chipEl.classList.remove('selected');
-      } else {
-        selectedTeacherLevels.push(level);
-        chipEl.classList.add('selected');
-      }
-    }
-
-    function confirmLevelsAndFold() {
-      if (selectedTeacherLevels.length === 0) {
-        alert("Please select at least one education level.");
-        return;
-      }
-      // Fold Level Section
-      document.getElementById('foldLevelSection').classList.add('collapsed');
-      document.getElementById('foldLevelStatus').innerText = `${selectedTeacherLevels.length} Level(s) Selected`;
-
-      // Build & Open Class Section
-      renderClassCreationSection();
-      document.getElementById('foldClassSection').classList.remove('collapsed');
-      document.getElementById('foldClassStatus').innerText = `Active`;
-    }
-
-    function renderClassCreationSection() {
-      const container = document.getElementById('foldClassBody');
-      let html = '';
-      selectedTeacherLevels.forEach(level => {
-        html += `
-          <div style="margin-top: 14px; background: var(--surface-color); padding: 12px; border-radius: 12px; border: 1px solid var(--border-color);">
-            <div style="font-weight: 800; font-size: 0.85rem; margin-bottom: 8px; color: var(--accent-gold);">${level}</div>
-            <div style="display: flex; gap: 8px; margin-bottom: 8px;">
-              <input type="text" id="inputClass_${level.replace(/\s+/g,'_')}" placeholder="e.g. Form 1A, Grade 3..." style="flex:1; background: var(--surface-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 8px; font-size: 0.8rem; outline: none;">
-              <button class="action-btn-sm" onclick="addClassToLevel('${level}')">+ Add</button>
-            </div>
-            <div id="classList_${level.replace(/\s+/g,'_')}">
-              ${renderLevelClassChips(level)}
-            </div>
-          </div>
-        `;
-      });
-      html += `
-        <button class="primary-btn" style="opacity: 1; font-size: 0.85rem; padding: 12px; margin-top: 14px;" onclick="confirmClassesAndFold()">Confirm Classes</button>
-      `;
-      container.innerHTML = html;
-    }
-
-    function addClassToLevel(level) {
-      const input = document.getElementById(`inputClass_${level.replace(/\s+/g,'_')}`);
-      const val = input.value.trim();
-      if (!val) return;
-
-      if (!teacherPortalData.classes.some(c => c.name === val && c.educationLevel === level)) {
-        teacherPortalData.classes.push({
-          name: val,
-          educationLevel: level,
-          subjects: [],
-          content: { Assignments: [], Announcements: [], Tests: [], Quizzes: [] }
-        });
-        savePermanentData();
-        input.value = '';
-        document.getElementById(`classList_${level.replace(/\s+/g,'_')}`).innerHTML = renderLevelClassChips(level);
-      }
-    }
-
-    function renderLevelClassChips(level) {
-      const classes = teacherPortalData.classes.filter(c => c.educationLevel === level);
-      if (classes.length === 0) return '<span style="font-size:0.7rem; color:var(--text-sub);">No classes added yet.</span>';
-      return classes.map(c => `<span class="tag-chip"><i class="fa-solid fa-chalkboard"></i> ${c.name}</span>`).join('');
-    }
-
-    function confirmClassesAndFold() {
-      const activeClasses = teacherPortalData.classes.filter(c => selectedTeacherLevels.includes(c.educationLevel));
-      if (activeClasses.length === 0) {
-        alert("Please add at least one class.");
-        return;
-      }
-      document.getElementById('foldClassSection').classList.add('collapsed');
-      document.getElementById('foldClassStatus').innerText = `${activeClasses.length} Class(es) Created`;
-
-      renderSubjectCreationSection();
-      document.getElementById('foldSubjectSection').classList.remove('collapsed');
-      document.getElementById('foldSubjectStatus').innerText = `Active`;
-    }
-
-    function renderSubjectCreationSection() {
-      const container = document.getElementById('foldSubjectBody');
-      const activeClasses = teacherPortalData.classes.filter(c => selectedTeacherLevels.includes(c.educationLevel));
-      let html = '';
-      activeClasses.forEach(cls => {
-        html += `
-          <div style="margin-top: 14px; background: var(--surface-color); padding: 12px; border-radius: 12px; border: 1px solid var(--border-color);">
-            <div style="font-weight: 800; font-size: 0.85rem; margin-bottom: 2px;">${cls.name}</div>
-            <div style="font-size: 0.7rem; color: var(--text-sub); margin-bottom: 8px;">${cls.educationLevel}</div>
-            <div style="display: flex; gap: 8px; margin-bottom: 8px;">
-              <input type="text" id="inputSub_${cls.name.replace(/\s+/g,'_')}" placeholder="e.g. Mathematics, History..." style="flex:1; background: var(--surface-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 8px; font-size: 0.8rem; outline: none;">
-              <button class="action-btn-sm" onclick="addSubjectToClass('${cls.name}', '${cls.educationLevel}')">+ Add</button>
-            </div>
-            <div id="subList_${cls.name.replace(/\s+/g,'_')}">
-              ${renderClassSubjectChips(cls)}
-            </div>
-          </div>
-        `;
-      });
-      container.innerHTML = html;
-      document.getElementById('finishCreationContainer').style.display = 'block';
-    }
-
-    function addSubjectToClass(className, level) {
-      const input = document.getElementById(`inputSub_${className.replace(/\s+/g,'_')}`);
-      const val = input.value.trim();
-      if (!val) return;
-
-      const cls = teacherPortalData.classes.find(c => c.name === className && c.educationLevel === level);
-      if (cls && !cls.subjects.includes(val)) {
-        cls.subjects.push(val);
-        savePermanentData();
-        input.value = '';
-        document.getElementById(`subList_${className.replace(/\s+/g,'_')}`).innerHTML = renderClassSubjectChips(cls);
-      }
-    }
-
-    function renderClassSubjectChips(cls) {
-      if (!cls.subjects || cls.subjects.length === 0) return '<span style="font-size:0.7rem; color:var(--text-sub);">No subjects added yet.</span>';
-      return cls.subjects.map(s => `<span class="tag-chip"><i class="fa-solid fa-book"></i> ${s}</span>`).join('');
-    }
-
-    function finishCreationFlow() {
-      document.getElementById('foldSubjectSection').classList.add('collapsed');
-      document.getElementById('foldSubjectStatus').innerText = `Completed`;
-      document.getElementById('teacherWorkflowContainer').style.display = 'none';
-      showTeacherClassesGrid();
-    }
-
-    function showTeacherClassesGrid() {
-      const container = document.getElementById('teacherClassesGrid');
-      let html = '';
-      if (teacherPortalData.classes.length === 0) {
-        html = '<div style="font-size: 0.8rem; color: var(--text-sub); text-align: center; grid-column: 1/-1;">No created classes available. Tapping edit to start.</div>';
-      } else {
-        teacherPortalData.classes.forEach((cls, idx) => {
-          html += `
-            <div class="class-card-item" onclick="openSelectedClassView(${idx})">
-              <div style="font-size: 0.68rem; font-weight: 800; color: var(--accent-gold); text-transform: uppercase;">${cls.educationLevel}</div>
-              <div style="font-weight: 900; font-size: 1rem; color: var(--text-main);">${cls.name}</div>
-              <div style="font-size: 0.72rem; color: var(--text-sub);">${cls.subjects.length > 0 ? cls.subjects.join(', ') : 'No subjects'}</div>
-            </div>
-          `;
-        });
-      }
-      container.innerHTML = html;
-      document.getElementById('teacherClassesGridSection').style.display = 'block';
-      document.getElementById('selectedClassViewSection').style.display = 'none';
-    }
-
-    function editCreationFlow() {
-      document.getElementById('teacherWorkflowContainer').style.display = 'block';
-      document.getElementById('teacherClassesGridSection').style.display = 'none';
-      document.getElementById('selectedClassViewSection').style.display = 'none';
-    }
-
-    function resetTeacherWorkflow() {
-      selectedTeacherLevels = [];
-      document.getElementById('teacherWorkflowContainer').style.display = 'block';
-      document.getElementById('foldLevelSection').classList.remove('collapsed');
-      document.getElementById('foldClassSection').classList.add('collapsed');
-      document.getElementById('foldSubjectSection').classList.add('collapsed');
-      document.getElementById('finishCreationContainer').style.display = 'none';
-      document.getElementById('teacherClassesGridSection').style.display = 'none';
-      document.getElementById('selectedClassViewSection').style.display = 'none';
-    }
-
-    function openSelectedClassView(classIndex) {
-      activeSelectedClassObj = teacherPortalData.classes[classIndex];
-      document.getElementById('teacherClassesGridSection').style.display = 'none';
-      document.getElementById('selectedClassViewSection').style.display = 'block';
-      document.getElementById('selectedClassNameHeading').innerText = activeSelectedClassObj.name;
-      document.getElementById('selectedClassMetaSub').innerText = `${activeSelectedClassObj.educationLevel} • ${activeSelectedClassObj.subjects.join(', ') || 'General'}`;
-      document.getElementById('activeContentFoldArea').style.display = 'none';
-    }
-
-    function goBackToClassGrid() {
-      activeSelectedClassObj = null;
-      document.getElementById('selectedClassViewSection').style.display = 'none';
-      document.getElementById('teacherClassesGridSection').style.display = 'block';
-    }
-
-    function toggleFoldDownContent(contentType) {
-      const foldArea = document.getElementById('activeContentFoldArea');
-      if (currentFoldContentType === contentType && foldArea.style.display === 'block') {
-        foldArea.style.display = 'none';
-        currentFoldContentType = null;
-        return;
-      }
-      currentFoldContentType = contentType;
-      renderFoldDownContentArea(contentType);
-      foldArea.style.display = 'block';
-    }
-
-    function renderFoldDownContentArea(contentType) {
-      const foldArea = document.getElementById('activeContentFoldArea');
-      if (!activeSelectedClassObj.content) {
-        activeSelectedClassObj.content = { Assignments: [], Announcements: [], Tests: [], Quizzes: [] };
-      }
-      const items = activeSelectedClassObj.content[contentType] || [];
-
-      let html = `
-        <div style="font-weight: 900; font-size: 0.95rem; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;">
-          <span>Manage ${contentType}</span>
-          <i class="fa-solid fa-xmark" style="cursor: pointer;" onclick="document.getElementById('activeContentFoldArea').style.display='none'"></i>
-        </div>
-        
-        <!-- Upload/Publish Form -->
-        <div style="background: var(--surface-color); padding: 12px; border-radius: 12px; border: 1px solid var(--border-color); margin-bottom: 16px;">
-          <div style="font-size: 0.75rem; font-weight: 800; color: var(--text-sub); margin-bottom: 8px;">Create New ${contentType}</div>
-          <input type="text" id="contentTitleInput" placeholder="Title / Topic" style="width:100%; background: var(--surface-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 8px; font-size: 0.8rem; margin-bottom: 8px; outline: none;">
-          <textarea id="contentDescInput" placeholder="Description or Details..." style="width:100%; background: var(--surface-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 8px; font-size: 0.8rem; margin-bottom: 8px; outline: none; min-height: 50px;"></textarea>
-          <input type="file" id="contentFileInput" style="font-size: 0.75rem; margin-bottom: 8px;">
-          <button class="action-btn-sm" style="width: 100%; padding: 8px;" onclick="publishFoldDownContent('${contentType}')">Publish to Class</button>
-        </div>
-
-        <!-- Existing Items List -->
-        <div style="font-size: 0.75rem; font-weight: 800; color: var(--text-sub); margin-bottom: 8px;">Published ${contentType}</div>
-      `;
-
-      if (items.length === 0) {
-        html += `<div style="font-size: 0.75rem; color: var(--text-sub);">No ${contentType.toLowerCase()} created yet.</div>`;
-      } else {
-        items.forEach((item, idx) => {
-          html += `
-            <div style="background: var(--surface-color); border: 1px solid var(--border-color); border-radius: 10px; padding: 10px; margin-bottom: 8px;">
-              <div style="font-weight: 800; font-size: 0.85rem;">${item.title}</div>
-              <div style="font-size: 0.75rem; color: var(--text-sub); margin: 2px 0;">${item.desc}</div>
-              ${item.file ? `<div style="font-size: 0.7rem; color: var(--accent-gold);"><i class="fa-solid fa-paperclip"></i> ${item.file}</div>` : ''}
-              <div style="display: flex; gap: 8px; margin-top: 8px;">
-                <button onclick="openStudentDocument('${item.title}', '${item.file || 'Document'}', \`${item.desc}\`)" style="font-size: 0.68rem; padding: 4px 8px; border-radius: 6px; background: var(--surface-elevated); border: 1px solid var(--border-color); cursor: pointer;">View</button>
-                <button onclick="deleteFoldDownContent('${contentType}', ${idx})" style="font-size: 0.68rem; padding: 4px 8px; border-radius: 6px; background: transparent; border: 1px solid #ef4444; color: #ef4444; cursor: pointer;">Delete</button>
-              </div>
-            </div>
-          `;
-        });
-      }
-      foldArea.innerHTML = html;
-    }
-
-    function publishFoldDownContent(contentType) {
-      const title = document.getElementById('contentTitleInput').value.trim();
-      const desc = document.getElementById('contentDescInput').value.trim();
-      const fileEl = document.getElementById('contentFileInput');
-      const file = fileEl.files && fileEl.files[0] ? fileEl.files[0].name : '';
-
-      if (!title) {
-        alert("Please provide a title.");
-        return;
-      }
-
-      if (!activeSelectedClassObj.content) activeSelectedClassObj.content = { Assignments: [], Announcements: [], Tests: [], Quizzes: [] };
-      activeSelectedClassObj.content[contentType].push({ title, desc, file });
-      savePermanentData();
-      renderFoldDownContentArea(contentType);
-    }
-
-    function deleteFoldDownContent(contentType, idx) {
-      if (confirm("Delete this item?")) {
-        activeSelectedClassObj.content[contentType].splice(idx, 1);
-        savePermanentData();
-        renderFoldDownContentArea(contentType);
-      }
-    }
-
-    /* -------------------------------------------------------------
-       STUDENT VIEW SYSTEM (REQUIREMENT 10: LEVEL/CLASS ISOLATION)
-    ------------------------------------------------------------- */
-    function openStudentClassesView() {
-      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-      const grid = document.getElementById('studentClassesGridContainer');
-      let html = '';
-
-      // Requirement 10: Filter classes matching student's level
-      const studentLevel = currentUserProfile.educationLevel || 'Upper Secondary';
-      const applicableClasses = teacherPortalData.classes.filter(c => c.educationLevel === studentLevel);
-
-      if (applicableClasses.length === 0) {
-        html = `<div style="font-size: 0.8rem; color: var(--text-sub); grid-column: 1/-1; text-align: center; padding: 20px;">No classes published for level: ${studentLevel}.</div>`;
-      } else {
-        applicableClasses.forEach(cls => {
-          html += `
-            <div class="portal-box-card" onclick="openStudentSubjectsForClass('${cls.name}', '${cls.educationLevel}')">
-              <div class="custom-vector-emblem"><i class="fa-solid fa-school"></i></div>
-              <div style="font-weight: 800; font-size: 0.95rem;">${cls.name}</div>
-              <div style="font-size: 0.72rem; color: var(--text-sub);">${cls.educationLevel}</div>
-            </div>
-          `;
-        });
-      }
-      grid.innerHTML = html;
-      document.getElementById('screen-student-classes').classList.add('active');
-    }
-
-    function openStudentSubjectsForClass(className, level) {
-      const cls = teacherPortalData.classes.find(c => c.name === className && c.educationLevel === level);
-      if (!cls) return;
-      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-      let screenEl = document.getElementById('screen-student-classes');
-      
-      let html = `
-        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
-          <button onclick="openStudentClassesView()" style="background: var(--surface-color); border: 1px solid var(--border-color); width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer;">
-            <i class="fa-solid fa-arrow-left"></i>
-          </button>
-          <div>
-            <h2 style="font-size: 1.2rem; font-weight: 900;">${cls.name}</h2>
-            <div style="font-size: 0.75rem; color: var(--text-sub);">${cls.educationLevel}</div>
-          </div>
-        </div>
-        <div class="responsive-grid-cards">
-      `;
-      if (!cls.subjects || cls.subjects.length === 0) {
-        html += `<div style="font-size: 0.8rem; color: var(--text-sub); grid-column: 1/-1; text-align: center; padding: 20px;">No subjects available for this class.</div>`;
-      } else {
-        cls.subjects.forEach(sub => {
-          html += `
-            <div class="portal-box-card" onclick="openStudentSubjectWorkspace('${cls.name}', '${cls.educationLevel}', '${sub}')">
-              <div class="custom-vector-emblem"><i class="fa-solid fa-book-bookmark"></i></div>
-              <div style="font-weight: 800; font-size: 0.95rem;">${sub}</div>
-              <div style="font-size: 0.72rem; color: var(--text-sub);">Open Content</div>
-            </div>
-          `;
-        });
-      }
-      html += `</div>`;
-      screenEl.innerHTML = html;
-      screenEl.classList.add('active');
-    }
-
-    function openStudentSubjectWorkspace(className, level, subjectName) {
-      const cls = teacherPortalData.classes.find(c => c.name === className && c.educationLevel === level);
-      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-      let wsScreen = document.getElementById('screen-student-subject-workspace');
-
-      let allContent = [];
-      if (cls && cls.content) {
-        Object.keys(cls.content).forEach(type => {
-          cls.content[type].forEach(item => {
-            allContent.push({ ...item, type });
-          });
-        });
-      }
-
-      let contentHtml = '';
-      if (allContent.length === 0) {
-        contentHtml = '<div style="font-size: 0.8rem; color: var(--text-sub); text-align: center; padding: 20px;">No content published for this subject yet.</div>';
-      } else {
-        allContent.forEach(item => {
-          contentHtml += `
-            <div class="feed-item">
-              <span class="feed-tag">${item.type}</span>
-              <div style="font-weight: 800; font-size: 0.9rem; margin-top: 4px;">${item.title}</div>
-              <div style="font-size: 0.8rem; color: var(--text-sub); margin-top: 2px;">${item.desc}</div>
-              <div style="margin-top: 10px;">
-                <button onclick="openStudentDocument('${item.title}', '${item.file || 'Document'}', \`${item.desc}\`)" style="background: var(--accent-gold); color: #fff; border: none; padding: 6px 12px; border-radius: 8px; font-size: 0.75rem; font-weight: 800; cursor: pointer;">
-                  Open File / View Details
-                </button>
-              </div>
-            </div>
-          `;
-        });
-      }
-
-      wsScreen.innerHTML = `
-        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
-          <button onclick="openStudentSubjectsForClass('${className}', '${level}')" style="background: var(--surface-color); border: 1px solid var(--border-color); width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer;">
-            <i class="fa-solid fa-arrow-left"></i>
-          </button>
-          <div>
-            <h2 style="font-size: 1.2rem; font-weight: 900;">${subjectName}</h2>
-            <div style="font-size: 0.75rem; color: var(--text-sub);">${className} (${level})</div>
-          </div>
-        </div>
-        <div class="feed-container">${contentHtml}</div>
-      `;
-      wsScreen.classList.add('active');
-    }
-
-    function goBackToStudentHome() {
-      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-      document.getElementById('screen-home').classList.add('active');
-    }
-
-    function openStudentDocument(title, fileName, contentDesc) {
-      document.getElementById('viewerDocTitle').innerText = title;
-      document.getElementById('viewerDocContent').innerHTML = `
-        <div style="font-weight: 800; font-size: 1rem; margin-bottom: 4px;">${title}</div>
-        <div style="font-size: 0.75rem; color: var(--accent-gold); font-weight: 700; margin-bottom: 12px;"><i class="fa-solid fa-paperclip"></i> File: ${fileName}</div>
-        <div style="padding: 16px; background: var(--surface-color); border: 1px solid var(--border-color); border-radius: 12px; color: var(--text-main); font-size: 0.88rem; line-height: 1.5; white-space: pre-wrap; margin-bottom: 12px;">
-          <strong>Description & Content:</strong><br><br>${contentDesc}
-        </div>
-      `;
-      document.getElementById('studentDocModal').classList.add('active');
-    }
-
-    function closeStudentDocModal() {
-      document.getElementById('studentDocModal').classList.remove('active');
-    }
-
-    function showComingSoonModal(featureName) {
-      document.getElementById('comingSoonTitle').innerText = `${featureName} — Coming Soon`;
-      document.getElementById('comingSoonModal').classList.add('active');
-    }
-
-    function closeComingSoonModal() {
-      document.getElementById('comingSoonModal').classList.remove('active');
-    }
-  </script>
 </body>
 </html>
