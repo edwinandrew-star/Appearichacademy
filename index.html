@@ -1510,38 +1510,18 @@ window.addEventListener("DOMContentLoaded", async () => {
 
 async function bootstrapAuthenticatedUser(user) {
   currentUser = user;
+  // The authenticated Supabase user ID is the identity source.
+  // Never trust a user ID supplied by HTML or JavaScript.
+  const { data: profile, error } = await sb.from("profiles")
+    .select("id, full_name, role, education_level, combination")
+    .eq("id", user.id).single();
 
-  // The authenticated Supabase user ID is always the source of identity.
-  // First ask the secure database function to make sure this user's profile
-  // exists. This avoids failures caused by profiles RLS blocking the browser.
-  const meta = user.user_metadata || {};
-  const requestedRole = meta.requested_role === "teacher" ? "teacher" : "student";
-
-  const { error: ensureError } = await sb.rpc("ensure_my_profile", {
-    p_full_name: meta.full_name || user.email?.split("@")[0] || "User",
-    p_role: requestedRole,
-    p_email: user.email || null,
-    p_education_level: requestedRole === "student" ? (meta.education_level || null) : null,
-    p_combination: requestedRole === "student" ? (meta.combination || null) : null
-  });
-
-  if (ensureError) {
-    console.error("ensure_my_profile failed:", ensureError);
-  }
-
-  const { data: profile, error: profileError } = await sb.from("profiles")
-    .select("id, full_name, role, education_level, combination, email")
-    .eq("id", user.id)
-    .maybeSingle();
-
-  if (profileError || !profile) {
-    console.error("Profile load failed:", profileError);
-    toast("Login succeeded, but your profile could not be loaded. Please run the APPEARICH profile SQL in Supabase.", "error");
+  if (error || !profile) {
+    toast("Your account profile is not ready yet. Please try again.", "error");
     return;
   }
-
   currentUserProfile = profile;
-  await launchDashboardBasedOnRole();
+  launchDashboardBasedOnRole();
 }
 
 function showAuthScreen() {
@@ -1569,19 +1549,9 @@ async function handleAuthSubmit() {
       education_level: currentAuthRole === "student" ? document.getElementById("eduLevelSelect").value : null,
       combination: currentAuthRole === "student" ? (document.getElementById("regCombination").value || null) : null
     };
-    const { data: signUpData, error } = await sb.auth.signUp({ email, password: pwd, options: { data: metadata } });
+    const { error } = await sb.auth.signUp({ email, password: pwd, options: { data: metadata } });
     if (error) return toast(error.message, "error");
-
-    // When email confirmation is disabled, Supabase returns a session and
-    // the normal auth-state listener will bootstrap the profile.
-    // When confirmation is enabled, no session exists yet; the profile will
-    // be repaired automatically on the first successful login.
-    if (signUpData?.user && signUpData?.session) {
-      await bootstrapAuthenticatedUser(signUpData.user);
-    }
-    toast(signUpData?.session
-      ? "Account created and signed in successfully."
-      : "Account created. Confirm your email, then sign in.", "success");
+    toast("Account created. Check your email if confirmation is enabled.", "success");
     return;
   }
 
