@@ -1511,47 +1511,33 @@ window.addEventListener("DOMContentLoaded", async () => {
 async function bootstrapAuthenticatedUser(user) {
   currentUser = user;
 
-  // Always use the authenticated Supabase user ID.
-  // If the profile trigger did not create a row, repair the profile from
-  // the user's Auth metadata instead of leaving the user stuck after login.
-  let { data: profile, error: profileError } = await sb.from("profiles")
+  // The authenticated Supabase user ID is always the source of identity.
+  // First ask the secure database function to make sure this user's profile
+  // exists. This avoids failures caused by profiles RLS blocking the browser.
+  const meta = user.user_metadata || {};
+  const requestedRole = meta.requested_role === "teacher" ? "teacher" : "student";
+
+  const { error: ensureError } = await sb.rpc("ensure_my_profile", {
+    p_full_name: meta.full_name || user.email?.split("@")[0] || "User",
+    p_role: requestedRole,
+    p_email: user.email || null,
+    p_education_level: requestedRole === "student" ? (meta.education_level || null) : null,
+    p_combination: requestedRole === "student" ? (meta.combination || null) : null
+  });
+
+  if (ensureError) {
+    console.error("ensure_my_profile failed:", ensureError);
+  }
+
+  const { data: profile, error: profileError } = await sb.from("profiles")
     .select("id, full_name, role, education_level, combination, email")
-    .eq("id", user.id).maybeSingle();
+    .eq("id", user.id)
+    .maybeSingle();
 
-  if (!profile && !profileError) {
-    const meta = user.user_metadata || {};
-    const requestedRole = meta.requested_role === "teacher" ? "teacher" : "student";
-    const repairProfile = {
-      id: user.id,
-      full_name: meta.full_name || user.email?.split("@")[0] || "User",
-      role: requestedRole,
-      email: user.email || null,
-      education_level: requestedRole === "student" ? (meta.education_level || null) : null,
-      combination: requestedRole === "student" ? (meta.combination || null) : null
-    };
-
-    const { error: insertError } = await sb.from("profiles").upsert(repairProfile, { onConflict: "id" });
-    if (!insertError) {
-      const result = await sb.from("profiles")
-        .select("id, full_name, role, education_level, combination, email")
-        .eq("id", user.id).maybeSingle();
-      profile = result.data;
-      profileError = result.error;
-    } else {
-      profileError = insertError;
-    }
-  }
-
-  if (!profile) {
-    console.error("Profile bootstrap failed:", profileError);
-    toast("Login succeeded, but your profile could not be loaded. Check the profiles table policies/triggers in Supabase.", "error");
+  if (profileError || !profile) {
+    console.error("Profile load failed:", profileError);
+    toast("Login succeeded, but your profile could not be loaded. Please run the APPEARICH profile SQL in Supabase.", "error");
     return;
-  }
-
-  // If the profile has no email but Auth does, keep the profile complete.
-  if (!profile.email && user.email) {
-    await sb.from("profiles").update({ email: user.email }).eq("id", user.id);
-    profile.email = user.email;
   }
 
   currentUserProfile = profile;
