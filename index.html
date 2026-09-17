@@ -1200,7 +1200,7 @@
               <div class="level-chip" onclick="toggleTeacherLevelSelection('Lower Secondary', this)">Lower Secondary</div>
               <div class="level-chip" onclick="toggleTeacherLevelSelection('Upper Secondary', this)">Upper Secondary</div>
             </div>
-            <button class="primary-btn" style="opacity: 1; font-size: 0.85rem; padding: 12px;" onclick="confirmLevelsAndFold()">Confirm Levels</button>
+            <button class="primary-btn" style="opacity: 1; font-size: 0.85rem; padding: 12px;" onclick="confirmLevelsAndFold()">Create Level</button>
           </div>
         </div>
 
@@ -1263,6 +1263,26 @@
               <div id="selectedClassMetaSub" style="font-size: 0.72rem; color: var(--text-sub);">Lower Secondary • Mathematics, English</div>
             </div>
           </div>
+        </div>
+
+        <!-- PERSISTENT CLASS ENROLLMENT KEY / MANAGEMENT -->
+        <div id="selectedClassManagementPanel" class="lms-item" style="margin-bottom:16px;">
+          <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap;">
+            <div style="min-width:0;flex:1;">
+              <strong style="font-size:.9rem;">Class Enrollment</strong>
+              <div class="lms-small" id="selectedClassEnrollmentMeta" style="margin-top:4px;">Loading enrollment key…</div>
+              <div id="selectedClassEnrollmentKey" style="font-size:1.05rem;font-weight:900;letter-spacing:.08em;margin-top:8px;word-break:break-all;">—</div>
+            </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              <button id="copySelectedClassKeyBtn" class="primary-btn" style="opacity:1;" onclick="copyActiveEnrollmentKey()"><i class="fa-solid fa-copy"></i> Copy Key</button>
+              <button id="deleteSelectedClassBtn" class="primary-btn" style="opacity:1;" onclick="deleteActiveClass()"><i class="fa-solid fa-trash"></i> Delete Class</button>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-bottom:16px;">
+          <div class="section-header-title"><span><i class="fa-solid fa-book-bookmark" style="color:var(--accent-gold);"></i> Subjects</span><button class="primary-btn" style="opacity:1;" onclick="addSubjectToClass()">+ Create Subject</button></div>
+          <div id="selectedClassSubjectsArea" class="feed-container"><div class="lms-small">Loading subjects…</div></div>
         </div>
 
         <!-- 2x2 Grid for Assignments, Announcements, Tests, Quizzes -->
@@ -1428,8 +1448,8 @@
    Replace these two values with your project's public values.
    NEVER put the Supabase service-role key in this file.
 */
-const SUPABASE_URL = "https://ccrxhifqtdhnkmxbafks.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNjcnhoaWZxdGRobmtteGJhZmtzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg3NTQ2MzksImV4cCI6MjEwNDMzMDYzOX0.g3YiiUNwdvsuwkF2E0HuzFm4xSOobueKTAzYAU-Vt4g";
+const SUPABASE_URL = "YOUR_SUPABASE_PROJECT_URL";
+const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY";
 const sb = (window.supabase && SUPABASE_URL.startsWith("http"))
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
   : null;
@@ -1509,34 +1529,19 @@ window.addEventListener("DOMContentLoaded", async () => {
 });
 
 async function bootstrapAuthenticatedUser(user) {
-  // =============================================================
-  // AUTHENTICATION FLOW
-  // Supabase Auth gives us the trusted user ID. We then load the
-  // matching public.profiles row. The frontend never invents a role.
-  // =============================================================
   currentUser = user;
+  // The authenticated Supabase user ID is the identity source.
+  // Never trust a user ID supplied by HTML or JavaScript.
+  const { data: profile, error } = await sb.from("profiles")
+    .select("id, full_name, role, education_level, combination")
+    .eq("id", user.id).single();
 
-  const { data: profile, error } = await sb
-    .from("profiles")
-    .select("id, full_name, role, email")
-    .eq("id", user.id)
-    .single();
-
-  if (error) {
-    console.error("Profile loading error:", error);
-    toast(`Could not load your profile: ${error.message}`, "error");
-    return;
-  }
-
-  if (!profile) {
-    console.error("No profile found for authenticated user:", user.id);
+  if (error || !profile) {
     toast("Your account profile is not ready yet. Please try again.", "error");
     return;
   }
-
   currentUserProfile = profile;
-  console.log("Logged-in profile:", currentUserProfile);
-  await launchDashboardBasedOnRole();
+  launchDashboardBasedOnRole();
 }
 
 function showAuthScreen() {
@@ -1570,51 +1575,8 @@ async function handleAuthSubmit() {
     return;
   }
 
-  // IMPORTANT: The selected Student/Teacher tab is only a portal hint.
-  // The database profile is the source of truth for authorization.
-  const { data: authData, error } = await sb.auth.signInWithPassword({ email, password: pwd });
+  const { error } = await sb.auth.signInWithPassword({ email, password: pwd });
   if (error) return toast("Login failed. Check your credentials.", "error");
-
-  const signedInUser = authData?.user;
-  if (!signedInUser) return toast("Login succeeded but no user session was returned.", "error");
-
-  // Load the role immediately after login so a teacher account cannot be
-  // accidentally opened inside the student portal (or vice versa).
-  const { data: loginProfile, error: profileError } = await sb
-    .from("profiles")
-    .select("id, full_name, role, email")
-    .eq("id", signedInUser.id)
-    .maybeSingle();
-
-  if (profileError) {
-    console.error("Role/profile lookup failed:", profileError);
-    await sb.auth.signOut();
-    return toast("Could not verify your portal role. Please try again.", "error");
-  }
-
-  if (!loginProfile) {
-    await sb.auth.signOut();
-    return toast("Your account has no profile yet. Please contact the administrator.", "error");
-  }
-
-  const dbRole = String(loginProfile.role || "").toLowerCase();
-  const selectedRole = String(currentAuthRole || "student").toLowerCase();
-
-  // Never promote/demote a user from the browser. If the selected portal
-  // does not match the database role, stop and ask the user to choose the
-  // correct portal. This keeps the database as the security authority.
-  const roleMatches =
-    (selectedRole === "teacher" && (dbRole === "teacher" || dbRole === "admin")) ||
-    (selectedRole === "student" && dbRole === "student");
-
-  if (!roleMatches) {
-    await sb.auth.signOut();
-    const actualPortal = (dbRole === "teacher" || dbRole === "admin") ? "Teacher" : "Student";
-    return toast(`This account is registered as ${actualPortal}. Select the ${actualPortal} portal and log in again.`, "error");
-  }
-
-  // bootstrapAuthenticatedUser() will fetch the same trusted profile and
-  // route to exactly one dashboard.
 }
 
 async function handleLogout() {
@@ -1623,43 +1585,31 @@ async function handleLogout() {
 }
 
 async function launchDashboardBasedOnRole() {
-  // Always clear every portal first. This prevents a previous screen from
-  // remaining visible when Supabase restores a session or changes users.
-  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
   document.getElementById("screen-auth").classList.remove("active");
   document.getElementById("mainHeader").style.display = "flex";
   document.getElementById("mainNavBar").style.display = "flex";
 
-  const role = String(currentUserProfile?.role || "").toLowerCase();
-
+  const role = currentUserProfile?.role;
   if (role === "teacher" || role === "admin") {
-    // Teacher/Admin gets ONLY the teacher portal.
     document.getElementById("screen-teacher-portal").classList.add("active");
-    document.getElementById("headerBrandTitle").innerText =
-      role === "admin" ? "Appearich Admin Portal" : "Appearich Teacher Portal";
+    document.getElementById("headerBrandTitle").innerText = role === "admin" ? "Appearich Admin Portal" : "Appearich Teacher Portal";
     document.getElementById("teacherPortalGreeting").innerText =
       `WELCOME, ${(currentUserProfile.full_name || "TEACHER").toUpperCase()}`;
     await loadTeacherClasses();
-  } else if (role === "student") {
-    // Student gets ONLY the student home portal.
+  } else {
     document.getElementById("screen-home").classList.add("active");
     document.getElementById("headerBrandTitle").innerText = "Appearich Student Portal";
     document.getElementById("dynamicGreeting").innerText =
       `WELCOME, ${(currentUserProfile.full_name || "SCHOLAR").toUpperCase()}`;
     document.getElementById("dynamicSubGreeting").innerText =
-      "Welcome to your academic workspace";
+      `Level: ${currentUserProfile.education_level || "General"}`;
     document.getElementById("profileDisplayName").innerText = currentUserProfile.full_name || "Scholar";
     document.getElementById("profileDisplayEmail").innerText = currentUser.email;
-    document.getElementById("profileDisplayProgram").innerText = "Academic Programme";
+    document.getElementById("profileDisplayProgram").innerText =
+      currentUserProfile.combination || currentUserProfile.education_level || "Academic Programme";
     document.getElementById("profileInitial").innerText =
       (currentUserProfile.full_name || "S").charAt(0).toUpperCase();
-  } else {
-    // Unknown/missing role: never guess. Return to login.
-    console.error("Unsupported profile role:", currentUserProfile?.role);
-    await sb.auth.signOut();
-    return showAuthScreen();
   }
-
   await refreshNotifications();
 }
 
@@ -1802,14 +1752,14 @@ async function openStudentSubjectWorkspace(subjectId) {
   if (!sb || !activeStudentClass) return;
   activeStudentSubject = { id: subjectId };
   const { data: subject } = await sb.from("subjects").select("id,name,class_id").eq("id", subjectId).single();
-  const [{ data: materials }, { data: assignments }, examResult] = await Promise.all([
+  const [{ data: materials }, { data: assignments }, { data: exams }] = await Promise.all([
     sb.from("materials").select("id,title,description,file_type,storage_path,published_at,available_at,due_at")
       .eq("subject_id", subjectId).eq("is_published", true).eq("is_archived", false).order("published_at",{ascending:false}).range(0,19),
     sb.from("assignments").select("id,title,instructions,published_at,due_at,max_marks")
       .eq("subject_id", subjectId).eq("is_archived", false).order("due_at",{ascending:true}).range(0,19),
-    sb.rpc("get_student_exams", { p_subject: subject?.name || "" })
+    sb.from("exams").select("id,title,instructions,start_at,end_at,duration_minutes,max_marks")
+      .eq("subject_id", subjectId).eq("is_archived", false).order("start_at",{ascending:false}).range(0,19)
   ]);
-  const exams = examResult?.data || [];
 
   switchScreen("screen-student-subject-workspace");
   const root = document.getElementById("screen-student-subject-workspace");
@@ -1827,8 +1777,8 @@ async function openStudentSubjectWorkspace(subjectId) {
       <div class="lms-small">Due: ${a.due_at ? new Date(a.due_at).toLocaleString() : "No deadline"} • ${a.max_marks ?? ""} marks</div>
       <div class="lms-item-actions"><button class="primary-btn" style="opacity:1" onclick="openAssignmentSubmission('${a.id}')">Submit</button></div>`)}
     ${sectionHtml("Exams", "fa-file-shield", exams, e => `
-      <strong>${escapeHtml(e.title)}</strong><div class="lms-small">${escapeHtml(e.description || "")}</div>
-      <div class="lms-small">${e.start_time ? new Date(e.start_time).toLocaleString() : "Open"} → ${e.end_time ? new Date(e.end_time).toLocaleString() : "No end"}</div>
+      <strong>${escapeHtml(e.title)}</strong><div class="lms-small">${escapeHtml(e.instructions || "")}</div>
+      <div class="lms-small">${e.start_at ? new Date(e.start_at).toLocaleString() : "Open"} → ${e.end_at ? new Date(e.end_at).toLocaleString() : "No end"}</div>
       <div class="lms-item-actions"><button class="primary-btn" style="opacity:1" onclick="startExam('${e.id}')">Start / Continue</button></div>`)}
   `;
 }
@@ -1896,102 +1846,54 @@ async function submitAssignment(assignmentId) {
    is only a visual display and cannot extend an attempt.
 */
 async function startExam(examId) {
-  if (!sb || !currentUser) return;
-
-  // SECURITY: PostgreSQL verifies that the current authenticated student is
-  // enrolled in the exam's class before creating/resuming an attempt.
-  const { data, error } = await sb.rpc("start_exam", { p_exam_id: examId });
+  if (!sb) return;
+  const { data, error } = await sb.rpc("start_exam_attempt", { p_exam_id: examId });
   if (error) return toast(error.message, "error");
-  if (!data) return toast("The exam attempt could not be created.", "error");
-
   currentExamAttempt = data;
   await renderExamAttempt();
 }
-
 async function renderExamAttempt() {
   if (!currentExamAttempt) return;
+  const { data: exam, error } = await sb.from("exams")
+    .select("id,title,duration_minutes,instructions,max_marks").eq("id", currentExamAttempt.exam_id).single();
+  const { data: questions } = await sb.from("exam_questions")
+    .select("id,question_text,question_type,options,marks,position")
+    .eq("exam_id", currentExamAttempt.exam_id).order("position");
+  if (error) return toast("Exam could not be loaded.", "error");
 
-  // Prefer the server-side RPC because the database is the authority for
-  // exam access and question structure. This also avoids assuming that
-  // question options are stored directly on exam_questions.
-  const { data: payload, error } = await sb.rpc("get_student_exam", {
-    p_exam_id: currentExamAttempt.exam_id
-  });
-
-  if (error) return toast(error.message, "error");
-
-  const exam = payload?.exam || payload || {};
-  const questions = payload?.questions || [];
-
-  const { data: answers } = await sb
-    .from("exam_answers")
-    .select("question_id,selected_option_id,answer_text")
-    .eq("attempt_id", currentExamAttempt.id);
-
-  pendingAnswerState = new Map((answers || []).map(a => [a.question_id, a]));
+  const { data: answers } = await sb.from("exam_answers")
+    .select("question_id,answer_text").eq("attempt_id", currentExamAttempt.id);
+  pendingAnswerState = new Map((answers||[]).map(a=>[a.question_id,a.answer_text]));
 
   const root = document.getElementById("screen-student-subject-workspace");
   switchScreen("screen-student-subject-workspace");
-
   root.innerHTML = `
     <div class="exam-timer" id="examTimer">Calculating time…</div>
-    <div style="margin:14px 0 20px">
-      <h2 style="font-weight:900">${escapeHtml(exam.title || "Exam")}</h2>
-      <p class="lms-small">${escapeHtml(exam.description || exam.instructions || "")}</p>
-    </div>
-    <form id="examForm" onsubmit="event.preventDefault(); submitExamAttempt(false);">
-      ${(questions || []).map((q, i) => renderQuestion(q, i)).join("")}
-      <button class="primary-btn" style="opacity:1" type="submit">Submit Exam</button>
+    <div style="margin:14px 0 20px"><h2 style="font-weight:900">${escapeHtml(exam.title)}</h2>
+    <p class="lms-small">${escapeHtml(exam.instructions||"")}</p></div>
+    <form id="examForm" onsubmit="event.preventDefault(); submitExamAttempt();">
+      ${(questions||[]).map((q,i)=>renderQuestion(q,i)).join("")}
+      <button class="primary-btn" style="opacity:1">Submit Exam</button>
     </form>`;
-
   updateExamTimer();
 }
-
-function getQuestionOptions(q) {
-  if (Array.isArray(q.options)) return q.options;
-  if (Array.isArray(q.exam_options)) return q.exam_options;
-  if (Array.isArray(q.options_data)) return q.options_data;
-  return [];
-}
-
-function renderQuestion(q, i) {
-  const saved = pendingAnswerState.get(q.id) || {};
-  const existingText = saved.answer_text || "";
-  const existingOption = saved.selected_option_id || "";
-  const opts = getQuestionOptions(q);
+function renderQuestion(q,i) {
+  const existing = pendingAnswerState.get(q.id) || "";
+  const opts = Array.isArray(q.options) ? q.options : [];
   let control = "";
-
   if (q.question_type === "multiple_choice" || q.question_type === "true_false") {
-    control = opts.map(o => {
-      const optionId = typeof o === "object" ? (o.id || o.option_id || "") : "";
-      const label = typeof o === "object" ? (o.option_text || o.text || o.label || "") : String(o);
-      const value = optionId || label;
-      const checked = (optionId && existingOption === optionId) || (!optionId && existingText === label);
-      return `<label class="exam-option">
-        <input type="radio" name="q_${escapeHtml(q.id)}" value="${escapeHtml(value)}"
-          ${checked ? "checked" : ""}
-          onchange="queueAnswerSave('${q.id}', this.value, ${optionId ? 'true' : 'false'})">
-        ${escapeHtml(label)}
-      </label>`;
-    }).join("");
+    control = opts.map(o => `<label class="exam-option"><input type="radio" name="q_${q.id}" value="${escapeHtml(o)}" ${existing===o?"checked":""} onchange="queueAnswerSave('${q.id}',this.value)"> ${escapeHtml(o)}</label>`).join("");
   } else {
-    control = `<textarea class="lms-textarea" data-question="${escapeHtml(q.id)}"
-      onchange="queueAnswerSave('${q.id}', this.value, false)">${escapeHtml(existingText)}</textarea>`;
+    control = `<textarea class="lms-textarea" data-question="${q.id}" onchange="queueAnswerSave('${q.id}',this.value)">${escapeHtml(existing)}</textarea>`;
   }
-
-  return `<div class="exam-question">
-    <strong>${i + 1}. ${escapeHtml(q.question_text || "")}</strong>
-    <div class="lms-small" style="margin:6px 0 10px">${q.points ?? q.marks ?? 1} mark(s)</div>
-    ${control || `<div class="lms-small">No answer options have been published for this question.</div>`}
-  </div>`;
+  return `<div class="exam-question"><strong>${i+1}. ${escapeHtml(q.question_text)}</strong>
+    <div class="lms-small" style="margin:6px 0 10px">${q.marks ?? 1} mark(s)</div>${control}</div>`;
 }
-
 function updateExamTimer() {
   clearInterval(examTimerHandle);
   const tick = async () => {
     if (!currentExamAttempt) return;
-    const endValue = currentExamAttempt.expires_at || currentExamAttempt.locked_at;
-    const end = new Date(endValue).getTime();
+    const end = new Date(currentExamAttempt.locked_at).getTime();
     const remain = Math.max(0, end - Date.now());
     const el = document.getElementById("examTimer");
     if (el) el.textContent = `Time remaining: ${formatDuration(remain)}`;
@@ -2000,59 +1902,32 @@ function updateExamTimer() {
       await submitExamAttempt(true);
     }
   };
-  tick();
-  examTimerHandle = setInterval(tick, 1000);
+  tick(); examTimerHandle = setInterval(tick, 1000);
 }
-
 function formatDuration(ms) {
-  const s = Math.floor(ms / 1000), h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), sec = s % 60;
-  return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(sec).padStart(2, "0")}`;
+  const s = Math.floor(ms/1000), h=Math.floor(s/3600), m=Math.floor((s%3600)/60), sec=s%60;
+  return `${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}:${String(sec).padStart(2,"0")}`;
 }
-
-function queueAnswerSave(questionId, value, isOption) {
-  const previous = pendingAnswerState.get(questionId) || {};
-  const next = isOption
-    ? { question_id: questionId, selected_option_id: value, answer_text: null }
-    : { question_id: questionId, selected_option_id: null, answer_text: value };
-  pendingAnswerState.set(questionId, { ...previous, ...next });
+function queueAnswerSave(questionId, answer) {
+  pendingAnswerState.set(questionId, answer);
   clearTimeout(answerSaveTimers.get(questionId));
-  answerSaveTimers.set(questionId, setTimeout(() => saveExamAnswer(questionId), 500));
+  answerSaveTimers.set(questionId, setTimeout(() => saveExamAnswer(questionId, answer), 600));
 }
-
-async function saveExamAnswer(questionId) {
+async function saveExamAnswer(questionId, answer) {
   if (!sb || !currentExamAttempt) return;
-  const answer = pendingAnswerState.get(questionId);
-  if (!answer) return;
-
   const { error } = await sb.from("exam_answers").upsert({
-    attempt_id: currentExamAttempt.id,
-    question_id: questionId,
-    selected_option_id: answer.selected_option_id || null,
-    answer_text: answer.answer_text || null,
-    updated_at: new Date().toISOString()
-  }, { onConflict: "attempt_id,question_id" });
-
-  if (error) toast("Answer save failed.", "error");
+    attempt_id: currentExamAttempt.id, question_id: questionId,
+    answer_text: answer, updated_at:new Date().toISOString()
+  }, { onConflict:"attempt_id,question_id" });
+  if (error) toast("Answer save failed; retrying when possible.", "error");
 }
-
-async function submitExamAttempt(auto = false) {
+async function submitExamAttempt(auto=false) {
   if (!sb || !currentExamAttempt) return;
-
-  for (const qid of pendingAnswerState.keys()) {
-    await saveExamAnswer(qid);
-  }
-
-  // Server-side submission. The browser never calculates marks or changes
-  // is_correct / points_awarded. PostgreSQL remains authoritative.
-  const { data, error } = await sb.rpc("submit_exam", {
-    p_attempt_id: currentExamAttempt.id
-  });
-
+  for (const [qid, ans] of pendingAnswerState.entries()) await saveExamAnswer(qid, ans);
+  const { data, error } = await sb.rpc("submit_exam_attempt", { p_attempt_id: currentExamAttempt.id, p_auto_submit:auto });
   if (error) return toast(error.message, "error");
-
   clearInterval(examTimerHandle);
   currentExamAttempt = null;
-  pendingAnswerState.clear();
   toast(auto ? "Exam expired and was submitted." : "Exam submitted.", "success");
   switchTab("screen-activity", document.querySelectorAll(".nav-item")[2]);
 }
@@ -2066,7 +1941,7 @@ function recordSecurityEvent(eventType, metadata={}) {
     attempt_id: currentExamAttempt.id,
     student_id: currentUser.id,
     exam_id: currentExamAttempt.exam_id,
-    event_type:eventType, event_data:metadata
+    event_type:eventType, metadata
   }).then(()=>{});
 }
 document.addEventListener("visibilitychange", () => {
@@ -2086,93 +1961,454 @@ window.addEventListener("beforeprint", () => recordSecurityEvent("print_attempt"
 */
 async function loadTeacherClasses() {
   if (!sb || !currentUser) return;
+
+  // The database remains the source of truth. We only display classes owned by
+  // the currently authenticated teacher. RLS must enforce the same ownership.
   const { data, error } = await sb.from("classes")
     .select("id,name,education_level,academic_year,description,is_archived")
-    .eq("teacher_id", currentUser.id).eq("is_archived", false)
-    .order("created_at",{ascending:false}).range(0,19);
-  if (error) return toast(error.message, "error");
+    .eq("teacher_id", currentUser.id)
+    .eq("is_archived", false)
+    .order("created_at", { ascending:false })
+    .range(0,19);
+
+  if (error) {
+    console.error("loadTeacherClasses failed:", error);
+    return toast("Failed to load your classes. Please try again.", "error");
+  }
+
   teacherPortalData.classes = data || [];
   showTeacherClassesGrid();
 }
+
 function showTeacherClassesGrid() {
   const sec = document.getElementById("teacherClassesGridSection");
   const grid = document.getElementById("teacherClassesGrid");
+  if (!sec || !grid) return;
+
   sec.style.display = "block";
-  grid.innerHTML = (teacherPortalData.classes||[]).map(c => `
-    <div class="portal-box-card" onclick="openSelectedClassView('${c.id}')">
-      <div class="custom-vector-emblem"><i class="fa-solid fa-school"></i></div>
-      <strong>${escapeHtml(c.name)}</strong>
-      <span class="lms-small">${escapeHtml(c.education_level||"")} • ${escapeHtml(c.academic_year||"")}</span>
-    </div>`).join("") || `<div class="lms-item">No classes created yet.</div>`;
+  grid.innerHTML = (teacherPortalData.classes || []).map(c => `
+    <div class="portal-box-card" style="position:relative;">
+      <div onclick="openSelectedClassView('${c.id}')" style="cursor:pointer;">
+        <div class="custom-vector-emblem"><i class="fa-solid fa-school"></i></div>
+        <strong>${escapeHtml(c.name)}</strong>
+        <span class="lms-small">${escapeHtml(c.education_level || "")} • ${escapeHtml(c.academic_year || "")}</span>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;">
+        <button class="primary-btn" style="opacity:1;flex:1;min-width:130px;" onclick="openSelectedClassView('${c.id}')">
+          <i class="fa-solid fa-folder-open"></i> Manage Class
+        </button>
+        <button class="primary-btn" style="opacity:1;min-width:120px;" onclick="deleteTeacherClass('${c.id}', event)">
+          <i class="fa-solid fa-trash"></i> Delete Class
+        </button>
+      </div>
+    </div>`).join("") || `<div class="lms-item"><strong>No classes yet.</strong><p class="lms-small" style="margin-top:6px;">Use Create Level to start your class setup.</p></div>`;
 }
+
+function scrollToCreationStep(sectionId) {
+  const section = document.getElementById(sectionId);
+  if (!section) return;
+  section.classList.remove("collapsed");
+  setTimeout(() => section.scrollIntoView({ behavior:"smooth", block:"start" }), 40);
+}
+
+function setCreationStatus(id, text) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = text;
+}
+
+function activateCreationStep(step) {
+  // Keep the existing foldable UI, but make the next required stage explicit.
+  const sections = ["foldLevelSection", "foldClassSection", "foldSubjectSection"];
+  sections.forEach(id => document.getElementById(id)?.classList.add("collapsed"));
+
+  const target = {
+    level:"foldLevelSection",
+    class:"foldClassSection",
+    subject:"foldSubjectSection"
+  }[step];
+  if (target) scrollToCreationStep(target);
+}
+
 async function createClassDirect() {
-  const name=document.getElementById("newClassName")?.value.trim();
-  const level=document.getElementById("newClassLevel")?.value;
-  const year=document.getElementById("newClassYear")?.value.trim();
-  const description=document.getElementById("newClassDescription")?.value.trim();
+  if (!requireBackend() || !currentUser) return;
+
+  const name = document.getElementById("newClassName")?.value.trim();
+  const level = document.getElementById("newClassLevel")?.value;
+  const year = document.getElementById("newClassYear")?.value.trim();
+  const description = document.getElementById("newClassDescription")?.value.trim();
+
   if (!name || !level || !year) return toast("Complete the class details.", "error");
-  const { data, error } = await sb.rpc("create_class_with_enrollment_key", {
-    p_name:name,p_education_level:level,p_academic_year:year,p_description:description||null
-  });
-  if (error) return toast(error.message,"error");
-  closeLmsModal(); toast(`Class created. Enrollment key: ${data.enrollment_key}`,"success");
-  await loadTeacherClasses();
+
+  const button = document.querySelector("#lmsModalBody form button[type='submit'], #lmsModalBody form button.primary-btn");
+  if (button) { button.disabled = true; button.dataset.originalText = button.innerHTML; button.innerHTML = "Creating class…"; }
+  toast("Creating class…", "info");
+
+  try {
+    const { data, error } = await sb.rpc("create_class_with_enrollment_key", {
+      p_name:name,
+      p_education_level:level,
+      p_academic_year:year,
+      p_description:description || null
+    });
+
+    if (error) {
+      console.error("create_class_with_enrollment_key failed:", error);
+      return toast("Failed to create class. Please try again.", "error");
+    }
+
+    const createdClassId = data?.class_id || data?.id;
+    const createdKey = data?.enrollment_key || data?.key || null;
+
+    if (!createdClassId) {
+      console.error("Class RPC returned an unexpected payload:", data);
+      return toast("Class was created, but its ID was not returned. Check Supabase logs.", "error");
+    }
+
+    activeSelectedClassObj = {
+      id: createdClassId,
+      name,
+      education_level: level,
+      academic_year: year,
+      description: description || null,
+      enrollment_key: createdKey
+    };
+
+    closeLmsModal();
+    toast("Class created successfully.", "success");
+    await loadTeacherClasses();
+
+    // Continue directly to Subject Creation instead of making the teacher guess
+    // which fold to open next.
+    setCreationStatus("foldLevelStatus", level);
+    setCreationStatus("foldClassStatus", `${name} • ${year}`);
+    setCreationStatus("foldSubjectStatus", "Ready for subject");
+
+    document.getElementById("teacherClassesGridSection").style.display = "none";
+    document.getElementById("teacherWorkflowContainer").style.display = "block";
+    activateCreationStep("subject");
+
+    await openSubjectModal(createdClassId, { afterCreateShowKey:true, existingKey:createdKey });
+  } finally {
+    if (button) { button.disabled = false; button.innerHTML = button.dataset.originalText || "Create Class"; }
+  }
 }
+
 function openCreateClassModal() {
+  const selectedLevel = selectedTeacherLevels.length === 1 ? selectedTeacherLevels[0] : "";
   openLmsModal("Create Class", `
     <form class="lms-form" onsubmit="event.preventDefault();createClassDirect()">
       <input class="lms-input" id="newClassName" placeholder="Class name" required>
       <select class="lms-select" id="newClassLevel" required>
-        <option value="">Education level</option><option>Lower Primary</option><option>Upper Primary</option>
-        <option>Lower Secondary</option><option>Upper Secondary</option>
+        <option value="">Education level</option>
+        <option ${selectedLevel === "Lower Primary" ? "selected" : ""}>Lower Primary</option>
+        <option ${selectedLevel === "Upper Primary" ? "selected" : ""}>Upper Primary</option>
+        <option ${selectedLevel === "Lower Secondary" ? "selected" : ""}>Lower Secondary</option>
+        <option ${selectedLevel === "Upper Secondary" ? "selected" : ""}>Upper Secondary</option>
       </select>
-      <input class="lms-input" id="newClassYear" placeholder="Academic year" required>
+      <input class="lms-input" id="newClassYear" placeholder="Academic year e.g. 2026/2027" required>
       <textarea class="lms-textarea" id="newClassDescription" placeholder="Description"></textarea>
-      <button class="primary-btn" style="opacity:1">Create Class & Generate Key</button>
+      <button type="submit" class="primary-btn" style="opacity:1">Create Class</button>
     </form>`);
 }
+
+async function loadEnrollmentKeyForClass(classId) {
+  if (!sb || !classId) return null;
+
+  // One active key belongs to a class. We retrieve the stored value; we never
+  // generate a new key merely because the teacher opened the class again.
+  const { data, error } = await sb.from("enrollment_keys")
+    .select("id,class_id,enrollment_key,is_active,expires_at,created_at")
+    .eq("class_id", classId)
+    .eq("is_active", true)
+    .order("created_at", { ascending:false })
+    .limit(1)
+    .maybeSingle();
+
+  if (error) {
+    console.error("loadEnrollmentKeyForClass failed:", error);
+    return null;
+  }
+  return data || null;
+}
+
+async function renderEnrollmentKeyForClass(classObj, preferredKey = null) {
+  const keyEl = document.getElementById("selectedClassEnrollmentKey");
+  const metaEl = document.getElementById("selectedClassEnrollmentMeta");
+  if (!keyEl || !metaEl) return;
+
+  keyEl.textContent = "Loading…";
+  metaEl.textContent = "Retrieving the stored enrollment key…";
+
+  const keyRow = preferredKey
+    ? { enrollment_key: preferredKey, is_active:true }
+    : await loadEnrollmentKeyForClass(classObj.id);
+
+  if (!keyRow?.enrollment_key) {
+    keyEl.textContent = "No active key found";
+    metaEl.textContent = "No enrollment key is currently available for this class.";
+    return;
+  }
+
+  classObj.enrollment_key = keyRow.enrollment_key;
+  keyEl.textContent = keyRow.enrollment_key;
+  metaEl.textContent = "Stored enrollment key • valid for this class";
+}
+
 async function openSelectedClassView(classId) {
-  activeSelectedClassObj = {id:classId};
-  const {data:c,error}=await sb.from("classes").select("*").eq("id",classId).single();
-  if(error)return toast(error.message,"error");
-  document.getElementById("teacherClassesGridSection").style.display="none";
-  document.getElementById("teacherWorkflowContainer").style.display="none";
-  document.getElementById("selectedClassViewSection").style.display="block";
-  document.getElementById("selectedClassNameHeading").textContent=c.name;
-  document.getElementById("selectedClassMetaSub").textContent=`${c.education_level||""} • ${c.academic_year||""}`;
+  if (!requireBackend() || !currentUser || !classId) return;
+
+  const { data:c, error } = await sb.from("classes")
+    .select("id,name,education_level,academic_year,description,is_archived,teacher_id")
+    .eq("id", classId)
+    .eq("teacher_id", currentUser.id)
+    .eq("is_archived", false)
+    .single();
+
+  if (error || !c) {
+    console.error("openSelectedClassView failed:", error);
+    return toast("Unable to open this class.", "error");
+  }
+
+  activeSelectedClassObj = c;
+  document.getElementById("teacherClassesGridSection").style.display = "none";
+  document.getElementById("teacherWorkflowContainer").style.display = "none";
+  document.getElementById("selectedClassViewSection").style.display = "block";
+  document.getElementById("selectedClassNameHeading").textContent = c.name;
+  document.getElementById("selectedClassMetaSub").textContent = `${c.education_level || ""} • ${c.academic_year || ""}`;
+  document.getElementById("activeContentFoldArea")?.style.setProperty("display", "none");
+
+  await renderEnrollmentKeyForClass(c);
+  await refreshSelectedClassSubjects(c.id);
 }
-async function goBackToClassGrid() {
-  document.getElementById("selectedClassViewSection").style.display="none";
-  document.getElementById("teacherWorkflowContainer").style.display="block";
-  await loadTeacherClasses();
+
+async function refreshSelectedClassSubjects(classId) {
+  // Keep the subject section in the selected-class workspace synchronized with
+  // Supabase after a subject is created, without reloading the page.
+  const body = document.getElementById("selectedClassSubjectsArea");
+  if (!body) return;
+
+  const { data, error } = await sb.from("subjects")
+    .select("id,name,description,is_archived")
+    .eq("class_id", classId)
+    .eq("is_archived", false)
+    .order("name");
+
+  if (error) {
+    console.error("refreshSelectedClassSubjects failed:", error);
+    body.innerHTML = `<div class="lms-small lms-danger">Unable to load subjects.</div>`;
+    return;
+  }
+
+  body.innerHTML = (data || []).map(s => `
+    <div class="lms-item" style="display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;">
+      <div><strong>${escapeHtml(s.name)}</strong><div class="lms-small">${escapeHtml(s.description || "")}</div></div>
+    </div>`).join("") || `<div class="lms-small">No subjects created for this class yet.</div>`;
 }
+
+async function copyActiveEnrollmentKey() {
+  const key = activeSelectedClassObj?.enrollment_key || document.getElementById("selectedClassEnrollmentKey")?.textContent?.trim();
+  if (!key || key === "—" || key === "Loading…" || key === "No active key found") return toast("No enrollment key is available to copy.", "error");
+
+  try {
+    await navigator.clipboard.writeText(key);
+    toast("Enrollment key copied.", "success");
+  } catch (error) {
+    console.error("Clipboard copy failed:", error);
+    toast(`Copy failed. Enrollment key: ${key}`, "error");
+  }
+}
+
+async function deleteTeacherClass(classId, event) {
+  event?.stopPropagation();
+  if (!requireBackend() || !currentUser || !classId) return;
+
+  const classObj = (teacherPortalData.classes || []).find(c => c.id === classId);
+  const className = classObj?.name || "this class";
+  if (!window.confirm(`Are you sure you want to delete "${className}"?`)) return;
+
+  toast("Deleting class…", "info");
+  const { error } = await sb.from("classes")
+    .update({ is_archived:true, updated_at:new Date().toISOString() })
+    .eq("id", classId)
+    .eq("teacher_id", currentUser.id)
+    .eq("is_archived", false);
+
+  if (error) {
+    console.error("deleteTeacherClass failed:", error);
+    return toast("Failed to delete class. Please try again.", "error");
+  }
+
+  teacherPortalData.classes = (teacherPortalData.classes || []).filter(c => c.id !== classId);
+  if (activeSelectedClassObj?.id === classId) {
+    activeSelectedClassObj = null;
+    document.getElementById("selectedClassViewSection").style.display = "none";
+  }
+  showTeacherClassesGrid();
+  toast("Class deleted successfully.", "success");
+}
+
+async function deleteActiveClass() {
+  if (!activeSelectedClassObj?.id) return toast("No class is selected.", "error");
+  await deleteTeacherClass(activeSelectedClassObj.id);
+}
+
 function resetTeacherWorkflow() {
-  document.getElementById("teacherWorkflowContainer").style.display="block";
-  document.getElementById("teacherClassesGridSection").style.display="none";
+  document.getElementById("teacherWorkflowContainer").style.display = "block";
+  document.getElementById("teacherClassesGridSection").style.display = "none";
+  document.getElementById("selectedClassViewSection").style.display = "none";
+  activateCreationStep("level");
 }
-function editCreationFlow() { openCreateClassModal(); }
-function confirmLevelsAndFold() { openCreateClassModal(); }
-function renderClassCreationSection(){}
-function addClassToLevel(){ openCreateClassModal(); }
-function confirmClassesAndFold(){ openCreateClassModal(); }
-function addSubjectToClass(){ openSubjectModal(activeSelectedClassObj?.id); }
-function finishCreationFlow(){ loadTeacherClasses(); }
-function toggleTeacherLevelSelection(level, el){ if(selectedTeacherLevels.includes(level)){selectedTeacherLevels=selectedTeacherLevels.filter(x=>x!==level);el.classList.remove("selected")}else{selectedTeacherLevels.push(level);el.classList.add("selected")} }
-function toggleFoldSection(id){document.getElementById(id)?.classList.toggle("collapsed");}
-function toggleFoldDownContent(type){currentFoldContentType=type;const a=document.getElementById("activeContentFoldArea");a.style.display="block";a.innerHTML=`<div class="lms-item"><strong>${escapeHtml(type)}</strong><p class="lms-small">Use the production content tools below to create and publish class-scoped ${type.toLowerCase()}.</p><div class="lms-item-actions"><button class="primary-btn" style="opacity:1" onclick="openContentCreation('${type}')">Create</button></div></div>`;}
+
+function editCreationFlow() {
+  resetTeacherWorkflow();
+}
+
+function confirmLevelsAndFold() {
+  if (!selectedTeacherLevels.length) {
+    return toast("Select at least one education level first.", "error");
+  }
+
+  setCreationStatus("foldLevelStatus", selectedTeacherLevels.join(", "));
+  setCreationStatus("foldClassStatus", "Ready to create class");
+  toast("Level created successfully. Continue to Class Creation.", "success");
+
+  // The database class still stores the selected level + academic year. This
+  // step only controls the UI workflow and does not create a fake level table.
+  activateCreationStep("class");
+  setTimeout(() => openCreateClassModal(), 180);
+}
+
+function renderClassCreationSection() {
+  activateCreationStep("class");
+}
+
+function addClassToLevel() {
+  activateCreationStep("class");
+  openCreateClassModal();
+}
+
+function confirmClassesAndFold() {
+  if (activeSelectedClassObj?.id) {
+    setCreationStatus("foldClassStatus", activeSelectedClassObj.name || "Class created");
+    setCreationStatus("foldSubjectStatus", "Ready for subject");
+    activateCreationStep("subject");
+    openSubjectModal(activeSelectedClassObj.id);
+  } else {
+    addClassToLevel();
+  }
+}
+
+function addSubjectToClass() {
+  const classId = activeSelectedClassObj?.id;
+  if (!classId) return toast("Create or select a class first.", "error");
+  activateCreationStep("subject");
+  openSubjectModal(classId);
+}
+
+async function finishCreationFlow() {
+  await loadTeacherClasses();
+  document.getElementById("teacherWorkflowContainer").style.display = "block";
+  toast("Creation flow completed.", "success");
+}
+
+function toggleTeacherLevelSelection(level, el) {
+  if (selectedTeacherLevels.includes(level)) {
+    selectedTeacherLevels = selectedTeacherLevels.filter(x => x !== level);
+    el.classList.remove("selected");
+  } else {
+    selectedTeacherLevels.push(level);
+    el.classList.add("selected");
+  }
+  setCreationStatus("foldLevelStatus", selectedTeacherLevels.length ? selectedTeacherLevels.join(", ") : "Select levels");
+}
+
+function toggleFoldSection(id) {
+  document.getElementById(id)?.classList.toggle("collapsed");
+}
+
+function toggleFoldDownContent(type) {
+  currentFoldContentType = type;
+  const a = document.getElementById("activeContentFoldArea");
+  if (!a) return;
+  a.style.display = "block";
+  a.innerHTML = `<div class="lms-item"><strong>${escapeHtml(type)}</strong><p class="lms-small">Use the production content tools below to create and publish class-scoped ${type.toLowerCase()}.</p><div class="lms-item-actions"><button class="primary-btn" style="opacity:1" onclick="openContentCreation('${type}')">Create</button></div></div>`;
+}
 function deleteFoldDownContent(){}
 
 /* ---------- 10. TEACHER SUBJECTS / MATERIALS / ASSIGNMENTS ---------- */
-async function openSubjectModal(classId) {
-  openLmsModal("Create Subject", `<form class="lms-form" onsubmit="event.preventDefault();createSubject('${classId}')">
-    <input class="lms-input" id="subjectName" placeholder="Subject name" required>
-    <textarea class="lms-textarea" id="subjectDesc" placeholder="Description"></textarea>
-    <button class="primary-btn" style="opacity:1">Create Subject</button></form>`);
+async function openSubjectModal(classId, options = {}) {
+  if (!classId) return toast("Select a class first.", "error");
+
+  // Confirm ownership before presenting the form. This is UI validation only;
+  // Supabase RLS remains the actual security boundary.
+  if (currentUser) {
+    const { data: ownedClass, error: classError } = await sb.from("classes")
+      .select("id,name,education_level,academic_year")
+      .eq("id", classId)
+      .eq("teacher_id", currentUser.id)
+      .eq("is_archived", false)
+      .maybeSingle();
+    if (classError || !ownedClass) {
+      console.error("openSubjectModal ownership check failed:", classError);
+      return toast("You cannot manage subjects for this class.", "error");
+    }
+    activeSelectedClassObj = { ...activeSelectedClassObj, ...ownedClass, id:classId };
+  }
+
+  openLmsModal("Create Subject", `
+    <form class="lms-form" onsubmit="event.preventDefault();createSubject('${classId}', ${options.afterCreateShowKey ? "true" : "false"})">
+      <div class="lms-small" style="margin-bottom:8px;">Class: <strong>${escapeHtml(activeSelectedClassObj?.name || "Selected class")}</strong></div>
+      <input class="lms-input" id="subjectName" placeholder="Subject name" required>
+      <textarea class="lms-textarea" id="subjectDesc" placeholder="Description"></textarea>
+      <button type="submit" class="primary-btn" style="opacity:1">Create Subject</button>
+    </form>`);
 }
-async function createSubject(classId) {
-  const {error}=await sb.from("subjects").insert({class_id:classId,name:document.getElementById("subjectName").value.trim(),description:document.getElementById("subjectDesc").value.trim()||null});
-  if(error)return toast(error.message,"error");closeLmsModal();toast("Subject created.","success");
+
+async function createSubject(classId, continueToEnrollment = true) {
+  if (!requireBackend() || !currentUser || !classId) return;
+
+  const name = document.getElementById("subjectName")?.value.trim();
+  const description = document.getElementById("subjectDesc")?.value.trim();
+  if (!name) return toast("Enter the subject name.", "error");
+
+  const button = document.querySelector("#lmsModalBody form button[type='submit']");
+  if (button) { button.disabled = true; button.innerHTML = "Creating subject…"; }
+  toast("Creating subject…", "info");
+
+  try {
+    const { data, error } = await sb.from("subjects").insert({
+      class_id:classId,
+      name,
+      description:description || null
+    }).select("id,name,description,class_id").single();
+
+    if (error) {
+      console.error("createSubject failed:", error);
+      return toast("Failed to create subject. Please try again.", "error");
+    }
+
+    closeLmsModal();
+    toast("Subject created successfully.", "success");
+
+    activeSelectedClassObj = { ...activeSelectedClassObj, id:classId };
+    setCreationStatus("foldSubjectStatus", name);
+    await refreshSelectedClassSubjects(classId);
+
+    // Move the teacher to the enrollment-key stage. The key is already stored
+    // with the class by the existing class-creation RPC; this function retrieves
+    // that stored key and never creates a second key on page load.
+    if (continueToEnrollment) {
+      document.getElementById("teacherWorkflowContainer").style.display = "none";
+      document.getElementById("teacherClassesGridSection").style.display = "none";
+      document.getElementById("selectedClassViewSection").style.display = "block";
+      await openSelectedClassView(classId);
+      toast("Subject created successfully. Your enrollment key is ready below.", "success");
+    }
+  } finally {
+    if (button) { button.disabled = false; button.innerHTML = "Create Subject"; }
+  }
 }
+
 function openContentCreation(type) {
   if(!activeSelectedClassObj)return toast("Select a class first.","error");
   openLmsModal(`Create ${type}`, `<form class="lms-form" onsubmit="event.preventDefault();createContent('${type}')">
@@ -2215,54 +2451,11 @@ async function createContent(type) {
     const ins=await sb.from("assignments").insert({teacher_id:currentUser.id,class_id:activeSelectedClassObj.id,subject_id:subjectId,title,instructions:desc||null,attachment_path:path,is_published:publish,published_at:publish?new Date().toISOString():null,due_at:document.getElementById("contentDue").value?new Date(document.getElementById("contentDue").value).toISOString():null});
     if(ins.error)return toast(ins.error.message,"error");
   } else {
-    closeLmsModal();
-    openExamCreationModal(type);
-    return;
+    toast(`${type} creation is reserved for the exam/question builder.`, "info");
   }
   closeLmsModal();toast(`${type} saved.`,"success");
 }
-async function openExamCreationModal(type = "Tests") {
-  if (!activeSelectedClassObj) return toast("Select a class first.", "error");
-  const { data: subjects, error } = await sb.from("subjects")
-    .select("id,name")
-    .eq("class_id", activeSelectedClassObj.id)
-    .eq("is_archived", false)
-    .order("name");
-  if (error) return toast(error.message, "error");
-
-  openLmsModal(`Create ${type}`, `<form class="lms-form" onsubmit="event.preventDefault();createExamDirect();">
-    <select class="lms-select" id="examSubject" required>
-      <option value="">Select subject</option>
-      ${(subjects || []).map(s => `<option value="${escapeHtml(s.name)}">${escapeHtml(s.name)}</option>`).join("")}
-    </select>
-    <input class="lms-input" id="examTitle" placeholder="Exam title" required>
-    <textarea class="lms-textarea" id="examDescription" placeholder="Instructions / description"></textarea>
-    <input class="lms-input" id="examDuration" type="number" min="1" value="60" placeholder="Duration (minutes)" required>
-    <button class="primary-btn" style="opacity:1">Create Exam</button>
-  </form>`);
-}
-
-async function createExamDirect() {
-  if (!activeSelectedClassObj) return;
-  const subject = document.getElementById("examSubject").value;
-  const title = document.getElementById("examTitle").value.trim();
-  const description = document.getElementById("examDescription").value.trim();
-  const duration = Number(document.getElementById("examDuration").value);
-  if (!subject || !title || !duration) return toast("Complete the exam details.", "error");
-
-  const { data, error } = await sb.rpc("teacher_create_exam", {
-    p_class_id: activeSelectedClassObj.id,
-    p_subject: subject,
-    p_title: title,
-    p_description: description || null,
-    p_duration_minutes: duration
-  });
-  if (error) return toast(error.message, "error");
-  closeLmsModal();
-  toast("Exam created. Add questions through the exam builder next.", "success");
-}
-
-function publishFoldDownContent(type){openContentCreation(type);}
+async function publishFoldDownContent(type){openContentCreation(type);}
 function openLmsModal(title, body) {
   let modal=document.getElementById("lmsGenericModal");
   if(!modal){modal=document.createElement("div");modal.id="lmsGenericModal";modal.className="lms-modal";modal.innerHTML='<div class="lms-modal-card"><div style="display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:14px"><h3 id="lmsModalTitle"></h3><button onclick="closeLmsModal()" class="icon-btn">×</button></div><div id="lmsModalBody"></div></div>';document.body.appendChild(modal);}
@@ -2278,25 +2471,13 @@ function goBackToStudentHome(){switchTab("screen-home",document.getElementById("
    only reads notifications for the authenticated user.
 */
 async function refreshNotifications() {
-  if (!sb || !currentUser) return;
-  // Notifications are optional in the current MVP. If the table is not yet
-  // installed, do not block login/dashboard loading.
-  const { data, error } = await sb.from("notifications")
-    .select("id,title,message,type,created_at,is_read")
-    .eq("user_id", currentUser.id)
-    .order("created_at", { ascending: false })
-    .range(0, 19);
-
-  if (error) {
-    console.warn("Notifications unavailable:", error.message);
-    return;
-  }
-
-  const unread = (data || []).filter(n => !n.is_read).length;
-  const badge = document.getElementById("heroBadgeLabel");
-  if (badge && currentUserProfile?.role === "student") {
-    badge.textContent = unread ? `Student Portal • ${unread} new` : "Student Portal";
-  }
+  if(!sb||!currentUser)return;
+  const {data}=await sb.from("notifications").select("id,title,message,type,created_at,is_read")
+    .eq("user_id",currentUser.id).order("created_at",{ascending:false}).range(0,19);
+  // Keep existing UI unchanged; surface a compact unread indicator if useful.
+  const unread=(data||[]).filter(n=>!n.is_read).length;
+  const badge=document.getElementById("heroBadgeLabel");
+  if(badge && currentUserProfile?.role==="student") badge.textContent=unread?`Student Portal • ${unread} new`:"Student Portal";
 }
 </script>
 
