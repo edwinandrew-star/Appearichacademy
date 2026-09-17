@@ -1522,26 +1522,69 @@ window.addEventListener("DOMContentLoaded", async () => {
   const user = await getSessionUser();
   if (user) await bootstrapAuthenticatedUser(user);
 
-  sb.auth.onAuthStateChange(async (_event, session) => {
-    if (session?.user) await bootstrapAuthenticatedUser(session.user);
-    else showAuthScreen();
+  // Defer the profile query outside the Auth state-change callback so
+  // Supabase Auth is not blocked by another Supabase request.
+  sb.auth.onAuthStateChange((_event, session) => {
+    setTimeout(() => {
+      if (session?.user) bootstrapAuthenticatedUser(session.user);
+      else showAuthScreen();
+    }, 0);
   });
 });
 
 async function bootstrapAuthenticatedUser(user) {
   currentUser = user;
+
   // The authenticated Supabase user ID is the identity source.
   // Never trust a user ID supplied by HTML or JavaScript.
-  const { data: profile, error } = await sb.from("profiles")
+  let { data: profile, error } = await sb.from("profiles")
     .select("id, full_name, role, education_level, combination")
-    .eq("id", user.id).single();
+    .eq("id", user.id)
+    .maybeSingle();
+
+  // If the profile row does not exist yet, try to create it from the
+  // metadata captured during Supabase Auth sign-up. This fixes the
+  // "profile is not ready yet" situation for accounts created by this UI.
+  if (!profile && !error) {
+    const metadata = user.user_metadata || {};
+    const requestedRole = metadata.requested_role || metadata.role || currentAuthRole || "student";
+    const safeRole = ["student", "teacher"].includes(requestedRole) ? requestedRole : "student";
+
+    const { data: createdProfile, error: createError } = await sb
+      .from("profiles")
+      .upsert({
+        id: user.id,
+        full_name: metadata.full_name || user.email?.split("@")[0] || "User",
+        role: safeRole,
+        education_level: metadata.education_level || null,
+        combination: metadata.combination || null
+      }, { onConflict: "id" })
+      .select("id, full_name, role, education_level, combination")
+      .single();
+
+    if (!createError && createdProfile) {
+      profile = createdProfile;
+      error = null;
+    } else if (createError) {
+      console.error("Profile creation failed:", createError);
+      toast(
+        createError.code === "42501"
+          ? "Login worked, but Supabase is blocking profile creation. Add the profiles INSERT/UPDATE policy, then try again."
+          : `Profile could not be loaded: ${createError.message}`,
+        "error"
+      );
+      return;
+    }
+  }
 
   if (error || !profile) {
-    toast("Your account profile is not ready yet. Please try again.", "error");
+    console.error("Profile lookup failed:", error);
+    toast("Your account profile could not be loaded. Check the profiles table and RLS policies.", "error");
     return;
   }
+
   currentUserProfile = profile;
-  launchDashboardBasedOnRole();
+  await launchDashboardBasedOnRole();
 }
 
 function showAuthScreen() {
