@@ -1456,8 +1456,10 @@ const sb = (window.supabase && SUPABASE_URL.startsWith("http"))
 
 let currentAuthRole = "student";
 let authMode = "login";
+let expectedLoginRole = null;
 let currentUser = null;
 let currentUserProfile = null;
+let authRoutingInProgress = false;
 let activeSelectedClassObj = null;
 let activeStudentClass = null;
 let activeStudentSubject = null;
@@ -1526,74 +1528,92 @@ window.addEventListener("DOMContentLoaded", async () => {
   // Supabase Auth is not blocked by another Supabase request.
   sb.auth.onAuthStateChange((_event, session) => {
     setTimeout(() => {
-      if (session?.user) bootstrapAuthenticatedUser(session.user);
-      else showAuthScreen();
+      if (session?.user) {
+        const roleForThisLogin = expectedLoginRole;
+        if (!currentUser || currentUser.id !== session.user.id) {
+          bootstrapAuthenticatedUser(session.user, roleForThisLogin);
+        }
+      } else {
+        showAuthScreen();
+      }
     }, 0);
   });
 });
 
-async function bootstrapAuthenticatedUser(user) {
-  currentUser = user;
+async function bootstrapAuthenticatedUser(user, loginRole = null) {
+  if (!user || !sb) return;
+  if (authRoutingInProgress) return;
+  authRoutingInProgress = true;
 
-  // The authenticated Supabase user ID is the identity source.
-  // Never trust a user ID supplied by HTML or JavaScript.
-  let { data: profile, error } = await sb.from("profiles")
-    .select("id, full_name, role, education_level, combination")
-    .eq("id", user.id)
-    .maybeSingle();
+  try {
+    currentUser = user;
 
-  // If the profile row does not exist yet, try to create it from the
-  // metadata captured during Supabase Auth sign-up. This fixes the
-  // "profile is not ready yet" situation for accounts created by this UI.
-  if (!profile && !error) {
-    const metadata = user.user_metadata || {};
-    const requestedRole = metadata.requested_role || metadata.role || currentAuthRole || "student";
-    const safeRole = ["student", "teacher"].includes(requestedRole) ? requestedRole : "student";
+    // The database profile is the authority for the account role.
+    // Never use the login tab to change a user's database role.
+    const { data: profile, error } = await sb.from("profiles")
+      .select("id, full_name, email, role, education_level, combination")
+      .eq("id", user.id)
+      .maybeSingle();
 
-    const { data: createdProfile, error: createError } = await sb
-      .from("profiles")
-      .upsert({
-        id: user.id,
-        full_name: metadata.full_name || user.email?.split("@")[0] || "User",
-        role: safeRole,
-        education_level: metadata.education_level || null,
-        combination: metadata.combination || null
-      }, { onConflict: "id" })
-      .select("id, full_name, role, education_level, combination")
-      .single();
-
-    if (!createError && createdProfile) {
-      profile = createdProfile;
-      error = null;
-    } else if (createError) {
-      console.error("Profile creation failed:", createError);
-      toast(
-        createError.code === "42501"
-          ? "Login worked, but Supabase is blocking profile creation. Add the profiles INSERT/UPDATE policy, then try again."
-          : `Profile could not be loaded: ${createError.message}`,
-        "error"
-      );
+    if (error) {
+      console.error("Profile lookup failed:", error);
+      toast("Your account profile could not be loaded. Check the profiles table and RLS policies.", "error");
       return;
     }
+
+    if (!profile) {
+      console.error("No profile exists for authenticated user:", user.id);
+      toast("Your account profile is missing. Contact the administrator.", "error");
+      await sb.auth.signOut();
+      return;
+    }
+
+    const actualRole = String(profile.role || "").trim().toLowerCase();
+    const requestedLoginRole = String(loginRole || "").trim().toLowerCase();
+
+    // A login tab is an access check, NOT a role assignment.
+    // Teacher tab requires a teacher/admin profile.
+    // Student tab requires a student profile.
+    if (requestedLoginRole) {
+      const roleMatches = requestedLoginRole === "teacher"
+        ? ["teacher", "admin", "teacher/admin"].includes(actualRole)
+        : actualRole === "student";
+
+      if (!roleMatches) {
+        const expectedLabel = requestedLoginRole === "teacher" ? "Teacher" : "Student";
+        const actualLabel = ["teacher", "admin", "teacher/admin"].includes(actualRole)
+          ? "Teacher"
+          : actualRole === "student"
+            ? "Student"
+            : actualRole || "unknown";
+
+        expectedLoginRole = null;
+        await sb.auth.signOut();
+        showAuthScreen();
+        toast(`This account is registered as ${actualLabel}. Select ${actualLabel} to log in.`, "error");
+        return;
+      }
+    }
+
+    currentUserProfile = {
+      ...profile,
+      role: actualRole
+    };
+
+    expectedLoginRole = null;
+    console.log("Appearich authenticated user:", currentUser.email);
+    console.log("Appearich database role:", actualRole);
+
+    await launchDashboardBasedOnRole();
+  } finally {
+    authRoutingInProgress = false;
   }
-
-  if (error || !profile) {
-    console.error("Profile lookup failed:", error);
-    toast("Your account profile could not be loaded. Check the profiles table and RLS policies.", "error");
-    return;
-  }
-
-  currentUserProfile = {
-    ...profile,
-    role: String(profile.role || "").trim().toLowerCase()
-  };
-
-  console.log("Profile loaded successfully:", currentUserProfile);
-  await launchDashboardBasedOnRole();
 }
 
 function showAuthScreen() {
-  currentUser = null; currentUserProfile = null;
+  currentUser = null;
+  currentUserProfile = null;
+  expectedLoginRole = null;
   document.getElementById("mainHeader").style.display = "none";
   document.getElementById("mainNavBar").style.display = "none";
   document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
@@ -1602,42 +1622,82 @@ function showAuthScreen() {
 
 async function handleAuthSubmit() {
   if (!requireBackend()) return;
-  const email = document.getElementById("authEmail").value.trim();
+
+  const email = document.getElementById("authEmail").value.trim().toLowerCase();
   const pwd = document.getElementById("authPassword").value;
   if (!email || !pwd) return toast("Enter email and password.", "error");
 
   if (authMode === "signup") {
     const name = document.getElementById("regName").value.trim();
     const cpwd = document.getElementById("authConfirmPassword").value;
-    if (!name || pwd !== cpwd) return toast("Check your name and password confirmation.", "error");
+
+    if (!name || pwd !== cpwd) {
+      return toast("Check your name and password confirmation.", "error");
+    }
+
+    // Public signup always creates a STUDENT profile.
+    // Teacher accounts are assigned/approved from the secure database side.
+    if (currentAuthRole === "teacher") {
+      return toast("Teacher accounts must be created or approved by the administrator. Use the Teacher tab to sign in after your teacher role has been assigned.", "error");
+    }
 
     const metadata = {
       full_name: name,
-      requested_role: currentAuthRole,
-      education_level: currentAuthRole === "student" ? document.getElementById("eduLevelSelect").value : null,
-      combination: currentAuthRole === "student" ? (document.getElementById("regCombination").value || null) : null
+      requested_role: "student",
+      education_level: document.getElementById("eduLevelSelect")?.value || null,
+      combination: document.getElementById("regCombination")?.value || null
     };
-    const { error } = await sb.auth.signUp({ email, password: pwd, options: { data: metadata } });
+
+    const { data, error } = await sb.auth.signUp({
+      email,
+      password: pwd,
+      options: { data: metadata }
+    });
+
     if (error) return toast(error.message, "error");
-    toast("Account created. Check your email if confirmation is enabled.", "success");
+
+    // If email confirmation is disabled, a session may already exist.
+    if (data?.session?.user) {
+      expectedLoginRole = "student";
+      await bootstrapAuthenticatedUser(data.session.user, "student");
+    } else {
+      toast("Student account created. Check your email if confirmation is enabled.", "success");
+      authMode = "login";
+      document.getElementById("authTitleText").innerText = "Welcome back";
+      document.getElementById("authSubText").innerText = "Select your portal and enter your credentials";
+      document.getElementById("authActionBtn").innerText = "Login";
+      document.getElementById("authSwitchPrompt").innerHTML = "Don't have an account? <span>Sign Up</span>";
+      switchAuthRole("student");
+    }
     return;
   }
 
-  const { error } = await sb.auth.signInWithPassword({ email, password: pwd });
-  if (error) return toast("Login failed. Check your credentials.", "error");
+  // Login: remember which portal the user explicitly selected.
+  expectedLoginRole = currentAuthRole;
+
+  const { data, error } = await sb.auth.signInWithPassword({
+    email,
+    password: pwd
+  });
+
+  if (error) {
+    expectedLoginRole = null;
+    return toast("Login failed. Check your credentials.", "error");
+  }
+
+  // Route immediately using the verified database role.
+  if (data?.user) {
+    await bootstrapAuthenticatedUser(data.user, expectedLoginRole);
+  }
 }
 
 async function handleLogout() {
+  expectedLoginRole = null;
   if (sb) await sb.auth.signOut();
   showAuthScreen();
 }
 
 async function launchDashboardBasedOnRole() {
-  // ============================================================
-  // ROLE-BASED ROUTING
-  // The Supabase profiles.role value is the ONLY authority used
-  // to decide which portal the authenticated user sees.
-  // ============================================================
   if (!currentUser || !currentUserProfile) {
     showAuthScreen();
     return;
@@ -1645,12 +1705,6 @@ async function launchDashboardBasedOnRole() {
 
   const role = String(currentUserProfile.role || "").trim().toLowerCase();
 
-  console.log("Appearich authenticated user:", currentUser.email);
-  console.log("Appearich database role:", role);
-
-  // Always hide every application screen before opening the
-  // authorized destination. This prevents the previous Student
-  // Portal from remaining visible after a Teacher login.
   document.querySelectorAll(".screen").forEach(screen => {
     screen.classList.remove("active");
   });
@@ -1658,51 +1712,30 @@ async function launchDashboardBasedOnRole() {
   document.getElementById("mainHeader").style.display = "flex";
   document.getElementById("mainNavBar").style.display = "flex";
 
-  // ------------------------------------------------------------
-  // TEACHER / ADMIN
-  // ------------------------------------------------------------
   if (role === "teacher" || role === "admin" || role === "teacher/admin") {
     const teacherScreen = document.getElementById("screen-teacher-portal");
-
-    if (!teacherScreen) {
-      console.error("Teacher portal screen was not found in the HTML.");
-      toast("Teacher Portal is missing from this build.", "error");
-      return;
-    }
+    if (!teacherScreen) return toast("Teacher Portal is missing from this build.", "error");
 
     teacherScreen.classList.add("active");
 
     const brand = document.getElementById("headerBrandTitle");
     if (brand) {
-      brand.innerText = role === "admin"
-        ? "Appearich Admin Portal"
-        : "Appearich Teacher Portal";
+      brand.innerText = role === "admin" ? "Appearich Admin Portal" : "Appearich Teacher Portal";
     }
 
     const greeting = document.getElementById("teacherPortalGreeting");
     if (greeting) {
-      greeting.innerText =
-        `WELCOME, ${(currentUserProfile.full_name || "TEACHER").toUpperCase()}`;
+      greeting.innerText = `WELCOME, ${(currentUserProfile.full_name || "TEACHER").toUpperCase()}`;
     }
 
-    // Teacher data is loaded only after the Teacher screen has been
-    // selected. It cannot redirect the user to the Student Portal.
     await loadTeacherClasses();
     await refreshNotifications();
     return;
   }
 
-  // ------------------------------------------------------------
-  // STUDENT
-  // ------------------------------------------------------------
   if (role === "student") {
     const studentScreen = document.getElementById("screen-home");
-
-    if (!studentScreen) {
-      console.error("Student portal screen was not found in the HTML.");
-      toast("Student Portal is missing from this build.", "error");
-      return;
-    }
+    if (!studentScreen) return toast("Student Portal is missing from this build.", "error");
 
     studentScreen.classList.add("active");
 
@@ -1710,47 +1743,29 @@ async function launchDashboardBasedOnRole() {
     if (brand) brand.innerText = "Appearich Student Portal";
 
     const greeting = document.getElementById("dynamicGreeting");
-    if (greeting) {
-      greeting.innerText =
-        `WELCOME, ${(currentUserProfile.full_name || "SCHOLAR").toUpperCase()}`;
-    }
+    if (greeting) greeting.innerText = `WELCOME, ${(currentUserProfile.full_name || "SCHOLAR").toUpperCase()}`;
 
     const subGreeting = document.getElementById("dynamicSubGreeting");
-    if (subGreeting) {
-      subGreeting.innerText =
-        `Level: ${currentUserProfile.education_level || "General"}`;
-    }
+    if (subGreeting) subGreeting.innerText = `Level: ${currentUserProfile.education_level || "General"}`;
 
     const profileName = document.getElementById("profileDisplayName");
-    if (profileName) {
-      profileName.innerText = currentUserProfile.full_name || "Scholar";
-    }
+    if (profileName) profileName.innerText = currentUserProfile.full_name || "Scholar";
 
     const profileEmail = document.getElementById("profileDisplayEmail");
     if (profileEmail) profileEmail.innerText = currentUser.email;
 
     const profileProgram = document.getElementById("profileDisplayProgram");
     if (profileProgram) {
-      profileProgram.innerText =
-        currentUserProfile.combination ||
-        currentUserProfile.education_level ||
-        "Academic Programme";
+      profileProgram.innerText = currentUserProfile.combination || currentUserProfile.education_level || "Academic Programme";
     }
 
     const profileInitial = document.getElementById("profileInitial");
-    if (profileInitial) {
-      profileInitial.innerText =
-        (currentUserProfile.full_name || "S").charAt(0).toUpperCase();
-    }
+    if (profileInitial) profileInitial.innerText = (currentUserProfile.full_name || "S").charAt(0).toUpperCase();
 
     await refreshNotifications();
     return;
   }
 
-  // ------------------------------------------------------------
-  // UNKNOWN / INVALID ROLE
-  // ------------------------------------------------------------
-  console.error("Invalid profile role:", currentUserProfile.role);
   await sb.auth.signOut();
   showAuthScreen();
   toast("This account has an invalid role. Please contact the administrator.", "error");
@@ -1760,26 +1775,44 @@ function switchAuthRole(role) {
   currentAuthRole = role;
   document.getElementById("tabRoleStudent").className = role === "student" ? "role-tab active" : "role-tab";
   document.getElementById("tabRoleTeacher").className = role === "teacher" ? "role-tab active" : "role-tab";
+
   const signup = authMode === "signup";
   document.getElementById("nameGroup").style.display = signup ? "block" : "none";
   document.getElementById("confirmPasswordGroup").style.display = signup ? "block" : "none";
   document.getElementById("studentDetailsFields").style.display = signup && role === "student" ? "block" : "none";
   document.getElementById("regName").placeholder = role === "teacher" ? "e.g. Dr. Kelvin Vance" : "e.g. Student Name";
+
+  const actionBtn = document.getElementById("authActionBtn");
+  if (actionBtn) {
+    actionBtn.innerText = authMode === "signup" ? (role === "teacher" ? "Teacher Sign Up" : "Sign Up") : "Login";
+  }
+
+  const subText = document.getElementById("authSubText");
+  if (subText && authMode === "login") {
+    subText.innerText = role === "teacher"
+      ? "Teacher sign in — your database role must be teacher"
+      : "Student sign in — your database role must be student";
+  }
 }
-function handleEduLevelChange() {
-  const level = document.getElementById("eduLevelSelect").value;
-  document.getElementById("combinationGroup").style.display =
-    (level === "Upper Secondary" || level === "Lower Secondary") ? "block" : "none";
-}
+
 function toggleAuthMode() {
   authMode = authMode === "login" ? "signup" : "login";
   document.getElementById("authTitleText").innerText = authMode === "login" ? "Welcome back" : "Create Account";
   document.getElementById("authSubText").innerText = authMode === "login"
-    ? "Select your portal and enter your credentials" : "Register for access to Appearich";
-  document.getElementById("authActionBtn").innerText = authMode === "login" ? "Login" : "Sign Up";
+    ? (currentAuthRole === "teacher" ? "Teacher sign in — your database role must be teacher" : "Student sign in — your database role must be student")
+    : "Create a student account. Teacher accounts are administrator-assigned.";
+  document.getElementById("authActionBtn").innerText = authMode === "login"
+    ? "Login"
+    : (currentAuthRole === "teacher" ? "Teacher Sign Up" : "Sign Up");
   document.getElementById("authSwitchPrompt").innerHTML =
     authMode === "login" ? "Don't have an account? <span>Sign Up</span>" : "Already have an account? <span>Sign In</span>";
   switchAuthRole(currentAuthRole);
+}
+
+function handleEduLevelChange() {
+  const level = document.getElementById("eduLevelSelect").value;
+  document.getElementById("combinationGroup").style.display =
+    (level === "Upper Secondary" || level === "Lower Secondary") ? "block" : "none";
 }
 async function sendPasswordReset() {
   if (!requireBackend()) return;
