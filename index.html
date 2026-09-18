@@ -1301,11 +1301,6 @@
           <div id="selectedClassSubjectsArea" class="feed-container"><div class="lms-small">Loading subjects…</div></div>
         </div>
 
-        <div id="teacherPublishedMaterialsPanel" style="margin-bottom:20px;">
-          <div class="section-header-title"><span><i class="fa-solid fa-folder-open" style="color:var(--accent-gold);"></i> Uploaded Materials</span></div>
-          <div id="teacherMaterialsArea" class="feed-container"><div class="lms-small">Loading uploaded materials…</div></div>
-        </div>
-
         <!-- Content management grid -->
         <div class="grid-2x2-workspace">
           <div class="workspace-section-card" onclick="toggleFoldDownContent('Materials')">
@@ -1843,15 +1838,49 @@ function openJoinClassModal() {
     </form>`);
 }
 async function joinClassWithKey() {
-  const key = document.getElementById("joinClassKey").value.trim();
-  if (!key || !sb) return;
-  // Secure validation is performed by the PostgreSQL RPC, not by comparing
-  // the entered key against a key exposed to the browser.
-  const { data, error } = await sb.rpc("join_class_by_enrollment_key", { p_key: key });
-  if (error) return toast(error.message, "error");
-  closeLmsModal();
-  toast(data?.message || "Class joined.", "success");
-  await loadStudentClasses();
+  const input = document.getElementById("joinClassKey");
+  const key = input?.value.trim();
+  if (!key || !sb || !currentUser) return;
+
+  const button = document.querySelector("#lmsModalBody form button[type='submit']");
+  if (button) { button.disabled = true; button.innerHTML = "Joining class…"; }
+
+  try {
+    // The database RPC is the only place that should resolve an enrollment key
+    // into a class and create the permanent student membership.
+    const { data, error } = await sb.rpc("join_class_by_enrollment_key", { p_key: key });
+
+    if (error) {
+      console.error("join_class_by_enrollment_key failed:", error);
+      return toast(error.message || "Unable to join this class.", "error");
+    }
+
+    // Some PostgreSQL functions return an object while others return a one-row
+    // array. Support both without changing the database contract.
+    const result = Array.isArray(data) ? data[0] : data;
+    const joinedClassId = result?.class_id || result?.id || result?.class?.id;
+
+    closeLmsModal();
+    toast(result?.message || "Class joined successfully.", "success");
+
+    // Reload from class_members so the class card is generated from the
+    // persistent database membership, not temporary frontend state.
+    await loadStudentClasses();
+
+    // Verify that the newly joined class is actually visible to this student.
+    // If the RPC inserted the membership but RLS blocks the read, show the
+    // precise problem instead of silently making it look like the join failed.
+    if (joinedClassId) {
+      const visibleCard = [...document.querySelectorAll("#studentClassesGridContainer .portal-box-card")]
+        .some(card => card.getAttribute("onclick")?.includes(String(joinedClassId)));
+      if (!visibleCard) {
+        console.warn("Class was joined but is not visible after reload. Check RLS policies for class_members/classes.");
+        toast("The class was joined, but it is not visible. Check student RLS policies for class_members and classes.", "error");
+      }
+    }
+  } finally {
+    if (button) { button.disabled = false; button.innerHTML = "Join Class"; }
+  }
 }
 
 /* ---------- 4. STUDENT SUBJECTS / CONTENT ---------- */
@@ -2497,7 +2526,6 @@ async function openSelectedClassView(classId) {
 
   await renderEnrollmentKeyForClass(c);
   await refreshSelectedClassSubjects(c.id);
-  await loadTeacherUploadedMaterials(c.id);
 }
 
 async function loadTeacherUploadedMaterials(classId) {
