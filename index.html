@@ -1754,13 +1754,25 @@ async function sendPasswordReset() {
 
 /* ---------- 2. NAVIGATION / THEME ---------- */
 function switchTab(screenId, element) {
+  const role = String(currentUserProfile?.role || "").toLowerCase();
+  const isTeacher = ["teacher", "admin", "teacher/admin"].includes(role);
+  const isStudent = role === "student";
+
+  // Keep teacher and student workspaces strictly separated.
+  if (isStudent && ["screen-teacher-portal"].includes(screenId)) {
+    return toast("This area is for teachers only.", "error");
+  }
+  if (isTeacher && ["screen-student-classes", "screen-student-subject-workspace"].includes(screenId)) {
+    return toast("This area is for students only.", "error");
+  }
+
   document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
   document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active"));
-  if (currentUserProfile?.role === "teacher" && screenId === "screen-home")
-    document.getElementById("screen-teacher-portal").classList.add("active");
+  if (isTeacher && screenId === "screen-home")
+    document.getElementById("screen-teacher-portal")?.classList.add("active");
   else document.getElementById(screenId)?.classList.add("active");
   element?.classList.add("active");
-  if (screenId === "screen-student-classes") loadStudentClasses();
+  if (screenId === "screen-student-classes" && isStudent) loadStudentClasses();
 }
 function toggleThemeMode() {
   const root = document.documentElement;
@@ -1795,7 +1807,18 @@ async function loadStudentClasses() {
     return;
   }
 
-  const rows = (data || []).filter(r => r.classes?.id);
+  // De-duplicate memberships by class_id so repeated joins can never create
+  // duplicate class cards in the student interface. The database remains the
+  // source of truth for membership.
+  const uniqueRows = [];
+  const seenClassIds = new Set();
+  for (const row of (data || [])) {
+    const classId = row?.classes?.id || row?.class_id;
+    if (!classId || !row?.classes || seenClassIds.has(classId)) continue;
+    seenClassIds.add(classId);
+    uniqueRows.push(row);
+  }
+  const rows = uniqueRows;
   const classIds = [...new Set(rows.map(r => r.classes.id))];
   let subjectMap = {};
   if (classIds.length) {
@@ -1812,17 +1835,24 @@ async function loadStudentClasses() {
     }
   }
 
-  box.innerHTML = rows.length ? rows.map(r => {
-    const c = r.classes;
-    const subjectNames = subjectMap[c.id] || [];
-    return `<div class="portal-box-card" onclick="openStudentSubjectsForClass('${c.id}')">
-      <div class="custom-vector-emblem"><i class="fa-solid fa-school"></i></div>
-      <strong>${escapeHtml(c.name)}</strong>
-      <span class="lms-small">${escapeHtml(c.education_level || "")} • ${escapeHtml(c.academic_year || "")}</span>
-      <span class="lms-small">${subjectNames.length ? escapeHtml(subjectNames.join(" • ")) : "No subjects yet"}</span>
-      <span class="lms-pill">Enrolled</span>
-    </div>`;
-  }).join("") : `
+  box.innerHTML = rows.length ? `
+    ${rows.map(r => {
+      const c = r.classes;
+      const subjectNames = subjectMap[c.id] || [];
+      return `<div class="portal-box-card" onclick="openStudentSubjectsForClass('${c.id}')">
+        <div class="custom-vector-emblem"><i class="fa-solid fa-school"></i></div>
+        <strong>${escapeHtml(c.name)}</strong>
+        <span class="lms-small">${escapeHtml(c.education_level || "")} • ${escapeHtml(c.academic_year || "")}</span>
+        <span class="lms-small">${subjectNames.length ? escapeHtml(subjectNames.join(" • ")) : "No subjects yet"}</span>
+        <span class="lms-pill">Enrolled</span>
+      </div>`;
+    }).join("")}
+    <div class="portal-box-card" onclick="openJoinClassModal()">
+      <div class="custom-vector-emblem"><i class="fa-solid fa-plus"></i></div>
+      <strong>Join Another Class</strong>
+      <span class="lms-small">Enter another enrollment key</span>
+    </div>
+  ` : `
     <div class="lms-item">
       <strong>No classes yet.</strong>
       <p class="lms-small" style="margin-top:6px;">Join a class using the enrollment key supplied by your teacher.</p>
@@ -1867,15 +1897,25 @@ async function joinClassWithKey() {
     // persistent database membership, not temporary frontend state.
     await loadStudentClasses();
 
-    // Verify that the newly joined class is actually visible to this student.
-    // If the RPC inserted the membership but RLS blocks the read, show the
-    // precise problem instead of silently making it look like the join failed.
+    // Verify the persistent membership directly. This avoids relying on a
+    // rendered card as proof that the database enrollment succeeded.
     if (joinedClassId) {
-      const visibleCard = [...document.querySelectorAll("#studentClassesGridContainer .portal-box-card")]
-        .some(card => card.getAttribute("onclick")?.includes(String(joinedClassId)));
-      if (!visibleCard) {
-        console.warn("Class was joined but is not visible after reload. Check RLS policies for class_members/classes.");
-        toast("The class was joined, but it is not visible. Check student RLS policies for class_members and classes.", "error");
+      const { data: membershipCheck, error: membershipCheckError } = await sb.from("class_members")
+        .select("class_id")
+        .eq("student_id", currentUser.id)
+        .eq("class_id", joinedClassId)
+        .limit(1);
+
+      if (membershipCheckError || !membershipCheck?.length) {
+        console.warn("Membership exists according to the RPC response but cannot be read by the student:", membershipCheckError);
+        toast("The class was joined, but student access is blocked. Check class_members RLS.", "error");
+      } else {
+        const visibleCard = [...document.querySelectorAll("#studentClassesGridContainer .portal-box-card")]
+          .some(card => card.getAttribute("onclick")?.includes(String(joinedClassId)));
+        if (!visibleCard) {
+          console.warn("Membership is readable but the class card is not rendered. Check classes RLS or the student class query.");
+          toast("Enrollment was saved, but the class could not be displayed. Check classes RLS.", "error");
+        }
       }
     }
   } finally {
@@ -1887,11 +1927,19 @@ async function joinClassWithKey() {
 async function openStudentSubjectsForClass(classId) {
   if (!sb || !currentUser || !classId) return;
 
-  const { data: membership, error: membershipError } = await sb.from("class_members")
+  // This is a student-only route. Never send a student into the teacher
+  // subject-management workspace.
+  const role = String(currentUserProfile?.role || "").toLowerCase();
+  if (["teacher", "admin", "teacher/admin"].includes(role)) {
+    return toast("Teachers should open classes from the Teacher Portal.", "info");
+  }
+
+  const { data: membershipRows, error: membershipError } = await sb.from("class_members")
     .select("class_id")
     .eq("class_id", classId)
     .eq("student_id", currentUser.id)
-    .maybeSingle();
+    .limit(1);
+  const membership = membershipRows?.[0] || null;
 
   if (membershipError || !membership) {
     return toast("You are not enrolled in this class.", "error");
@@ -2503,6 +2551,10 @@ async function renderEnrollmentKeyForClass(classObj, preferredKey = null) {
 
 async function openSelectedClassView(classId) {
   if (!requireBackend() || !currentUser || !classId) return;
+  const role = String(currentUserProfile?.role || "").toLowerCase();
+  if (!["teacher", "admin", "teacher/admin"].includes(role)) {
+    return toast("Students cannot manage teacher classes. Open your enrolled class instead.", "error");
+  }
 
   const { data:c, error } = await sb.from("classes")
     .select("id,name,education_level,academic_year,description,is_archived,teacher_id")
@@ -2773,6 +2825,10 @@ function addClassToLevel() {
 }
 
 function confirmClassesAndFold() {
+  const role = String(currentUserProfile?.role || "").toLowerCase();
+  if (!["teacher", "admin", "teacher/admin"].includes(role)) {
+    return toast("Students cannot manage subjects. Open your class to view its subjects.", "error");
+  }
   if (activeSelectedClassObj?.id) {
     setCreationStatus("foldClassStatus", activeSelectedClassObj.name || "Class created");
     setCreationStatus("foldSubjectStatus", "Ready for subject");
@@ -2784,6 +2840,10 @@ function confirmClassesAndFold() {
 }
 
 function addSubjectToClass() {
+  const role = String(currentUserProfile?.role || "").toLowerCase();
+  if (!["teacher", "admin", "teacher/admin"].includes(role)) {
+    return toast("Students cannot manage subjects. Open your class to view its subjects.", "error");
+  }
   const classId = activeSelectedClassObj?.id;
   if (!classId) return toast("Create or select a class first.", "error");
   activateCreationStep("subject");
@@ -2821,6 +2881,10 @@ function toggleFoldSection(id) {
 }
 
 async function toggleFoldDownContent(type) {
+  const role = String(currentUserProfile?.role || "").toLowerCase();
+  if (!["teacher", "admin", "teacher/admin"].includes(role)) {
+    return toast("Students cannot manage class content. Open the class to view published content.", "error");
+  }
   currentFoldContentType = type;
   const a = document.getElementById("activeContentFoldArea");
   const classId = activeSelectedClassObj?.id;
@@ -2829,21 +2893,19 @@ async function toggleFoldDownContent(type) {
   a.style.display = "block";
   a.innerHTML = `
     <div class="lms-item">
-      <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap;">
-        <div>
-          <strong>${escapeHtml(type)}</strong>
-          <p class="lms-small" style="margin-top:5px;">Create and publish ${escapeHtml(type.toLowerCase())} for this exact class.</p>
+      <div>
+        <strong>${escapeHtml(type)}</strong>
+        <p class="lms-small" style="margin-top:5px;">Create and publish ${escapeHtml(type.toLowerCase())} for this exact class.</p>
+      </div>
+      <button class="primary-btn" style="opacity:1" onclick="openContentCreation('${type}')">
+        <i class="fa-solid fa-plus"></i> Create ${escapeHtml(type)}
+      </button>
+      <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border-color);">
+        <div class="section-header-title" style="margin-bottom:10px;">
+          <span><i class="fa-solid fa-clock-rotate-left" style="color:var(--accent-gold);"></i> Uploaded History</span>
         </div>
-        <button class="primary-btn" style="opacity:1" onclick="openContentCreation('${type}')">
-          <i class="fa-solid fa-plus"></i> Create ${escapeHtml(type)}
-        </button>
+        <div id="teacherContentHistoryArea"><div class="lms-small">Loading history…</div></div>
       </div>
-    </div>
-    <div class="lms-item" style="margin-top:12px;">
-      <div class="section-header-title" style="margin-bottom:10px;">
-        <span><i class="fa-solid fa-clock-rotate-left" style="color:var(--accent-gold);"></i> Uploaded History</span>
-      </div>
-      <div id="teacherContentHistoryArea"><div class="lms-small">Loading history…</div></div>
     </div>`;
   await loadTeacherContentHistory(type, classId);
 }
@@ -2956,6 +3018,12 @@ function deleteFoldDownContent(){}
 /* ---------- 10. TEACHER SUBJECTS / MATERIALS / ASSIGNMENTS ---------- */
 async function openSubjectModal(classId, options = {}) {
   if (!classId) return toast("Select a class first.", "error");
+
+  const role = String(currentUserProfile?.role || "").toLowerCase();
+  if (!["teacher", "admin", "teacher/admin"].includes(role)) {
+    console.warn("Blocked student access to teacher subject management.");
+    return toast("Students cannot manage subjects. Open your class to view its subjects.", "error");
+  }
 
   // Confirm ownership before presenting the form. This is UI validation only;
   // Supabase RLS remains the actual security boundary.
