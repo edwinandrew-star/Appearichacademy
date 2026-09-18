@@ -1997,15 +1997,15 @@ async function openStudentSubjectWorkspace(subjectId) {
 
   const [materialsRes, assignmentsRes, announcementsRes, testsRes, quizzesRes, examsRes] = await Promise.all([
     sb.from("materials").select("id,title,description,file_name,mime_type,file_type,file_size,storage_path,storage_bucket,published_at,available_at,due_at,class_id,subject_id")
-      .eq("subject_id", subjectId).eq("class_id", activeStudentClass.id).eq("is_published", true).or("is_archived.eq.false,is_archived.is.null").order("published_at",{ascending:false}).range(0,49),
+      .eq("subject_id", subjectId).eq("class_id", activeStudentClass.id).or("is_archived.eq.false,is_archived.is.null").order("published_at",{ascending:false}).range(0,49),
     sb.from("assignments").select("id,title,instructions,published_at,due_at,max_marks,attachment_path,class_id,subject_id")
-      .eq("subject_id", subjectId).eq("class_id", activeStudentClass.id).eq("is_published", true).or("is_archived.eq.false,is_archived.is.null").order("due_at",{ascending:true}).range(0,49),
+      .eq("subject_id", subjectId).eq("class_id", activeStudentClass.id).or("is_archived.eq.false,is_archived.is.null").order("due_at",{ascending:true}).range(0,49),
     sb.from("announcements").select("id,title,message,published_at,class_id,subject_id")
-      .eq("subject_id", subjectId).eq("class_id", activeStudentClass.id).eq("is_published", true).or("is_archived.eq.false,is_archived.is.null").order("published_at",{ascending:false}).range(0,49),
+      .eq("subject_id", subjectId).eq("class_id", activeStudentClass.id).or("is_archived.eq.false,is_archived.is.null").order("published_at",{ascending:false}).range(0,49),
     sb.from("tests").select("id,title,instructions,duration_minutes,start_at,end_at,max_marks,is_published,class_id,subject_id")
-      .eq("subject_id", subjectId).eq("class_id", activeStudentClass.id).eq("is_published", true).or("is_archived.eq.false,is_archived.is.null").order("start_at",{ascending:false}).range(0,49),
+      .eq("subject_id", subjectId).eq("class_id", activeStudentClass.id).or("is_archived.eq.false,is_archived.is.null").order("start_at",{ascending:false}).range(0,49),
     sb.from("quizzes").select("id,title,instructions,duration_minutes,start_at,end_at,max_marks,is_published,class_id,subject_id")
-      .eq("subject_id", subjectId).eq("class_id", activeStudentClass.id).eq("is_published", true).or("is_archived.eq.false,is_archived.is.null").order("start_at",{ascending:false}).range(0,49),
+      .eq("subject_id", subjectId).eq("class_id", activeStudentClass.id).or("is_archived.eq.false,is_archived.is.null").order("start_at",{ascending:false}).range(0,49),
     // Keep the existing exam system visible alongside the newer Test/Quiz system.
     sb.from("exams").select("id,title,instructions,start_at,end_at,duration_minutes,max_marks,class_id,subject_id")
       .eq("subject_id", subjectId).eq("class_id", activeStudentClass.id).or("is_archived.eq.false,is_archived.is.null").order("start_at",{ascending:false}).range(0,49)
@@ -3335,7 +3335,7 @@ async function createContent(type) {
   const title = document.getElementById("contentTitleInput")?.value.trim();
   const desc = document.getElementById("contentDescInput")?.value.trim();
   const file = document.getElementById("contentFileInput")?.files?.[0] || null;
-  const publish = !!document.getElementById("contentPublish")?.checked;
+  const publish = true; // Teacher-created academic content is visible to enrolled students immediately.
   if (!subjectId || !title) return toast("Select a subject and enter a title.", "error");
 
   const classId = activeSelectedClassObj.id;
