@@ -1945,13 +1945,19 @@ async function openStudentSubjectsForClass(classId) {
     return toast("You are not enrolled in this class.", "error");
   }
 
+  // Load the exact enrolled class. Do not apply the teacher-only ownership
+  // filter here, and do not require is_archived=false because older class
+  // rows may have NULL in that field. Membership + RLS controls access.
   const { data: c, error: classError } = await sb.from("classes")
-    .select("id,name,education_level,academic_year,description,teacher_id")
+    .select("id,name,education_level,academic_year,description,teacher_id,is_archived")
     .eq("id", classId)
-    .eq("is_archived", false)
-    .single();
+    .maybeSingle();
 
-  if (classError || !c) return toast("Class could not be loaded.", "error");
+  if (classError) {
+    console.error("openStudentSubjectsForClass class load failed:", classError);
+    return toast(classError.message || "Class could not be loaded.", "error");
+  }
+  if (!c) return toast("Class could not be loaded. Check the student's class access policy.", "error");
   activeStudentClass = { ...c };
   const { data: subjects, error } = await sb.from("subjects")
     .select("id,name,description")
