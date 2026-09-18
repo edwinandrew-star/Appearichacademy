@@ -1635,17 +1635,14 @@ async function handleAuthSubmit() {
       return toast("Check your name and password confirmation.", "error");
     }
 
-    // Public signup always creates a STUDENT profile.
-    // Teacher accounts are assigned/approved from the secure database side.
-    if (currentAuthRole === "teacher") {
-      return toast("Teacher accounts must be created or approved by the administrator. Use the Teacher tab to sign in after your teacher role has been assigned.", "error");
-    }
+    const signupRole = currentAuthRole === "teacher" ? "teacher" : "student";
 
     const metadata = {
       full_name: name,
-      requested_role: "student",
-      education_level: document.getElementById("eduLevelSelect")?.value || null,
-      combination: document.getElementById("regCombination")?.value || null
+      requested_role: signupRole,
+      role: signupRole,
+      education_level: signupRole === "student" ? (document.getElementById("eduLevelSelect")?.value || null) : null,
+      combination: signupRole === "student" ? (document.getElementById("regCombination")?.value || null) : null
     };
 
     const { data, error } = await sb.auth.signUp({
@@ -1656,23 +1653,23 @@ async function handleAuthSubmit() {
 
     if (error) return toast(error.message, "error");
 
-    // If email confirmation is disabled, a session may already exist.
     if (data?.session?.user) {
-      expectedLoginRole = "student";
-      await bootstrapAuthenticatedUser(data.session.user, "student");
+      expectedLoginRole = signupRole;
+      await bootstrapAuthenticatedUser(data.session.user, signupRole);
     } else {
-      toast("Student account created. Check your email if confirmation is enabled.", "success");
+      toast(`${signupRole === "teacher" ? "Teacher" : "Student"} account created. Check your email if confirmation is enabled.`, "success");
       authMode = "login";
       document.getElementById("authTitleText").innerText = "Welcome back";
-      document.getElementById("authSubText").innerText = "Select your portal and enter your credentials";
+      document.getElementById("authSubText").innerText = signupRole === "teacher"
+        ? "Teacher sign in — use the Teacher tab"
+        : "Student sign in — use the Student tab";
       document.getElementById("authActionBtn").innerText = "Login";
       document.getElementById("authSwitchPrompt").innerHTML = "Don't have an account? <span>Sign Up</span>";
-      switchAuthRole("student");
+      switchAuthRole(signupRole);
     }
     return;
   }
 
-  // Login: remember which portal the user explicitly selected.
   expectedLoginRole = currentAuthRole;
 
   const { data, error } = await sb.auth.signInWithPassword({
@@ -1685,7 +1682,6 @@ async function handleAuthSubmit() {
     return toast("Login failed. Check your credentials.", "error");
   }
 
-  // Route immediately using the verified database role.
   if (data?.user) {
     await bootstrapAuthenticatedUser(data.user, expectedLoginRole);
   }
@@ -1800,7 +1796,7 @@ function toggleAuthMode() {
   document.getElementById("authTitleText").innerText = authMode === "login" ? "Welcome back" : "Create Account";
   document.getElementById("authSubText").innerText = authMode === "login"
     ? (currentAuthRole === "teacher" ? "Teacher sign in — your database role must be teacher" : "Student sign in — your database role must be student")
-    : "Create a student account. Teacher accounts are administrator-assigned.";
+    : (currentAuthRole === "teacher" ? "Create your teacher account." : "Create your student account.");
   document.getElementById("authActionBtn").innerText = authMode === "login"
     ? "Login"
     : (currentAuthRole === "teacher" ? "Teacher Sign Up" : "Sign Up");
