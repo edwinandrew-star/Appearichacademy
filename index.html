@@ -1260,10 +1260,25 @@
       <div id="teacherClassesGridSection" style="display: none;">
         <div class="section-header-title">
           <span><i class="fa-solid fa-grid-2" style="color: var(--accent-gold);"></i> Your Created Classes</span>
-          <button onclick="editCreationFlow()" style="background: none; border: none; color: var(--accent-gold); font-weight: 800; font-size: 0.75rem; cursor: pointer;">+ Add / Edit Setup</button>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+            <button onclick="openArchivedClasses()" style="background: none; border: none; color: var(--accent-gold); font-weight: 800; font-size: 0.75rem; cursor: pointer;">
+              <i class="fa-solid fa-box-archive"></i> Archived
+            </button>
+            <button onclick="editCreationFlow()" style="background: none; border: none; color: var(--accent-gold); font-weight: 800; font-size: 0.75rem; cursor: pointer;">+ Add / Edit Setup</button>
+          </div>
         </div>
         <div class="class-grid-cards" id="teacherClassesGrid">
           <!-- Dynamically populated class cards -->
+        </div>
+
+        <div id="archivedClassesSection" style="display:none;margin-top:20px;">
+          <div class="section-header-title">
+            <span><i class="fa-solid fa-box-archive" style="color: var(--accent-gold);"></i> Archived Classes</span>
+            <button onclick="closeArchivedClasses()" style="background:none;border:none;color:var(--text-sub);font-weight:800;font-size:.75rem;cursor:pointer;">
+              Close
+            </button>
+          </div>
+          <div class="class-grid-cards" id="archivedClassesGrid"></div>
         </div>
       </div>
 
@@ -2393,6 +2408,7 @@ async function loadTeacherClasses() {
   }
 
   teacherPortalData.classes = data || [];
+  document.getElementById("archivedClassesSection")?.style.setProperty("display", "none");
   showTeacherClassesGrid();
 }
 
@@ -2778,6 +2794,73 @@ function goBackToClassGrid() {
   document.getElementById("teacherClassesGridSection").style.display = "block";
   document.getElementById("activeContentFoldArea")?.style.setProperty("display", "none");
   loadTeacherClasses();
+}
+
+async function openArchivedClasses() {
+  if (!requireBackend() || !currentUser) return;
+
+  const section = document.getElementById("archivedClassesSection");
+  const grid = document.getElementById("archivedClassesGrid");
+  if (!section || !grid) return;
+
+  section.style.display = "block";
+  grid.innerHTML = `<div class="lms-item"><span class="lms-small">Loading archived classes…</span></div>`;
+
+  const { data, error } = await sb.from("classes")
+    .select("id,name,education_level,academic_year,description,is_archived,created_at")
+    .eq("teacher_id", currentUser.id)
+    .eq("is_archived", true)
+    .order("updated_at", { ascending:false })
+    .range(0,9999);
+
+  if (error) {
+    console.error("openArchivedClasses failed:", error);
+    grid.innerHTML = `<div class="lms-item"><strong>Unable to load archived classes.</strong><p class="lms-small" style="margin-top:6px;">${escapeHtml(error.message || "Please try again.")}</p></div>`;
+    return;
+  }
+
+  if (!(data || []).length) {
+    grid.innerHTML = `<div class="lms-item"><strong>No archived classes.</strong><p class="lms-small" style="margin-top:6px;">Deleted classes will appear here so you can restore them later.</p></div>`;
+    return;
+  }
+
+  grid.innerHTML = data.map(c => `
+    <div class="portal-box-card" style="position:relative;">
+      <div>
+        <div class="custom-vector-emblem"><i class="fa-solid fa-box-archive"></i></div>
+        <strong>${escapeHtml(c.name)}</strong>
+        <span class="lms-small">${escapeHtml(c.education_level || "")} • ${escapeHtml(c.academic_year || "")}</span>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;">
+        <button class="primary-btn" style="opacity:1;flex:1;min-width:130px;" onclick="restoreTeacherClass('${c.id}', event)">
+          <i class="fa-solid fa-rotate-left"></i> Restore Class
+        </button>
+      </div>
+    </div>`).join("");
+}
+
+function closeArchivedClasses() {
+  document.getElementById("archivedClassesSection")?.style.setProperty("display", "none");
+}
+
+async function restoreTeacherClass(classId, event) {
+  event?.stopPropagation();
+  if (!requireBackend() || !currentUser || !classId) return;
+
+  const { error } = await sb.from("classes")
+    .update({ is_archived:false, updated_at:new Date().toISOString() })
+    .eq("id", classId)
+    .eq("teacher_id", currentUser.id)
+    .eq("is_archived", true);
+
+  if (error) {
+    console.error("restoreTeacherClass failed:", error);
+    return toast("Failed to restore class. Please try again.", "error");
+  }
+
+  toast("Class restored successfully. Students can access it again.", "success");
+  await loadTeacherClasses();
+  await openArchivedClasses();
 }
 
 async function deleteTeacherClass(classId, event) {
@@ -3166,12 +3249,60 @@ function openContentCreation(type) {
 
 async function openAcademicAttachment(storagePath) {
   if (!storagePath) return toast("No attachment is available.", "error");
+
   try {
     const url = await getAcademicFileUrl(storagePath, "academic-materials", false);
-    openLmsModal("Assignment Attachment", `<iframe class="document-frame" src="${escapeHtml(url)}" title="Assignment attachment"></iframe>`);
+    const pathName = String(storagePath).split("?")[0].toLowerCase();
+    const isPdf = /\.pdf$/i.test(pathName);
+    const isImage = /\.(png|jpe?g|webp|gif|svg)$/i.test(pathName);
+    const isOffice = /\.(docx?|pptx?|xlsx?)$/i.test(pathName);
+
+    let content = "";
+
+    if (isPdf) {
+      content = `<iframe class="document-frame" src="${escapeHtml(url)}#toolbar=1&navpanes=0&view=FitH" title="Academic attachment"></iframe>`;
+    } else if (isImage) {
+      content = `<div style="text-align:center"><img src="${escapeHtml(url)}" alt="Academic attachment" style="max-width:100%;max-height:72vh;object-fit:contain;border-radius:14px;"></div>`;
+    } else if (isOffice) {
+      const officeUrl = `https://view.officeapps.live.com/op/view.aspx?src=${encodeURIComponent(url)}`;
+      content = `<iframe class="document-frame" src="${escapeHtml(officeUrl)}" title="Office document attachment"></iframe>
+        <div class="lms-small" style="margin-top:8px;">PowerPoint, Word and Excel files are opened using the Microsoft Office web viewer.</div>`;
+    } else {
+      content = `<div class="lms-item"><strong>${escapeHtml(pathName.split("/").pop() || "Academic attachment")}</strong>
+        <p class="lms-small" style="margin-top:6px;">This file type may not support an in-browser preview. You can still open or download it.</p></div>`;
+    }
+
+    content += `<div class="lms-item-actions" style="margin-top:10px;">
+      <button class="primary-btn" style="opacity:1" onclick="window.open('${escapeHtml(url)}','_blank','noopener,noreferrer')">
+        <i class="fa-solid fa-up-right-from-square"></i> Open in Browser
+      </button>
+      <button class="primary-btn" style="opacity:1" onclick="downloadAcademicAttachment('${escapeHtml(storagePath)}')">
+        <i class="fa-solid fa-download"></i> Download
+      </button>
+    </div>`;
+
+    openLmsModal("Academic Attachment", content);
   } catch (error) {
     console.error("openAcademicAttachment failed:", error);
     toast(error?.message || "Unable to open the attachment.", "error");
+  }
+}
+
+async function downloadAcademicAttachment(storagePath) {
+  if (!storagePath) return toast("No attachment is available.", "error");
+  try {
+    const url = await getAcademicFileUrl(storagePath, "academic-materials", true);
+    const a = document.createElement("a");
+    a.href = url;
+    a.target = "_blank";
+    a.rel = "noopener";
+    a.download = String(storagePath).split("/").pop() || "academic-attachment";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  } catch (error) {
+    console.error("downloadAcademicAttachment failed:", error);
+    toast(error?.message || "Unable to download the attachment.", "error");
   }
 }
 
