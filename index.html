@@ -986,13 +986,6 @@
   background:var(--surface-color); border:1px solid var(--accent-gold-border);
   color:var(--accent-gold); font-weight:900; text-align:center; }
 
-.academic-file-card { display:flex; gap:14px; align-items:flex-start; justify-content:space-between; flex-wrap:wrap; }
-.academic-file-main { display:flex; gap:12px; align-items:flex-start; min-width:0; flex:1; }
-.academic-file-name { font-size:.84rem; font-weight:800; overflow-wrap:anywhere; }
-.academic-file-meta { display:flex; gap:7px; flex-wrap:wrap; align-items:center; margin-top:7px; }
-.academic-file-actions { display:flex; gap:8px; flex-wrap:wrap; }
-@media (max-width:600px) { .academic-file-actions { width:100%; } .academic-file-actions .primary-btn { flex:1; min-width:120px; } }
-
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -1855,18 +1848,19 @@ async function openStudentSubjectWorkspace(subjectId) {
   if (subjectError || !subject) return toast("Subject could not be loaded.", "error");
 
   const [materialsRes, assignmentsRes, announcementsRes, testsRes, quizzesRes, examsRes] = await Promise.all([
-    sb.from("materials").select("id,title,description,file_name,mime_type,file_type,file_size,storage_path,published_at,available_at,due_at")
-      .eq("subject_id", subjectId).eq("class_id", activeStudentClass.id).eq("is_published", true).eq("is_archived", false).order("published_at",{ascending:false}).range(0,49),
-    sb.from("assignments").select("id,title,instructions,published_at,due_at,max_marks,attachment_path,attachment_file_name,attachment_mime_type")
-      .eq("subject_id", subjectId).eq("class_id", activeStudentClass.id).eq("is_published", true).eq("is_archived", false).order("due_at",{ascending:true}).range(0,49),
+    sb.from("materials").select("id,title,description,file_type,storage_path,published_at,available_at,due_at")
+      .eq("subject_id", subjectId).eq("is_published", true).eq("is_archived", false).order("published_at",{ascending:false}).range(0,49),
+    sb.from("assignments").select("id,title,instructions,published_at,due_at,max_marks,attachment_path")
+      .eq("subject_id", subjectId).eq("is_published", true).eq("is_archived", false).order("due_at",{ascending:true}).range(0,49),
     sb.from("announcements").select("id,title,message,published_at")
-      .eq("subject_id", subjectId).eq("class_id", activeStudentClass.id).eq("is_published", true).eq("is_archived", false).order("published_at",{ascending:false}).range(0,49),
+      .eq("subject_id", subjectId).eq("is_published", true).eq("is_archived", false).order("published_at",{ascending:false}).range(0,49),
     sb.from("tests").select("id,title,instructions,duration_minutes,start_at,end_at,max_marks,is_published")
-      .eq("subject_id", subjectId).eq("class_id", activeStudentClass.id).eq("is_published", true).eq("is_archived", false).order("start_at",{ascending:false}).range(0,49),
+      .eq("subject_id", subjectId).eq("is_published", true).eq("is_archived", false).order("start_at",{ascending:false}).range(0,49),
     sb.from("quizzes").select("id,title,instructions,duration_minutes,start_at,end_at,max_marks,is_published")
-      .eq("subject_id", subjectId).eq("class_id", activeStudentClass.id).eq("is_published", true).eq("is_archived", false).order("start_at",{ascending:false}).range(0,49),
+      .eq("subject_id", subjectId).eq("is_published", true).eq("is_archived", false).order("start_at",{ascending:false}).range(0,49),
+    // Keep the existing exam system visible alongside the newer Test/Quiz system.
     sb.from("exams").select("id,title,instructions,start_at,end_at,duration_minutes,max_marks")
-      .eq("subject_id", subjectId).eq("class_id", activeStudentClass.id).eq("is_archived", false).order("start_at",{ascending:false}).range(0,49)
+      .eq("subject_id", subjectId).eq("is_archived", false).order("start_at",{ascending:false}).range(0,49)
   ]);
 
   const firstError = [materialsRes,assignmentsRes,announcementsRes,testsRes,quizzesRes,examsRes].find(r => r.error);
@@ -1885,12 +1879,14 @@ async function openStudentSubjectWorkspace(subjectId) {
     <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
       <button onclick="openStudentSubjectsForClass('${activeStudentClass.id}')" style="background:var(--surface-color);border:1px solid var(--border-color);width:36px;height:36px;border-radius:50%;cursor:pointer;"><i class="fa-solid fa-arrow-left"></i></button>
       <div><h2 style="font-size:1.2rem;font-weight:900;">${escapeHtml(subject.name)}</h2>
-      <div class="lms-small">Published materials, assignments, tests, quizzes and exams</div></div>
+      <div class="lms-small">Materials, assignments, announcements, tests, quizzes and exams</div></div>
     </div>
     ${sectionHtml("Announcements", "fa-bullhorn", announcements, a => `
       <strong>${escapeHtml(a.title)}</strong><div class="lms-small" style="margin-top:6px;white-space:pre-wrap;">${escapeHtml(a.message)}</div>
       <div class="lms-small" style="margin-top:8px;">${a.published_at ? new Date(a.published_at).toLocaleString() : "Published"}</div>`)}
-    ${sectionHtml("Materials", "fa-book-open", materials, m => renderStudentMaterialItem(m))}
+    ${sectionHtml("Materials", "fa-book-open", materials, m => `
+      <strong>${escapeHtml(m.title)}</strong><div class="lms-small">${escapeHtml(m.description || "")}</div>
+      <div class="lms-item-actions"><button class="primary-btn" style="opacity:1" onclick="openStudentDocument('${m.id}')">Open</button></div>`)}
     ${sectionHtml("Assignments", "fa-file-pen", assignments, a => `
       <strong>${escapeHtml(a.title)}</strong><div class="lms-small">${escapeHtml(a.instructions || "")}</div>
       <div class="lms-small">Due: ${a.due_at ? new Date(a.due_at).toLocaleString() : "No deadline"} • ${a.max_marks ?? ""} marks</div>
@@ -1912,33 +1908,6 @@ async function openStudentSubjectWorkspace(subjectId) {
   `;
 }
 
-function renderStudentMaterialItem(m) {
-  const fileName = m.file_name || (m.storage_path || "").split("/").pop() || m.title || "Learning material";
-  const size = m.file_size ? formatAcademicFileSize(m.file_size) : "";
-  return `
-    <div class="academic-file-card">
-      <div class="academic-file-main">
-        <div class="custom-vector-emblem">
-          <i class="fa-solid ${academicFileIcon(fileName, m.mime_type || m.file_type)}"></i>
-        </div>
-        <div style="min-width:0;flex:1;">
-          <strong>${escapeHtml(m.title)}</strong>
-          <div class="academic-file-name" style="margin-top:4px;">${escapeHtml(fileName)}</div>
-          ${m.description ? `<div class="lms-small" style="margin-top:5px;">${escapeHtml(m.description)}</div>` : ""}
-          <div class="academic-file-meta">
-            <span class="lms-pill">${escapeHtml((m.mime_type || m.file_type || "FILE").split("/").pop().toUpperCase())}</span>
-            ${size ? `<span class="lms-small">${escapeHtml(size)}</span>` : ""}
-            ${m.published_at ? `<span class="lms-small">Published ${new Date(m.published_at).toLocaleDateString()}</span>` : ""}
-          </div>
-        </div>
-      </div>
-      <div class="academic-file-actions">
-        <button class="primary-btn" style="opacity:1" onclick="openAcademicDocument('${m.id}','materials')"><i class="fa-solid fa-eye"></i> View Online</button>
-        <button class="primary-btn" style="opacity:1" onclick="downloadAcademicDocument('${m.id}','materials')"><i class="fa-solid fa-download"></i> Download</button>
-      </div>
-    </div>`;
-}
-
 function sectionHtml(title, icon, rows, renderer) {
   return `<div style="margin-bottom:22px;"><div class="academic-core-header"><i class="fa-solid ${icon}"></i><h3>${title}</h3></div>
     <div class="lms-list">${(rows||[]).map(renderer).map(x=>`<div class="lms-item">${x}</div>`).join("") || `<div class="lms-item"><span class="lms-small">Nothing published here yet.</span></div>`}</div></div>`;
@@ -1952,79 +1921,25 @@ function switchScreen(id) {
    Files live in Supabase Storage; metadata lives in PostgreSQL.
    The viewer obtains an authorized URL and renders it in-app.
 */
-async function getAcademicSignedUrl(storagePath, download = false) {
-  if (!sb || !storagePath) throw new Error("File location is missing.");
-  const options = download ? { download: true } : {};
-  const { data, error } = await sb.storage.from("academic-materials").createSignedUrl(storagePath, 900, options);
-  if (error || !data?.signedUrl) throw error || new Error("Could not create a secure file URL.");
-  return data.signedUrl;
-}
-
-async function openAcademicDocument(id, table = "materials") {
-  if (!sb) return;
-  const select = table === "materials"
-    ? "id,title,file_name,mime_type,file_type,storage_path"
-    : "id,title,attachment_file_name,attachment_mime_type,attachment_path";
-  const { data: file, error } = await sb.from(table).select(select).eq("id", id).single();
-  if (error || !file) return toast("The document could not be found.", "error");
-
-  const storagePath = table === "materials" ? file.storage_path : file.attachment_path;
-  if (!storagePath) return toast("This item has no uploaded file.", "error");
-
-  try {
-    const url = await getAcademicSignedUrl(storagePath);
-    const fileName = table === "materials"
-      ? (file.file_name || storagePath.split("/").pop() || file.title || "Document")
-      : (file.attachment_file_name || storagePath.split("/").pop() || file.title || "Attachment");
-    const mime = String(table === "materials" ? (file.mime_type || file.file_type || "") : (file.attachment_mime_type || "")).toLowerCase();
-    const lowerName = fileName.toLowerCase();
-    const isPdf = mime.includes("pdf") || lowerName.endsWith(".pdf");
-    const isImage = mime.startsWith("image/") || /\.(png|jpg|jpeg|webp|gif)$/i.test(lowerName);
-    const isText = mime.startsWith("text/") || lowerName.endsWith(".txt");
-    const isOffice = /\.(doc|docx|ppt|pptx|xls|xlsx)$/i.test(lowerName) || /word|excel|spreadsheet|powerpoint|presentation/.test(mime);
-    let content;
-    if (isPdf) {
-      content = `<div style="height:75vh;"><iframe class="document-frame" src="${escapeHtml(url)}#toolbar=1&navpanes=0" style="width:100%;height:100%;border:0;border-radius:14px;"></iframe></div>`;
-    } else if (isImage) {
-      content = `<div style="min-height:50vh;display:flex;align-items:center;justify-content:center;"><img src="${escapeHtml(url)}" alt="${escapeHtml(file.title || fileName)}" style="max-width:100%;max-height:72vh;object-fit:contain;border-radius:14px;"></div>`;
-    } else if (isText) {
-      content = `<iframe src="${escapeHtml(url)}" style="width:100%;height:70vh;border:1px solid var(--border-color);border-radius:14px;background:white;"></iframe>`;
-    } else if (isOffice) {
-      const officeViewer = "https://view.officeapps.live.com/op/view.aspx?src=" + encodeURIComponent(url);
-      content = `<div style="height:72vh;display:flex;flex-direction:column;gap:10px;"><iframe src="${escapeHtml(officeViewer)}" style="width:100%;flex:1;border:1px solid var(--border-color);border-radius:14px;background:white;"></iframe><div class="lms-small">If the online preview is unavailable, use Download below.</div></div>`;
-    } else {
-      content = `<div class="lms-item" style="text-align:center;padding:40px;"><div class="custom-vector-emblem" style="margin:auto;"><i class="fa-solid fa-file"></i></div><strong>${escapeHtml(fileName)}</strong><p class="lms-small" style="margin-top:8px;">This file type cannot be previewed directly in the browser.</p></div>`;
-    }
-    openLmsModal(file.title || fileName, `${content}<div style="display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap;margin-top:12px;"><button class="primary-btn" style="opacity:1" onclick="downloadAcademicDocument('${id}','${table}')"><i class="fa-solid fa-download"></i> Download</button></div>`);
-  } catch (err) {
-    console.error("Document viewer failed:", err);
-    toast("You are not authorized to open this document.", "error");
-  }
-}
-
-async function downloadAcademicDocument(id, table = "materials") {
-  if (!sb) return;
-  const select = table === "materials" ? "id,title,file_name,storage_path" : "id,title,attachment_file_name,attachment_path";
-  const { data: file, error } = await sb.from(table).select(select).eq("id", id).single();
-  if (error || !file) return toast("The file could not be found.", "error");
-  const storagePath = table === "materials" ? file.storage_path : file.attachment_path;
-  if (!storagePath) return toast("This item has no uploaded file.", "error");
-  try {
-    const url = await getAcademicSignedUrl(storagePath, true);
-    const link = document.createElement("a");
-    link.href = url;
-    link.target = "_blank";
-    link.rel = "noopener";
-    link.download = table === "materials" ? (file.file_name || file.title || "download") : (file.attachment_file_name || file.title || "download");
-    document.body.appendChild(link); link.click(); link.remove();
-  } catch (err) {
-    console.error("Download failed:", err);
-    toast("Unable to download this file.", "error");
-  }
-}
-
 async function openStudentDocument(materialId) {
-  return openAcademicDocument(materialId, "materials");
+  if (!sb) return;
+  const { data: m, error } = await sb.from("materials")
+    .select("id,title,file_type,storage_path").eq("id", materialId).single();
+  if (error || !m) return toast("Material could not be opened.", "error");
+  let signed = null;
+  let signError = null;
+  for (const bucket of ["academic-materials", "materials"]) {
+    const result = await sb.storage.from(bucket).createSignedUrl(m.storage_path, 600);
+    if (!result.error) { signed = result.data; break; }
+    signError = result.error;
+  }
+  if (signError || !signed) return toast("You are not authorized to open this file.", "error");
+
+  const url = signed.signedUrl;
+  const content = m.file_type === "application/pdf" || /\.pdf$/i.test(m.storage_path)
+    ? `<iframe class="document-frame" src="${escapeHtml(url)}#toolbar=1&navpanes=0"></iframe>`
+    : `<img src="${escapeHtml(url)}" alt="" style="max-width:100%;max-height:72vh;object-fit:contain;border-radius:14px;">`;
+  openLmsModal(m.title, content);
 }
 function closeStudentDocModal() { closeLmsModal(); }
 
@@ -2599,17 +2514,12 @@ function toggleFoldSection(id) {
   document.getElementById(id)?.classList.toggle("collapsed");
 }
 
-async function toggleFoldDownContent(type) {
+function toggleFoldDownContent(type) {
   currentFoldContentType = type;
   const a = document.getElementById("activeContentFoldArea");
   if (!a) return;
   a.style.display = "block";
-  a.innerHTML = `<div class="lms-item"><div class="lms-small">Loading ${escapeHtml(type.toLowerCase())}...</div></div>`;
-  if (type === "Materials") {
-    await loadTeacherUploadedContent("Materials");
-    return;
-  }
-  await loadTeacherUploadedContent(type);
+  a.innerHTML = `<div class="lms-item"><strong>${escapeHtml(type)}</strong><p class="lms-small">Use the production content tools below to create and publish class-scoped ${type.toLowerCase()}.</p><div class="lms-item-actions"><button class="primary-btn" style="opacity:1" onclick="openContentCreation('${type}')">Create</button></div></div>`;
 }
 function deleteFoldDownContent(){}
 
@@ -2697,60 +2607,6 @@ function contentTypeConfig(type) {
   }[type] || { table:null, icon:"fa-plus", desc:"Create academic content." };
 }
 
-function renderTeacherMaterialItem(row) {
-  const fileName = row.file_name || (row.storage_path || "").split("/").pop() || row.title || "Learning material";
-  const size = row.file_size ? formatAcademicFileSize(row.file_size) : "";
-  return `<div class="lms-item"><div class="academic-file-card"><div class="academic-file-main"><div class="custom-vector-emblem"><i class="fa-solid ${academicFileIcon(fileName,row.mime_type || row.file_type)}"></i></div><div style="min-width:0;flex:1;"><strong>${escapeHtml(row.title)}</strong><div class="academic-file-name" style="margin-top:4px;">${escapeHtml(fileName)}</div>${row.description ? `<div class="lms-small" style="margin-top:5px;">${escapeHtml(row.description)}</div>` : ""}<div class="academic-file-meta"><span class="lms-pill">${row.is_published ? "Published" : "Draft"}</span>${size ? `<span class="lms-small">${escapeHtml(size)}</span>` : ""}${row.published_at ? `<span class="lms-small">${new Date(row.published_at).toLocaleString()}</span>` : ""}</div></div></div><div class="academic-file-actions"><button class="primary-btn" style="opacity:1" onclick="openAcademicDocument('${row.id}','materials')"><i class="fa-solid fa-eye"></i> View</button><button class="primary-btn" style="opacity:1" onclick="downloadAcademicDocument('${row.id}','materials')"><i class="fa-solid fa-download"></i> Download</button></div></div></div>`;
-}
-
-function renderTeacherGenericContentItem(type,row) {
-  const title = row.title || "Untitled";
-  if (type === "Assignments") return `<div class="lms-item"><strong>${escapeHtml(title)}</strong><div class="lms-small" style="margin-top:6px;white-space:pre-wrap;">${escapeHtml(row.instructions || "")}</div><div class="lms-small" style="margin-top:7px;">${row.max_marks ?? 100} marks • ${row.due_at ? `Due ${new Date(row.due_at).toLocaleString()}` : "No deadline"}</div><div style="margin-top:8px;"><span class="lms-pill">${row.is_published ? "Published" : "Draft"}</span></div></div>`;
-  if (type === "Announcements") return `<div class="lms-item"><strong>${escapeHtml(title)}</strong><div class="lms-small" style="margin-top:6px;white-space:pre-wrap;">${escapeHtml(row.message || "")}</div><div style="margin-top:8px;"><span class="lms-pill">${row.is_published ? "Published" : "Draft"}</span></div></div>`;
-  return `<div class="lms-item"><strong>${escapeHtml(title)}</strong><div class="lms-small" style="margin-top:6px;">${escapeHtml(row.instructions || "")}</div><div class="lms-small" style="margin-top:7px;">${row.duration_minutes || "No"} minutes • ${row.max_marks ?? 100} marks</div><div style="margin-top:8px;"><span class="lms-pill">${row.is_published ? "Published" : "Draft"}</span></div></div>`;
-}
-
-async function loadTeacherUploadedContent(type) {
-  if (!sb || !currentUser || !activeSelectedClassObj?.id) return;
-  const area = document.getElementById("activeContentFoldArea");
-  if (!area) return;
-  const configs = {
-    Materials: { table:"materials", select:"id,title,description,file_name,mime_type,file_type,file_size,storage_path,is_published,published_at,created_at,subject_id" },
-    Assignments: { table:"assignments", select:"id,title,instructions,due_at,max_marks,is_published,published_at,created_at,subject_id,attachment_path,attachment_file_name,attachment_mime_type" },
-    Announcements: { table:"announcements", select:"id,title,message,is_published,published_at,created_at,subject_id" },
-    Tests: { table:"tests", select:"id,title,instructions,duration_minutes,max_marks,start_at,end_at,is_published,published_at,created_at,subject_id" },
-    Quizzes: { table:"quizzes", select:"id,title,instructions,duration_minutes,max_marks,start_at,end_at,is_published,published_at,created_at,subject_id" }
-  };
-  const cfg = configs[type];
-  if (!cfg) return;
-  const { data, error } = await sb.from(cfg.table).select(cfg.select).eq("class_id",activeSelectedClassObj.id).eq("teacher_id",currentUser.id).eq("is_archived",false).order("created_at",{ascending:false}).range(0,99);
-  if (error) {
-    console.error(`loadTeacherUploadedContent(${type})`,error);
-    area.innerHTML = `<div class="lms-item lms-danger">${escapeHtml(error.message)}</div>`;
-    return;
-  }
-  const rows = data || [];
-  area.innerHTML = `<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px;"><div><strong>${escapeHtml(type)}</strong><div class="lms-small">Uploaded for ${escapeHtml(activeSelectedClassObj.name || "this class")}</div></div><button class="primary-btn" style="opacity:1" onclick="openContentCreation('${type}')"><i class="fa-solid fa-plus"></i> ${type === "Materials" ? "Upload" : "Create"}</button></div>${rows.length ? `<div class="lms-list">${rows.map(row => type === "Materials" ? renderTeacherMaterialItem(row) : renderTeacherGenericContentItem(type,row)).join("")}</div>` : `<div class="lms-item"><strong>No ${escapeHtml(type.toLowerCase())} yet.</strong><div class="lms-small" style="margin-top:6px;">${type === "Materials" ? "Upload a file and it will appear here immediately." : "Create content for this class to see it here."}</div></div>`}`;
-}
-
-function formatAcademicFileSize(bytes) {
-  if (!bytes) return "";
-  const units=["B","KB","MB","GB"]; let value=Number(bytes), i=0;
-  while(value>=1024 && i<units.length-1){value/=1024;i++;}
-  return `${value.toFixed(i===0?0:1)} ${units[i]}`;
-}
-
-function academicFileIcon(fileName="",mimeType="") {
-  const value=`${fileName} ${mimeType}`.toLowerCase();
-  if(value.includes("pdf")) return "fa-file-pdf";
-  if(value.includes("word") || /\.(doc|docx)$/i.test(fileName)) return "fa-file-word";
-  if(value.includes("powerpoint") || value.includes("presentation") || /\.(ppt|pptx)$/i.test(fileName)) return "fa-file-powerpoint";
-  if(value.includes("excel") || value.includes("spreadsheet") || /\.(xls|xlsx)$/i.test(fileName)) return "fa-file-excel";
-  if(/\.(png|jpg|jpeg|webp|gif)$/i.test(fileName)) return "fa-file-image";
-  if(/\.txt$/i.test(fileName)) return "fa-file-lines";
-  return "fa-file";
-}
-
 function openContentCreation(type) {
   if (!activeSelectedClassObj?.id) return toast("Select a class first.", "error");
   const cfg = contentTypeConfig(type);
@@ -2773,7 +2629,7 @@ function openContentCreation(type) {
       ${isMaterial || isAssignment ? `<label class="lms-small">${isAssignment ? "Attachment (optional)" : "Learning file"}</label><input class="lms-input" id="contentFileInput" type="file" ${isMaterial ? "required" : ""} accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt,.png,.jpg,.jpeg,.webp">` : ""}
       ${isAssignment ? `<label class="lms-small">Maximum marks</label><input class="lms-input" id="contentMaxMarks" type="number" min="1" step="0.01" value="100" required><label class="lms-small">Due date (optional)</label><input class="lms-input" id="contentDue" type="datetime-local">` : ""}
       ${isAssessment ? `<div class="lms-grid"><div><label class="lms-small">Duration (minutes)</label><input class="lms-input" id="contentDuration" type="number" min="1" value="60"></div><div><label class="lms-small">Maximum marks</label><input class="lms-input" id="contentMaxMarks" type="number" min="1" step="0.01" value="100"></div></div><div class="lms-grid"><div><label class="lms-small">Start (optional)</label><input class="lms-input" id="contentStartAt" type="datetime-local"></div><div><label class="lms-small">End (optional)</label><input class="lms-input" id="contentEndAt" type="datetime-local"></div></div>` : ""}
-      ${`<label class="lms-small"><input type="checkbox" id="contentPublish" ${isMaterial || isAnnouncement ? "checked" : ""}> Publish immediately</label>`}
+      ${!isAnnouncement ? `<label class="lms-small"><input type="checkbox" id="contentPublish"> Publish immediately</label>` : `<label class="lms-small"><input type="checkbox" id="contentPublish" checked> Publish immediately</label>`}
       <button class="primary-btn" style="opacity:1">Save ${escapeHtml(type)}</button>
     </form>`);
 
@@ -2790,9 +2646,14 @@ async function uploadAcademicFile(file, classId, subjectId) {
   if (file.size > 50 * 1024 * 1024) throw new Error("Maximum academic file size is 50 MB.");
   const safe = file.name.replace(/[^a-zA-Z0-9._-]/g,"_");
   const path = `${currentUser.id}/${classId}/${subjectId}/${crypto.randomUUID()}-${safe}`;
-  const { error } = await sb.storage.from("academic-materials").upload(path,file,{upsert:false,contentType:file.type || undefined});
-  if (error) throw error;
-  return { path, bucket:"academic-materials" };
+  const buckets = ["academic-materials", "materials"];
+  let lastError = null;
+  for (const bucket of buckets) {
+    const { error } = await sb.storage.from(bucket).upload(path,file,{upsert:false});
+    if (!error) return { path, bucket };
+    lastError = error;
+  }
+  throw lastError || new Error("No academic storage bucket is available.");
 }
 
 async function createContent(type) {
@@ -2818,7 +2679,6 @@ async function createContent(type) {
       uploadedBucket = uploaded.bucket;
       const { error } = await sb.from("materials").insert({
         teacher_id:currentUser.id,class_id:classId,subject_id:subjectId,title,description:desc||null,
-        file_name:file.name,mime_type:file.type||null,
         storage_path:uploaded.path,file_type:file.type||null,file_size:file.size,
         is_published:publish,published_at:publish?new Date().toISOString():null
       });
@@ -2833,8 +2693,7 @@ async function createContent(type) {
       const maxMarks = Number(document.getElementById("contentMaxMarks")?.value || 100);
       const { error } = await sb.from("assignments").insert({
         teacher_id:currentUser.id,class_id:classId,subject_id:subjectId,title,instructions:desc||null,
-        attachment_path:uploadedPath,attachment_file_name:file?.name || null,attachment_mime_type:file?.type || null,
-        is_published:publish,published_at:publish?new Date().toISOString():null,
+        attachment_path:uploadedPath,is_published:publish,published_at:publish?new Date().toISOString():null,
         due_at:dueValue?new Date(dueValue).toISOString():null,max_marks:maxMarks
       });
       if (error) throw error;
