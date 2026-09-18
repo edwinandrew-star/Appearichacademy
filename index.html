@@ -980,6 +980,12 @@
 .lms-danger { color:#b91c1c; }
 .lms-success { color:#15803d; }
 .document-frame { width:100%; height:70vh; border:0; border-radius:14px; background:#fff; }
+.lms-document-modal { width:min(98vw,1400px) !important; height:96vh !important; max-height:96vh !important; display:flex; flex-direction:column; }
+.lms-document-modal #lmsModalBody { flex:1; min-height:0; display:flex; flex-direction:column; }
+.lms-document-viewer { flex:1; min-height:0; }
+.lms-document-viewer .document-frame { height:100%; min-height:0; border-radius:10px; }
+.lms-document-actions { flex-shrink:0; }
+.lms-document-modal.lms-document-browser-fullscreen { width:100vw !important; height:100vh !important; max-height:100vh !important; border-radius:0 !important; }
 .exam-option { display:flex; gap:8px; align-items:flex-start; padding:10px; border:1px solid var(--border-color); border-radius:12px; }
 .exam-question { padding:16px; border:1px solid var(--border-color); border-radius:16px; margin-bottom:12px; }
 .exam-timer { position:sticky; top:8px; z-index:20; padding:10px 14px; border-radius:12px;
@@ -1193,28 +1199,12 @@
             <span class="fold-header-status" id="foldLevelStatus">Select levels</span>
           </div>
           <div class="fold-body">
-            <p style="font-size: 0.75rem; color: var(--text-sub); margin-bottom: 10px;">Select any existing level or add a new one. Levels are not limited to a fixed list.</p>
+            <p style="font-size: 0.75rem; color: var(--text-sub); margin-bottom: 10px;">Select the education level for the class. Only the four supported levels are available.</p>
             <div class="level-chips-grid">
               <div class="level-chip" onclick="toggleTeacherLevelSelection('Lower Primary', this)">Lower Primary</div>
               <div class="level-chip" onclick="toggleTeacherLevelSelection('Upper Primary', this)">Upper Primary</div>
               <div class="level-chip" onclick="toggleTeacherLevelSelection('Lower Secondary', this)">Lower Secondary</div>
               <div class="level-chip" onclick="toggleTeacherLevelSelection('Upper Secondary', this)">Upper Secondary</div>
-              <div class="level-chip" onclick="toggleTeacherLevelSelection('Form 1', this)">Form 1</div>
-              <div class="level-chip" onclick="toggleTeacherLevelSelection('Form 2', this)">Form 2</div>
-              <div class="level-chip" onclick="toggleTeacherLevelSelection('Form 3', this)">Form 3</div>
-              <div class="level-chip" onclick="toggleTeacherLevelSelection('Form 4', this)">Form 4</div>
-              <div class="level-chip" onclick="toggleTeacherLevelSelection('Form 5', this)">Form 5</div>
-              <div class="level-chip" onclick="toggleTeacherLevelSelection('Form 6', this)">Form 6</div>
-            </div>
-            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;">
-              <input class="lms-input" id="customTeacherLevel" list="teacherLevelSuggestions" placeholder="Add another level e.g. IGCSE Year 10" style="flex:1;min-width:220px;">
-              <datalist id="teacherLevelSuggestions">
-                <option value="Lower Primary"></option><option value="Upper Primary"></option>
-                <option value="Lower Secondary"></option><option value="Upper Secondary"></option>
-                <option value="Form 1"></option><option value="Form 2"></option><option value="Form 3"></option>
-                <option value="Form 4"></option><option value="Form 5"></option><option value="Form 6"></option>
-              </datalist>
-              <button type="button" class="primary-btn" style="opacity:1;" onclick="addCustomTeacherLevel()">Add Level</button>
             </div>
             <button class="primary-btn" style="opacity: 1; font-size: 0.85rem; padding: 12px; margin-top:10px;" onclick="confirmLevelsAndFold()">Continue to Classes</button>
           </div>
@@ -1976,7 +1966,7 @@ async function openStudentSubjectsForClass(classId) {
   activeStudentClass = { ...c };
   const { data: subjects, error } = await sb.from("subjects")
     .select("id,name,description")
-    .eq("class_id", classId).eq("is_archived", false).order("name");
+    .eq("class_id", classId).or("is_archived.eq.false,is_archived.is.null").order("name");
   if (error) return toast(error.message, "error");
 
   switchScreen("screen-student-subject-workspace");
@@ -2007,18 +1997,18 @@ async function openStudentSubjectWorkspace(subjectId) {
 
   const [materialsRes, assignmentsRes, announcementsRes, testsRes, quizzesRes, examsRes] = await Promise.all([
     sb.from("materials").select("id,title,description,file_name,mime_type,file_type,file_size,storage_path,storage_bucket,published_at,available_at,due_at,class_id,subject_id")
-      .eq("subject_id", subjectId).eq("class_id", activeStudentClass.id).eq("is_published", true).eq("is_archived", false).order("published_at",{ascending:false}).range(0,49),
+      .eq("subject_id", subjectId).eq("class_id", activeStudentClass.id).eq("is_published", true).or("is_archived.eq.false,is_archived.is.null").order("published_at",{ascending:false}).range(0,49),
     sb.from("assignments").select("id,title,instructions,published_at,due_at,max_marks,attachment_path,class_id,subject_id")
-      .eq("subject_id", subjectId).eq("class_id", activeStudentClass.id).eq("is_published", true).eq("is_archived", false).order("due_at",{ascending:true}).range(0,49),
+      .eq("subject_id", subjectId).eq("class_id", activeStudentClass.id).eq("is_published", true).or("is_archived.eq.false,is_archived.is.null").order("due_at",{ascending:true}).range(0,49),
     sb.from("announcements").select("id,title,message,published_at,class_id,subject_id")
-      .eq("subject_id", subjectId).eq("class_id", activeStudentClass.id).eq("is_published", true).eq("is_archived", false).order("published_at",{ascending:false}).range(0,49),
+      .eq("subject_id", subjectId).eq("class_id", activeStudentClass.id).eq("is_published", true).or("is_archived.eq.false,is_archived.is.null").order("published_at",{ascending:false}).range(0,49),
     sb.from("tests").select("id,title,instructions,duration_minutes,start_at,end_at,max_marks,is_published,class_id,subject_id")
-      .eq("subject_id", subjectId).eq("class_id", activeStudentClass.id).eq("is_published", true).eq("is_archived", false).order("start_at",{ascending:false}).range(0,49),
+      .eq("subject_id", subjectId).eq("class_id", activeStudentClass.id).eq("is_published", true).or("is_archived.eq.false,is_archived.is.null").order("start_at",{ascending:false}).range(0,49),
     sb.from("quizzes").select("id,title,instructions,duration_minutes,start_at,end_at,max_marks,is_published,class_id,subject_id")
-      .eq("subject_id", subjectId).eq("class_id", activeStudentClass.id).eq("is_published", true).eq("is_archived", false).order("start_at",{ascending:false}).range(0,49),
+      .eq("subject_id", subjectId).eq("class_id", activeStudentClass.id).eq("is_published", true).or("is_archived.eq.false,is_archived.is.null").order("start_at",{ascending:false}).range(0,49),
     // Keep the existing exam system visible alongside the newer Test/Quiz system.
     sb.from("exams").select("id,title,instructions,start_at,end_at,duration_minutes,max_marks,class_id,subject_id")
-      .eq("subject_id", subjectId).eq("class_id", activeStudentClass.id).eq("is_archived", false).order("start_at",{ascending:false}).range(0,49)
+      .eq("subject_id", subjectId).eq("class_id", activeStudentClass.id).or("is_archived.eq.false,is_archived.is.null").order("start_at",{ascending:false}).range(0,49)
   ]);
 
   const firstError = [materialsRes,assignmentsRes,announcementsRes,testsRes,quizzesRes,examsRes].find(r => r.error);
@@ -2048,7 +2038,10 @@ async function openStudentSubjectWorkspace(subjectId) {
     ${sectionHtml("Assignments", "fa-file-pen", assignments, a => `
       <strong>${escapeHtml(a.title)}</strong><div class="lms-small">${escapeHtml(a.instructions || "")}</div>
       <div class="lms-small">Due: ${a.due_at ? new Date(a.due_at).toLocaleString() : "No deadline"} • ${a.max_marks ?? ""} marks</div>
-      <div class="lms-item-actions"><button class="primary-btn" style="opacity:1" onclick="openAssignmentSubmission('${a.id}')">Submit</button></div>`)}
+      <div class="lms-item-actions">
+        ${a.attachment_path ? `<button class="primary-btn" style="opacity:1" onclick="openAcademicAttachment('${escapeHtml(a.attachment_path)}')"><i class="fa-solid fa-eye"></i> View Attachment</button><button class="primary-btn" style="opacity:1" onclick="downloadAcademicAttachment('${escapeHtml(a.attachment_path)}')"><i class="fa-solid fa-download"></i> Download</button>` : ""}
+        <button class="primary-btn" style="opacity:1" onclick="openAssignmentSubmission('${a.id}')">Submit</button>
+      </div>`)}
     ${sectionHtml("Tests", "fa-file-circle-check", tests, x => `
       <strong>${escapeHtml(x.title)}</strong><div class="lms-small">${escapeHtml(x.instructions || "")}</div>
       <div class="lms-small">${x.duration_minutes ? `${x.duration_minutes} minutes` : "No fixed duration"} • ${x.max_marks ?? 100} marks</div>
@@ -2469,7 +2462,9 @@ async function createClassDirect() {
   const year = document.getElementById("newClassYear")?.value.trim();
   const description = document.getElementById("newClassDescription")?.value.trim();
 
+  const allowedLevels = ["Lower Primary", "Upper Primary", "Lower Secondary", "Upper Secondary"];
   if (!name || !level || !year) return toast("Complete the class details.", "error");
+  if (!allowedLevels.includes(level)) return toast("Select one of the four supported education levels.", "error");
 
   const button = document.querySelector("#lmsModalBody form button[type='submit'], #lmsModalBody form button.primary-btn");
   if (button) { button.disabled = true; button.dataset.originalText = button.innerHTML; button.innerHTML = "Creating class…"; }
@@ -2533,14 +2528,10 @@ function openCreateClassModal() {
   openLmsModal("Create Class", `
     <form class="lms-form" onsubmit="event.preventDefault();createClassDirect()">
       <input class="lms-input" id="newClassName" placeholder="Class name e.g. Form 3A" required>
-      <input class="lms-input" id="newClassLevel" list="newClassLevelSuggestions" value="${escapeHtml(selectedLevel)}" placeholder="Education level e.g. Form 3" required>
-      <datalist id="newClassLevelSuggestions">
-        ${options}
-        <option value="Lower Primary"></option><option value="Upper Primary"></option>
-        <option value="Lower Secondary"></option><option value="Upper Secondary"></option>
-        <option value="Form 1"></option><option value="Form 2"></option><option value="Form 3"></option>
-        <option value="Form 4"></option><option value="Form 5"></option><option value="Form 6"></option>
-      </datalist>
+      <select class="lms-select" id="newClassLevel" required>
+        <option value="">Select education level</option>
+        ${["Lower Primary","Upper Primary","Lower Secondary","Upper Secondary"].map(level => `<option value="${escapeHtml(level)}" ${selectedLevel === level ? "selected" : ""}>${escapeHtml(level)}</option>`).join("")}
+      </select>
       <input class="lms-input" id="newClassYear" placeholder="Academic year e.g. 2026/2027" required>
       <textarea class="lms-textarea" id="newClassDescription" placeholder="Description"></textarea>
       <button type="submit" class="primary-btn" style="opacity:1">Create Class</button>
@@ -2965,23 +2956,17 @@ async function finishCreationFlow() {
 }
 
 function toggleTeacherLevelSelection(level, el) {
-  if (selectedTeacherLevels.includes(level)) {
-    selectedTeacherLevels = selectedTeacherLevels.filter(x => x !== level);
-    el?.classList.remove("selected");
-  } else {
-    selectedTeacherLevels.push(level);
-    el?.classList.add("selected");
-  }
-  setCreationStatus("foldLevelStatus", selectedTeacherLevels.length ? selectedTeacherLevels.join(", ") : "Select levels");
+  const allowedLevels = ["Lower Primary", "Upper Primary", "Lower Secondary", "Upper Secondary"];
+  if (!allowedLevels.includes(level)) return toast("Only the four supported education levels can be selected.", "error");
+
+  // A class has one education level. Selecting a new level replaces the previous selection.
+  selectedTeacherLevels = [level];
+  document.querySelectorAll("#foldLevelSection .level-chip").forEach(chip => chip.classList.remove("selected"));
+  el?.classList.add("selected");
+  setCreationStatus("foldLevelStatus", level);
 }
 function addCustomTeacherLevel() {
-  const input = document.getElementById("customTeacherLevel");
-  const level = input?.value.trim();
-  if (!level) return toast("Enter a level name first.", "error");
-  if (!selectedTeacherLevels.includes(level)) selectedTeacherLevels.push(level);
-  setCreationStatus("foldLevelStatus", selectedTeacherLevels.join(", "));
-  if (input) input.value = "";
-  toast(`Level "${level}" added.`, "success");
+  return toast("Custom education levels are not available. Select one of the four supported levels.", "error");
 }
 
 function toggleFoldSection(id) {
@@ -3253,38 +3238,66 @@ async function openAcademicAttachment(storagePath) {
   try {
     const url = await getAcademicFileUrl(storagePath, "academic-materials", false);
     const pathName = String(storagePath).split("?")[0].toLowerCase();
+    const fileName = String(storagePath).split("/").pop() || "Academic attachment";
     const isPdf = /\.pdf$/i.test(pathName);
     const isImage = /\.(png|jpe?g|webp|gif|svg)$/i.test(pathName);
     const isOffice = /\.(docx?|pptx?|xlsx?)$/i.test(pathName);
 
-    let content = "";
+    let content = `<div class="lms-document-viewer" id="academicDocumentViewer">`;
 
     if (isPdf) {
-      content = `<iframe class="document-frame" src="${escapeHtml(url)}#toolbar=1&navpanes=0&view=FitH" title="Academic attachment"></iframe>`;
+      content += `<iframe class="document-frame" src="${escapeHtml(url)}#toolbar=1&navpanes=0&view=FitH" title="Academic attachment"></iframe>`;
     } else if (isImage) {
-      content = `<div style="text-align:center"><img src="${escapeHtml(url)}" alt="Academic attachment" style="max-width:100%;max-height:72vh;object-fit:contain;border-radius:14px;"></div>`;
+      content += `<div style="height:100%;display:flex;align-items:center;justify-content:center;overflow:auto;background:#111;border-radius:10px;padding:12px;"><img src="${escapeHtml(url)}" alt="Academic attachment" style="max-width:100%;max-height:100%;object-fit:contain;"></div>`;
     } else if (isOffice) {
       const officeUrl = `https://view.officeapps.live.com/op/view.aspx?src=${encodeURIComponent(url)}`;
-      content = `<iframe class="document-frame" src="${escapeHtml(officeUrl)}" title="Office document attachment"></iframe>
-        <div class="lms-small" style="margin-top:8px;">PowerPoint, Word and Excel files are opened using the Microsoft Office web viewer.</div>`;
+      content += `<iframe class="document-frame" src="${escapeHtml(officeUrl)}" title="Office document attachment"></iframe>`;
     } else {
-      content = `<div class="lms-item"><strong>${escapeHtml(pathName.split("/").pop() || "Academic attachment")}</strong>
-        <p class="lms-small" style="margin-top:6px;">This file type may not support an in-browser preview. You can still open or download it.</p></div>`;
+      content += `<div class="lms-item" style="margin:auto;max-width:600px;"><strong>${escapeHtml(fileName)}</strong>
+        <p class="lms-small" style="margin-top:6px;">This file type does not support an in-browser preview. Use Download to save it to your device.</p></div>`;
     }
 
-    content += `<div class="lms-item-actions" style="margin-top:10px;">
-      <button class="primary-btn" style="opacity:1" onclick="window.open('${escapeHtml(url)}','_blank','noopener,noreferrer')">
-        <i class="fa-solid fa-up-right-from-square"></i> Open in Browser
+    content += `</div>`;
+    content += `<div class="lms-item-actions lms-document-actions" style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;">
+      <button class="primary-btn" style="opacity:1" onclick="toggleAcademicDocumentFullscreen()">
+        <i class="fa-solid fa-expand"></i> Full Screen
       </button>
       <button class="primary-btn" style="opacity:1" onclick="downloadAcademicAttachment('${escapeHtml(storagePath)}')">
         <i class="fa-solid fa-download"></i> Download
       </button>
+      <button class="primary-btn" style="opacity:1" onclick="window.open('${escapeHtml(url)}','_blank','noopener,noreferrer')">
+        <i class="fa-solid fa-up-right-from-square"></i> Open in Browser
+      </button>
     </div>`;
 
-    openLmsModal("Academic Attachment", content);
+    openLmsModal(fileName, content);
+    const modal = document.getElementById("lmsGenericModal");
+    const card = modal?.querySelector(".lms-modal-card");
+    if (card) card.classList.add("lms-document-modal");
   } catch (error) {
     console.error("openAcademicAttachment failed:", error);
     toast(error?.message || "Unable to open the attachment.", "error");
+  }
+}
+
+async function toggleAcademicDocumentFullscreen() {
+  const viewer = document.getElementById("academicDocumentViewer");
+  const modal = document.getElementById("lmsGenericModal");
+  const card = modal?.querySelector(".lms-modal-card");
+  if (!viewer) return;
+  try {
+    if (document.fullscreenElement) {
+      await document.exitFullscreen();
+      return;
+    }
+    if (viewer.requestFullscreen) {
+      await viewer.requestFullscreen();
+    } else if (card) {
+      card.classList.add("lms-document-browser-fullscreen");
+    }
+  } catch (error) {
+    console.warn("Fullscreen request failed:", error);
+    if (card) card.classList.add("lms-document-browser-fullscreen");
   }
 }
 
