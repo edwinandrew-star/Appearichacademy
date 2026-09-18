@@ -2531,7 +2531,6 @@ async function loadTeacherUploadedMaterials(classId) {
     subjectMap = Object.fromEntries((subjects||[]).map(x=>[x.id,x.name]));
   }
 
-  const classIdSet = classId;
   area.innerHTML = data.map(m => {
     const published = m.is_published === true;
     const subjectName = subjectMap[m.subject_id] || "Subject";
@@ -2793,13 +2792,137 @@ function toggleFoldSection(id) {
   document.getElementById(id)?.classList.toggle("collapsed");
 }
 
-function toggleFoldDownContent(type) {
+async function toggleFoldDownContent(type) {
   currentFoldContentType = type;
   const a = document.getElementById("activeContentFoldArea");
-  if (!a) return;
+  const classId = activeSelectedClassObj?.id;
+  if (!a || !classId) return toast("Select a class first.", "error");
+
   a.style.display = "block";
-  a.innerHTML = `<div class="lms-item"><strong>${escapeHtml(type)}</strong><p class="lms-small">Use the production content tools below to create and publish class-scoped ${type.toLowerCase()}.</p><div class="lms-item-actions"><button class="primary-btn" style="opacity:1" onclick="openContentCreation('${type}')">Create</button></div></div>`;
+  a.innerHTML = `
+    <div class="lms-item">
+      <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap;">
+        <div>
+          <strong>${escapeHtml(type)}</strong>
+          <p class="lms-small" style="margin-top:5px;">Create and publish ${escapeHtml(type.toLowerCase())} for this exact class.</p>
+        </div>
+        <button class="primary-btn" style="opacity:1" onclick="openContentCreation('${type}')">
+          <i class="fa-solid fa-plus"></i> Create ${escapeHtml(type)}
+        </button>
+      </div>
+    </div>
+    <div class="lms-item" style="margin-top:12px;">
+      <div class="section-header-title" style="margin-bottom:10px;">
+        <span><i class="fa-solid fa-clock-rotate-left" style="color:var(--accent-gold);"></i> Uploaded History</span>
+      </div>
+      <div id="teacherContentHistoryArea"><div class="lms-small">Loading history…</div></div>
+    </div>`;
+  await loadTeacherContentHistory(type, classId);
 }
+
+async function loadTeacherContentHistory(type, classId) {
+  const area = document.getElementById("teacherContentHistoryArea");
+  if (!area || !sb || !currentUser || !classId) return;
+
+  const configs = {
+    Materials: {
+      table:"materials",
+      select:"id,title,description,file_name,mime_type,file_type,file_size,storage_path,storage_bucket,is_published,is_archived,created_at,subject_id,class_id,teacher_id"
+    },
+    Assignments: {
+      table:"assignments",
+      select:"id,title,instructions,published_at,due_at,max_marks,attachment_path,is_published,is_archived,created_at,subject_id,class_id,teacher_id"
+    },
+    Announcements: {
+      table:"announcements",
+      select:"id,title,message,published_at,is_published,is_archived,created_at,subject_id,class_id,teacher_id"
+    },
+    Tests: {
+      table:"tests",
+      select:"id,title,instructions,duration_minutes,start_at,end_at,max_marks,published_at,is_published,is_archived,created_at,subject_id,class_id,teacher_id"
+    },
+    Quizzes: {
+      table:"quizzes",
+      select:"id,title,instructions,duration_minutes,start_at,end_at,max_marks,published_at,is_published,is_archived,created_at,subject_id,class_id,teacher_id"
+    }
+  };
+
+  const cfg = configs[type];
+  if (!cfg) {
+    area.innerHTML = `<div class="lms-small">No history handler is configured for this section.</div>`;
+    return;
+  }
+
+  const { data, error } = await sb.from(cfg.table)
+    .select(cfg.select)
+    .eq("teacher_id", currentUser.id)
+    .eq("class_id", classId)
+    .eq("is_archived", false)
+    .order("created_at", { ascending:false })
+    .range(0,99);
+
+  if (error) {
+    console.error(`loadTeacherContentHistory(${type}) failed:`, error);
+    area.innerHTML = `<div class="lms-small lms-danger">Unable to load ${escapeHtml(type.toLowerCase())} history: ${escapeHtml(error.message)}</div>`;
+    return;
+  }
+
+  if (!data?.length) {
+    area.innerHTML = `<div class="lms-small">No uploaded history for this class yet.</div>`;
+    return;
+  }
+
+  const subjectIds = [...new Set(data.map(x => x.subject_id).filter(Boolean))];
+  let subjectMap = {};
+  if (subjectIds.length) {
+    const { data: subjects } = await sb.from("subjects")
+      .select("id,name")
+      .in("id", subjectIds);
+    subjectMap = Object.fromEntries((subjects || []).map(x => [x.id, x.name]));
+  }
+
+  area.innerHTML = data.map(item => {
+    const subject = subjectMap[item.subject_id] || "Subject";
+    const published = item.is_published === true;
+    let details = `Subject: ${escapeHtml(subject)}`;
+    let actions = "";
+
+    if (type === "Materials") {
+      const fileType = academicFileIsPdf(item)
+        ? "PDF"
+        : (item.mime_type || item.file_type || "File").split("/").pop().toUpperCase();
+      details += ` • ${escapeHtml(fileType)} • ${formatAcademicFileSize(item.file_size)}`;
+      actions = `
+        <button class="primary-btn" style="opacity:1" onclick="openTeacherDocument('${item.id}')"><i class="fa-solid fa-eye"></i> View</button>
+        <button class="primary-btn" style="opacity:1" onclick="downloadAcademicMaterial('${item.id}')"><i class="fa-solid fa-download"></i> Download</button>`;
+    } else if (type === "Assignments") {
+      details += ` • ${item.due_at ? `Due: ${new Date(item.due_at).toLocaleString()}` : "No deadline"} • ${item.max_marks ?? 100} marks`;
+      actions = item.attachment_path
+        ? `<button class="primary-btn" style="opacity:1" onclick="openAcademicAttachment('${escapeHtml(item.attachment_path)}')"><i class="fa-solid fa-paperclip"></i> Attachment</button>`
+        : "";
+    } else if (type === "Announcements") {
+      details += ` • ${item.published_at ? new Date(item.published_at).toLocaleString() : "Not published"}`;
+    } else {
+      details += ` • ${item.duration_minutes ? `${item.duration_minutes} min` : "No fixed duration"} • ${item.max_marks ?? 100} marks`;
+      if (item.start_at) details += ` • Starts: ${new Date(item.start_at).toLocaleString()}`;
+      actions = `<button class="primary-btn" style="opacity:1" onclick="${type === "Tests" ? `openTestQuestionBuilder('${item.id}')` : `openQuizQuestionBuilder('${item.id}')`}"><i class="fa-solid fa-list-check"></i> Questions</button>`;
+    }
+
+    return `<div class="lms-item" style="margin-bottom:10px;">
+      <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start;">
+        <div style="min-width:0;flex:1;">
+          <strong>${escapeHtml(item.title || item.file_name || "Untitled")}</strong>
+          <div class="lms-small" style="margin-top:5px;">${details}</div>
+          ${item.description || item.instructions || item.message ? `<div class="lms-small" style="margin-top:5px;">${escapeHtml(item.description || item.instructions || item.message || "")}</div>` : ""}
+          <div class="lms-small" style="margin-top:5px;">Created: ${item.created_at ? new Date(item.created_at).toLocaleString() : "—"}</div>
+        </div>
+        <span class="lms-pill">${published ? "Published" : "Draft"}</span>
+      </div>
+      ${actions ? `<div class="lms-item-actions">${actions}</div>` : ""}
+    </div>`;
+  }).join("");
+}
+
 function deleteFoldDownContent(){}
 
 /* ---------- 10. TEACHER SUBJECTS / MATERIALS / ASSIGNMENTS ---------- */
@@ -2918,6 +3041,17 @@ function openContentCreation(type) {
       const select = document.getElementById("contentSubject");
       if (select) select.innerHTML = (data||[]).map(x => `<option value="${x.id}">${escapeHtml(x.name)}</option>`).join("") || `<option value="">Create a subject first</option>`;
     });
+}
+
+async function openAcademicAttachment(storagePath) {
+  if (!storagePath) return toast("No attachment is available.", "error");
+  try {
+    const url = await getAcademicFileUrl(storagePath, "academic-materials", false);
+    openLmsModal("Assignment Attachment", `<iframe class="document-frame" src="${escapeHtml(url)}" title="Assignment attachment"></iframe>`);
+  } catch (error) {
+    console.error("openAcademicAttachment failed:", error);
+    toast(error?.message || "Unable to open the attachment.", "error");
+  }
 }
 
 async function uploadAcademicFile(file, classId, subjectId) {
