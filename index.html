@@ -1043,10 +1043,10 @@
           <div class="form-group">
             <label>Education Level</label>
             <select id="eduLevelSelect" onchange="handleEduLevelChange()">
-              <option value="Lower Primary">Lower Primary</option>
-              <option value="Upper Primary">Upper Primary</option>
-              <option value="Lower Secondary">Lower Secondary</option>
-              <option value="Upper Secondary">Upper Secondary</option>
+              <option value="Cambridge Primary">Cambridge Primary (Stages 1–6)</option>
+              <option value="Cambridge Lower Secondary">Cambridge Lower Secondary (Stages 7–9)</option>
+              <option value="Cambridge Upper Secondary">Cambridge Upper Secondary (Years 10–11)</option>
+              <option value="Cambridge Advanced">Cambridge Advanced (Years 12–13)</option>
             </select>
           </div>
           <div class="form-group" id="combinationGroup" style="display: none;">
@@ -1148,6 +1148,14 @@
           <div style="font-size: 0.7rem; color: var(--text-sub);">Recent submissions</div>
         </div>
       </div>
+      <!-- CAMBRIDGE ACADEMIC TOOLS -->
+      <div class="section-header-title"><span><i class="fa-solid fa-graduation-cap" style="color:var(--accent-gold);"></i> Academic Tools</span></div>
+      <div class="student-dashboard-cards-row">
+        <div class="dashboard-mini-card" onclick="openStudentGrades()"><div class="academic-icon-box"><i class="fa-solid fa-chart-column"></i></div><div style="font-weight:800;font-size:.9rem;">My Grades</div><div style="font-size:.7rem;color:var(--text-sub);">Marks and assessment progress</div></div>
+        <div class="dashboard-mini-card" onclick="openAcademicCalendar()"><div class="academic-icon-box"><i class="fa-solid fa-calendar-days"></i></div><div style="font-weight:800;font-size:.9rem;">Calendar</div><div style="font-size:.7rem;color:var(--text-sub);">Deadlines and academic dates</div></div>
+        <div class="dashboard-mini-card" onclick="openNotificationInbox()"><div class="academic-icon-box"><i class="fa-solid fa-bell"></i></div><div style="font-weight:800;font-size:.9rem;">Notifications</div><div style="font-size:.7rem;color:var(--text-sub);">Academic updates</div></div>
+      </div>
+
       <!-- PHOTOGRAPHIC GRID WITH COMING SOON POPUPS -->
       <div class="photo-grid-2x2">
         <div class="photo-card" onclick="showComingSoonModal('Events')">
@@ -1199,12 +1207,12 @@
             <span class="fold-header-status" id="foldLevelStatus">Select levels</span>
           </div>
           <div class="fold-body">
-            <p style="font-size: 0.75rem; color: var(--text-sub); margin-bottom: 10px;">Select the education level for the class. Only the four supported levels are available.</p>
+            <p style="font-size: 0.75rem; color: var(--text-sub); margin-bottom: 10px;">Select the Cambridge pathway for the class. Stages/Years and grading can then be configured for that pathway.</p>
             <div class="level-chips-grid">
-              <div class="level-chip" onclick="toggleTeacherLevelSelection('Lower Primary', this)">Lower Primary</div>
-              <div class="level-chip" onclick="toggleTeacherLevelSelection('Upper Primary', this)">Upper Primary</div>
-              <div class="level-chip" onclick="toggleTeacherLevelSelection('Lower Secondary', this)">Lower Secondary</div>
-              <div class="level-chip" onclick="toggleTeacherLevelSelection('Upper Secondary', this)">Upper Secondary</div>
+              <div class="level-chip" onclick="toggleTeacherLevelSelection('Cambridge Primary', this)">Cambridge Primary<br><span class="lms-small">Stages 1–6</span></div>
+              <div class="level-chip" onclick="toggleTeacherLevelSelection('Cambridge Lower Secondary', this)">Cambridge Lower Secondary<br><span class="lms-small">Stages 7–9</span></div>
+              <div class="level-chip" onclick="toggleTeacherLevelSelection('Cambridge Upper Secondary', this)">Cambridge Upper Secondary<br><span class="lms-small">Years 10–11</span></div>
+              <div class="level-chip" onclick="toggleTeacherLevelSelection('Cambridge Advanced', this)">Cambridge Advanced<br><span class="lms-small">Years 12–13</span></div>
             </div>
             <button class="primary-btn" style="opacity: 1; font-size: 0.85rem; padding: 12px; margin-top:10px;" onclick="confirmLevelsAndFold()">Continue to Classes</button>
           </div>
@@ -1254,6 +1262,7 @@
             <button onclick="openArchivedClasses()" style="background: none; border: none; color: var(--accent-gold); font-weight: 800; font-size: 0.75rem; cursor: pointer;">
               <i class="fa-solid fa-box-archive"></i> Archived
             </button>
+            <button onclick="showCambridgeFramework()" style="background:none;border:none;color:var(--accent-gold);font-weight:800;font-size:.75rem;cursor:pointer;"><i class="fa-solid fa-graduation-cap"></i> Cambridge Framework</button>
             <button onclick="editCreationFlow()" style="background: none; border: none; color: var(--accent-gold); font-weight: 800; font-size: 0.75rem; cursor: pointer;">+ Add / Edit Setup</button>
           </div>
         </div>
@@ -2454,17 +2463,42 @@ function activateCreationStep(step) {
   if (target) scrollToCreationStep(target);
 }
 
+const CAMBRIDGE_PATHWAYS = {
+  "Cambridge Primary": { stages:["Stage 1","Stage 2","Stage 3","Stage 4","Stage 5","Stage 6"], grading:"A*–U / school-configured" },
+  "Cambridge Lower Secondary": { stages:["Stage 7","Stage 8","Stage 9"], grading:"A*–U / school-configured" },
+  "Cambridge Upper Secondary": { stages:["Year 10","Year 11"], grading:"A*–E and 9–1 where applicable" },
+  "Cambridge Advanced": { stages:["Year 12 (AS)","Year 13 (A Level)"], grading:"A*–E" }
+};
+
+function getCambridgePathway(level){ return CAMBRIDGE_PATHWAYS[level] || null; }
+function updateCambridgeStageOptions(){
+  const level=document.getElementById("newClassLevel")?.value;
+  const select=document.getElementById("newClassStage");
+  if(!select)return;
+  const cfg=getCambridgePathway(level);
+  select.innerHTML=`<option value="">Select Stage / Year</option>`+(cfg?.stages||[]).map(x=>`<option value="${escapeHtml(x)}">${escapeHtml(x)}</option>`).join("");
+}
+function showCambridgeFramework(){
+  openLmsModal("Cambridge Academic Framework",`
+    <div class="lms-list">
+      ${Object.entries(CAMBRIDGE_PATHWAYS).map(([name,cfg])=>`<div class="lms-item"><strong>${escapeHtml(name)}</strong><div class="lms-small" style="margin-top:5px;">${cfg.stages.join(" • ")}</div><div class="lms-small" style="margin-top:5px;">Grade scale: ${escapeHtml(cfg.grading)}</div></div>`).join("")}
+    </div>
+    <div class="lms-item" style="margin-top:12px;"><strong>Assessment workflow</strong><div class="lms-small" style="margin-top:5px;">Assignments, Tests, Quizzes and Exams remain separate assessment types. Marks are recorded against their maximum marks and can be mapped to the selected Cambridge grading scale.</div></div>`);
+}
+
 async function createClassDirect() {
   if (!requireBackend() || !currentUser) return;
 
   const name = document.getElementById("newClassName")?.value.trim();
   const level = document.getElementById("newClassLevel")?.value;
   const year = document.getElementById("newClassYear")?.value.trim();
-  const description = document.getElementById("newClassDescription")?.value.trim();
+  const stage = document.getElementById("newClassStage")?.value;
+  const rawDescription = document.getElementById("newClassDescription")?.value.trim();
+  const description = stage ? `${rawDescription ? rawDescription + "\n\n" : ""}Cambridge Stage/Year: ${stage}` : rawDescription;
 
-  const allowedLevels = ["Lower Primary", "Upper Primary", "Lower Secondary", "Upper Secondary"];
-  if (!name || !level || !year) return toast("Complete the class details.", "error");
-  if (!allowedLevels.includes(level)) return toast("Select one of the four supported education levels.", "error");
+  const allowedLevels = ["Cambridge Primary", "Cambridge Lower Secondary", "Cambridge Upper Secondary", "Cambridge Advanced"];
+  if (!name || !level || !year || !stage) return toast("Complete the class details, including the Cambridge Stage / Year.", "error");
+  if (!allowedLevels.includes(level)) return toast("Select one of the four supported Cambridge pathways.", "error");
 
   const button = document.querySelector("#lmsModalBody form button[type='submit'], #lmsModalBody form button.primary-btn");
   if (button) { button.disabled = true; button.dataset.originalText = button.innerHTML; button.innerHTML = "Creating class…"; }
@@ -2528,9 +2562,12 @@ function openCreateClassModal() {
   openLmsModal("Create Class", `
     <form class="lms-form" onsubmit="event.preventDefault();createClassDirect()">
       <input class="lms-input" id="newClassName" placeholder="Class name e.g. Form 3A" required>
-      <select class="lms-select" id="newClassLevel" required>
-        <option value="">Select education level</option>
-        ${["Lower Primary","Upper Primary","Lower Secondary","Upper Secondary"].map(level => `<option value="${escapeHtml(level)}" ${selectedLevel === level ? "selected" : ""}>${escapeHtml(level)}</option>`).join("")}
+      <select class="lms-select" id="newClassLevel" onchange="updateCambridgeStageOptions()" required>
+        <option value="">Select Cambridge pathway</option>
+        ${["Cambridge Primary","Cambridge Lower Secondary","Cambridge Upper Secondary","Cambridge Advanced"].map(level => `<option value="${escapeHtml(level)}" ${selectedLevel === level ? "selected" : ""}>${escapeHtml(level)}</option>`).join("")}
+      </select>
+      <select class="lms-select" id="newClassStage" required>
+        <option value="">Select Stage / Year</option>
       </select>
       <input class="lms-input" id="newClassYear" placeholder="Academic year e.g. 2026/2027" required>
       <textarea class="lms-textarea" id="newClassDescription" placeholder="Description"></textarea>
@@ -2956,8 +2993,8 @@ async function finishCreationFlow() {
 }
 
 function toggleTeacherLevelSelection(level, el) {
-  const allowedLevels = ["Lower Primary", "Upper Primary", "Lower Secondary", "Upper Secondary"];
-  if (!allowedLevels.includes(level)) return toast("Only the four supported education levels can be selected.", "error");
+  const allowedLevels = ["Cambridge Primary", "Cambridge Lower Secondary", "Cambridge Upper Secondary", "Cambridge Advanced"];
+  if (!allowedLevels.includes(level)) return toast("Only the four supported Cambridge pathways can be selected.", "error");
 
   // A class has one education level. Selecting a new level replaces the previous selection.
   selectedTeacherLevels = [level];
