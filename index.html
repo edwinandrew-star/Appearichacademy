@@ -2052,8 +2052,27 @@ async function openStudentSubjectWorkspace(subjectId) {
 }
 
 function sectionHtml(title, icon, rows, renderer) {
-  return `<div style="margin-bottom:22px;"><div class="academic-core-header"><i class="fa-solid ${icon}"></i><h3>${title}</h3></div>
-    <div class="lms-list">${(rows||[]).map(renderer).map(x=>`<div class="lms-item">${x}</div>`).join("") || `<div class="lms-item"><span class="lms-small">Nothing published here yet.</span></div>`}</div></div>`;
+  const sectionId = `student-section-${String(title).toLowerCase().replace(/[^a-z0-9]+/g, "-")}-${Date.now()}-${Math.random().toString(36).slice(2,7)}`;
+  const content = (rows || []).map(renderer).map(x => `<div class="lms-item">${x}</div>`).join("") || `<div class="lms-item"><span class="lms-small">Nothing published here yet.</span></div>`;
+  return `<div style="margin-bottom:12px;border:1px solid var(--border-color);border-radius:12px;overflow:hidden;">
+    <button type="button" onclick="toggleStudentSection('${sectionId}', this)" aria-expanded="false" style="width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:15px 16px;background:var(--surface-color);border:0;cursor:pointer;text-align:left;color:inherit;">
+      <span style="display:flex;align-items:center;gap:10px;"><i class="fa-solid ${icon}"></i><strong>${escapeHtml(title)}</strong><span class="lms-small">(${(rows || []).length})</span></span>
+      <i class="fa-solid fa-chevron-down" style="transition:transform .2s ease;"></i>
+    </button>
+    <div id="${sectionId}" style="display:none;padding:0 12px 12px;">
+      <div class="lms-list">${content}</div>
+    </div>
+  </div>`;
+}
+
+function toggleStudentSection(sectionId, button) {
+  const content = document.getElementById(sectionId);
+  if (!content) return;
+  const isOpen = content.style.display !== "none";
+  content.style.display = isOpen ? "none" : "block";
+  button.setAttribute("aria-expanded", String(!isOpen));
+  const icon = button.querySelector(".fa-chevron-down");
+  if (icon) icon.style.transform = isOpen ? "rotate(0deg)" : "rotate(180deg)";
 }
 function switchScreen(id) {
   document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
