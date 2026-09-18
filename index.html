@@ -1193,14 +1193,30 @@
             <span class="fold-header-status" id="foldLevelStatus">Select levels</span>
           </div>
           <div class="fold-body">
-            <p style="font-size: 0.75rem; color: var(--text-sub); margin-bottom: 10px;">Select one or multiple levels you teach:</p>
+            <p style="font-size: 0.75rem; color: var(--text-sub); margin-bottom: 10px;">Select any existing level or add a new one. Levels are not limited to a fixed list.</p>
             <div class="level-chips-grid">
               <div class="level-chip" onclick="toggleTeacherLevelSelection('Lower Primary', this)">Lower Primary</div>
               <div class="level-chip" onclick="toggleTeacherLevelSelection('Upper Primary', this)">Upper Primary</div>
               <div class="level-chip" onclick="toggleTeacherLevelSelection('Lower Secondary', this)">Lower Secondary</div>
               <div class="level-chip" onclick="toggleTeacherLevelSelection('Upper Secondary', this)">Upper Secondary</div>
+              <div class="level-chip" onclick="toggleTeacherLevelSelection('Form 1', this)">Form 1</div>
+              <div class="level-chip" onclick="toggleTeacherLevelSelection('Form 2', this)">Form 2</div>
+              <div class="level-chip" onclick="toggleTeacherLevelSelection('Form 3', this)">Form 3</div>
+              <div class="level-chip" onclick="toggleTeacherLevelSelection('Form 4', this)">Form 4</div>
+              <div class="level-chip" onclick="toggleTeacherLevelSelection('Form 5', this)">Form 5</div>
+              <div class="level-chip" onclick="toggleTeacherLevelSelection('Form 6', this)">Form 6</div>
             </div>
-            <button class="primary-btn" style="opacity: 1; font-size: 0.85rem; padding: 12px;" onclick="confirmLevelsAndFold()">Create Level</button>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;">
+              <input class="lms-input" id="customTeacherLevel" list="teacherLevelSuggestions" placeholder="Add another level e.g. IGCSE Year 10" style="flex:1;min-width:220px;">
+              <datalist id="teacherLevelSuggestions">
+                <option value="Lower Primary"></option><option value="Upper Primary"></option>
+                <option value="Lower Secondary"></option><option value="Upper Secondary"></option>
+                <option value="Form 1"></option><option value="Form 2"></option><option value="Form 3"></option>
+                <option value="Form 4"></option><option value="Form 5"></option><option value="Form 6"></option>
+              </datalist>
+              <button type="button" class="primary-btn" style="opacity:1;" onclick="addCustomTeacherLevel()">Add Level</button>
+            </div>
+            <button class="primary-btn" style="opacity: 1; font-size: 0.85rem; padding: 12px; margin-top:10px;" onclick="confirmLevelsAndFold()">Continue to Classes</button>
           </div>
         </div>
 
@@ -1283,6 +1299,11 @@
         <div style="margin-bottom:16px;">
           <div class="section-header-title"><span><i class="fa-solid fa-book-bookmark" style="color:var(--accent-gold);"></i> Subjects</span><button class="primary-btn" style="opacity:1;" onclick="addSubjectToClass()">+ Create Subject</button></div>
           <div id="selectedClassSubjectsArea" class="feed-container"><div class="lms-small">Loading subjects…</div></div>
+        </div>
+
+        <div id="teacherPublishedMaterialsPanel" style="margin-bottom:20px;">
+          <div class="section-header-title"><span><i class="fa-solid fa-folder-open" style="color:var(--accent-gold);"></i> Uploaded Materials</span></div>
+          <div id="teacherMaterialsArea" class="feed-container"><div class="lms-small">Loading uploaded materials…</div></div>
         </div>
 
         <!-- Content management grid -->
@@ -1769,19 +1790,41 @@ async function loadStudentClasses() {
   box.innerHTML = `<div class="lms-item">Loading your classes...</div>`;
 
   const { data, error } = await sb.from("class_members")
-    .select("class_id, joined_at, classes(id,name,education_level,academic_year,description)")
+    .select("class_id, joined_at, classes(id,name,education_level,academic_year,description,teacher_id)")
     .eq("student_id", currentUser.id)
     .order("joined_at", { ascending: false })
-    .range(0, 19); // pagination: first 20; fetch more on demand later
+    .range(0,9999);
 
-  if (error) return box.innerHTML = `<div class="lms-item lms-danger">${escapeHtml(error.message)}</div>`;
-  const rows = data || [];
-  box.innerHTML = rows.length ? rows.map((r, i) => {
+  if (error) {
+    box.innerHTML = `<div class="lms-item lms-danger">${escapeHtml(error.message)}</div>`;
+    return;
+  }
+
+  const rows = (data || []).filter(r => r.classes?.id);
+  const classIds = [...new Set(rows.map(r => r.classes.id))];
+  let subjectMap = {};
+  if (classIds.length) {
+    const { data: subjects, error: subjectError } = await sb.from("subjects")
+      .select("id,name,class_id")
+      .in("class_id", classIds)
+      .eq("is_archived", false)
+      .order("name");
+    if (!subjectError) {
+      for (const s of (subjects || [])) {
+        if (!subjectMap[s.class_id]) subjectMap[s.class_id] = [];
+        subjectMap[s.class_id].push(s.name);
+      }
+    }
+  }
+
+  box.innerHTML = rows.length ? rows.map(r => {
     const c = r.classes;
+    const subjectNames = subjectMap[c.id] || [];
     return `<div class="portal-box-card" onclick="openStudentSubjectsForClass('${c.id}')">
       <div class="custom-vector-emblem"><i class="fa-solid fa-school"></i></div>
       <strong>${escapeHtml(c.name)}</strong>
       <span class="lms-small">${escapeHtml(c.education_level || "")} • ${escapeHtml(c.academic_year || "")}</span>
+      <span class="lms-small">${subjectNames.length ? escapeHtml(subjectNames.join(" • ")) : "No subjects yet"}</span>
       <span class="lms-pill">Enrolled</span>
     </div>`;
   }).join("") : `
@@ -1813,9 +1856,26 @@ async function joinClassWithKey() {
 
 /* ---------- 4. STUDENT SUBJECTS / CONTENT ---------- */
 async function openStudentSubjectsForClass(classId) {
-  if (!sb) return;
-  activeStudentClass = { id: classId };
-  const { data: c } = await sb.from("classes").select("id,name,education_level,academic_year").eq("id", classId).single();
+  if (!sb || !currentUser || !classId) return;
+
+  const { data: membership, error: membershipError } = await sb.from("class_members")
+    .select("class_id")
+    .eq("class_id", classId)
+    .eq("student_id", currentUser.id)
+    .maybeSingle();
+
+  if (membershipError || !membership) {
+    return toast("You are not enrolled in this class.", "error");
+  }
+
+  const { data: c, error: classError } = await sb.from("classes")
+    .select("id,name,education_level,academic_year,description,teacher_id")
+    .eq("id", classId)
+    .eq("is_archived", false)
+    .single();
+
+  if (classError || !c) return toast("Class could not be loaded.", "error");
+  activeStudentClass = { ...c };
   const { data: subjects, error } = await sb.from("subjects")
     .select("id,name,description")
     .eq("class_id", classId).eq("is_archived", false).order("name");
@@ -1848,19 +1908,19 @@ async function openStudentSubjectWorkspace(subjectId) {
   if (subjectError || !subject) return toast("Subject could not be loaded.", "error");
 
   const [materialsRes, assignmentsRes, announcementsRes, testsRes, quizzesRes, examsRes] = await Promise.all([
-    sb.from("materials").select("id,title,description,file_type,storage_path,published_at,available_at,due_at")
-      .eq("subject_id", subjectId).eq("is_published", true).eq("is_archived", false).order("published_at",{ascending:false}).range(0,49),
-    sb.from("assignments").select("id,title,instructions,published_at,due_at,max_marks,attachment_path")
-      .eq("subject_id", subjectId).eq("is_published", true).eq("is_archived", false).order("due_at",{ascending:true}).range(0,49),
-    sb.from("announcements").select("id,title,message,published_at")
-      .eq("subject_id", subjectId).eq("is_published", true).eq("is_archived", false).order("published_at",{ascending:false}).range(0,49),
-    sb.from("tests").select("id,title,instructions,duration_minutes,start_at,end_at,max_marks,is_published")
-      .eq("subject_id", subjectId).eq("is_published", true).eq("is_archived", false).order("start_at",{ascending:false}).range(0,49),
-    sb.from("quizzes").select("id,title,instructions,duration_minutes,start_at,end_at,max_marks,is_published")
-      .eq("subject_id", subjectId).eq("is_published", true).eq("is_archived", false).order("start_at",{ascending:false}).range(0,49),
+    sb.from("materials").select("id,title,description,file_name,mime_type,file_type,file_size,storage_path,storage_bucket,published_at,available_at,due_at,class_id,subject_id")
+      .eq("subject_id", subjectId).eq("class_id", activeStudentClass.id).eq("is_published", true).eq("is_archived", false).order("published_at",{ascending:false}).range(0,49),
+    sb.from("assignments").select("id,title,instructions,published_at,due_at,max_marks,attachment_path,class_id,subject_id")
+      .eq("subject_id", subjectId).eq("class_id", activeStudentClass.id).eq("is_published", true).eq("is_archived", false).order("due_at",{ascending:true}).range(0,49),
+    sb.from("announcements").select("id,title,message,published_at,class_id,subject_id")
+      .eq("subject_id", subjectId).eq("class_id", activeStudentClass.id).eq("is_published", true).eq("is_archived", false).order("published_at",{ascending:false}).range(0,49),
+    sb.from("tests").select("id,title,instructions,duration_minutes,start_at,end_at,max_marks,is_published,class_id,subject_id")
+      .eq("subject_id", subjectId).eq("class_id", activeStudentClass.id).eq("is_published", true).eq("is_archived", false).order("start_at",{ascending:false}).range(0,49),
+    sb.from("quizzes").select("id,title,instructions,duration_minutes,start_at,end_at,max_marks,is_published,class_id,subject_id")
+      .eq("subject_id", subjectId).eq("class_id", activeStudentClass.id).eq("is_published", true).eq("is_archived", false).order("start_at",{ascending:false}).range(0,49),
     // Keep the existing exam system visible alongside the newer Test/Quiz system.
-    sb.from("exams").select("id,title,instructions,start_at,end_at,duration_minutes,max_marks")
-      .eq("subject_id", subjectId).eq("is_archived", false).order("start_at",{ascending:false}).range(0,49)
+    sb.from("exams").select("id,title,instructions,start_at,end_at,duration_minutes,max_marks,class_id,subject_id")
+      .eq("subject_id", subjectId).eq("class_id", activeStudentClass.id).eq("is_archived", false).order("start_at",{ascending:false}).range(0,49)
   ]);
 
   const firstError = [materialsRes,assignmentsRes,announcementsRes,testsRes,quizzesRes,examsRes].find(r => r.error);
@@ -1921,26 +1981,92 @@ function switchScreen(id) {
    Files live in Supabase Storage; metadata lives in PostgreSQL.
    The viewer obtains an authorized URL and renders it in-app.
 */
+async function getAcademicFileUrl(storagePath, bucket, download=false) {
+  if (!sb || !storagePath) throw new Error("This material has no stored file path.");
+  const result = await sb.storage.from(bucket || "academic-materials").createSignedUrl(
+    storagePath, 900, download ? { download:true } : {}
+  );
+  if (result.error || !result.data?.signedUrl) {
+    throw result.error || new Error("The file URL could not be generated.");
+  }
+  return result.data.signedUrl;
+}
+
+async function resolveAcademicFile(material, download=false) {
+  const buckets = [material.storage_bucket || "academic-materials", "academic-materials", "materials"].filter(Boolean);
+  let lastError = null;
+  for (const bucket of [...new Set(buckets)]) {
+    try {
+      const url = await getAcademicFileUrl(material.storage_path, bucket, download);
+      return { url, bucket };
+    } catch (error) {
+      lastError = error;
+    }
+  }
+  throw lastError || new Error("The academic file is not accessible.");
+}
+
+function academicFileIsPdf(material) {
+  return String(material.mime_type || material.file_type || "").toLowerCase() === "application/pdf" || /\.pdf$/i.test(material.file_name || material.storage_path || "");
+}
+function academicFileIsImage(material) {
+  return String(material.mime_type || material.file_type || "").toLowerCase().startsWith("image/") || /\.(png|jpe?g|webp|gif)$/i.test(material.file_name || material.storage_path || "");
+}
+function academicFileIsOffice(material) {
+  return /\.(docx?|pptx?|xlsx?)$/i.test(material.file_name || material.storage_path || "");
+}
+
 async function openStudentDocument(materialId) {
   if (!sb) return;
-  const { data: m, error } = await sb.from("materials")
-    .select("id,title,file_type,storage_path").eq("id", materialId).single();
-  if (error || !m) return toast("Material could not be opened.", "error");
-  let signed = null;
-  let signError = null;
-  for (const bucket of ["academic-materials", "materials"]) {
-    const result = await sb.storage.from(bucket).createSignedUrl(m.storage_path, 600);
-    if (!result.error) { signed = result.data; break; }
-    signError = result.error;
-  }
-  if (signError || !signed) return toast("You are not authorized to open this file.", "error");
+  const { data:m, error } = await sb.from("materials")
+    .select("id,title,description,file_name,mime_type,file_type,file_size,storage_path,storage_bucket,published_at,class_id,subject_id")
+    .eq("id", materialId).single();
+  if (error || !m) return toast(error?.message || "Material could not be opened.", "error");
 
-  const url = signed.signedUrl;
-  const content = m.file_type === "application/pdf" || /\.pdf$/i.test(m.storage_path)
-    ? `<iframe class="document-frame" src="${escapeHtml(url)}#toolbar=1&navpanes=0"></iframe>`
-    : `<img src="${escapeHtml(url)}" alt="" style="max-width:100%;max-height:72vh;object-fit:contain;border-radius:14px;">`;
-  openLmsModal(m.title, content);
+  try {
+    const { url } = await resolveAcademicFile(m, false);
+    let content = "";
+    if (academicFileIsPdf(m)) {
+      content = `<iframe class="document-frame" title="${escapeHtml(m.title)}" src="${escapeHtml(url)}#toolbar=1&navpanes=0&view=FitH"></iframe>
+        <div class="lms-small" style="margin-top:8px;">If the embedded PDF does not render in this browser, use Open in Browser.</div>
+        <div class="lms-item-actions"><button class="primary-btn" style="opacity:1" onclick="window.open('${escapeHtml(url)}','_blank','noopener,noreferrer')"><i class="fa-solid fa-up-right-from-square"></i> Open in Browser</button></div>`;
+    } else if (academicFileIsImage(m)) {
+      content = `<div style="text-align:center"><img src="${escapeHtml(url)}" alt="${escapeHtml(m.title)}" style="max-width:100%;max-height:72vh;object-fit:contain;border-radius:14px;"></div>`;
+    } else if (academicFileIsOffice(m)) {
+      const officeUrl = `https://view.officeapps.live.com/op/view.aspx?src=${encodeURIComponent(url)}`;
+      content = `<iframe class="document-frame" title="${escapeHtml(m.title)}" src="${escapeHtml(officeUrl)}"></iframe>`;
+    } else {
+      content = `<div class="lms-item"><strong>${escapeHtml(m.file_name || m.title)}</strong><p class="lms-small" style="margin-top:6px">This file type cannot be previewed safely in the browser. Use Download.</p></div>`;
+    }
+    openLmsModal(m.title, `${content}<div class="lms-item-actions"><button class="primary-btn" style="opacity:1" onclick="downloadAcademicMaterial('${m.id}')"><i class="fa-solid fa-download"></i> Download</button></div>`);
+  } catch (error) {
+    console.error("openStudentDocument failed:", error);
+    toast(error.message || "Unable to open this material.", "error");
+  }
 }
+
+async function downloadAcademicMaterial(materialId) {
+  if (!sb) return;
+  const { data:m, error } = await sb.from("materials")
+    .select("id,title,file_name,mime_type,file_type,storage_path,storage_bucket")
+    .eq("id", materialId).single();
+  if (error || !m) return toast(error?.message || "Material could not be found.", "error");
+  try {
+    const { url } = await resolveAcademicFile(m, true);
+    const a = document.createElement("a");
+    a.href = url;
+    a.target = "_blank";
+    a.rel = "noopener";
+    a.download = m.file_name || m.title || "academic-material";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  } catch (error) {
+    console.error("downloadAcademicMaterial failed:", error);
+    toast(error.message || "Unable to download this material.", "error");
+  }
+}
+
 function closeStudentDocModal() { closeLmsModal(); }
 
 /* ---------- 6. ASSIGNMENTS ---------- */
@@ -2157,7 +2283,7 @@ async function loadTeacherClasses() {
     .eq("teacher_id", currentUser.id)
     .eq("is_archived", false)
     .order("created_at", { ascending:false })
-    .range(0,19);
+    .range(0,9999);
 
   if (error) {
     console.error("loadTeacherClasses failed:", error);
@@ -2283,16 +2409,20 @@ async function createClassDirect() {
 
 function openCreateClassModal() {
   const selectedLevel = selectedTeacherLevels.length === 1 ? selectedTeacherLevels[0] : "";
+  const options = selectedTeacherLevels.length
+    ? selectedTeacherLevels.map(level => `<option value="${escapeHtml(level)}" ${selectedLevel === level ? "selected" : ""}>${escapeHtml(level)}</option>`).join("")
+    : "";
   openLmsModal("Create Class", `
     <form class="lms-form" onsubmit="event.preventDefault();createClassDirect()">
-      <input class="lms-input" id="newClassName" placeholder="Class name" required>
-      <select class="lms-select" id="newClassLevel" required>
-        <option value="">Education level</option>
-        <option ${selectedLevel === "Lower Primary" ? "selected" : ""}>Lower Primary</option>
-        <option ${selectedLevel === "Upper Primary" ? "selected" : ""}>Upper Primary</option>
-        <option ${selectedLevel === "Lower Secondary" ? "selected" : ""}>Lower Secondary</option>
-        <option ${selectedLevel === "Upper Secondary" ? "selected" : ""}>Upper Secondary</option>
-      </select>
+      <input class="lms-input" id="newClassName" placeholder="Class name e.g. Form 3A" required>
+      <input class="lms-input" id="newClassLevel" list="newClassLevelSuggestions" value="${escapeHtml(selectedLevel)}" placeholder="Education level e.g. Form 3" required>
+      <datalist id="newClassLevelSuggestions">
+        ${options}
+        <option value="Lower Primary"></option><option value="Upper Primary"></option>
+        <option value="Lower Secondary"></option><option value="Upper Secondary"></option>
+        <option value="Form 1"></option><option value="Form 2"></option><option value="Form 3"></option>
+        <option value="Form 4"></option><option value="Form 5"></option><option value="Form 6"></option>
+      </datalist>
       <input class="lms-input" id="newClassYear" placeholder="Academic year e.g. 2026/2027" required>
       <textarea class="lms-textarea" id="newClassDescription" placeholder="Description"></textarea>
       <button type="submit" class="primary-btn" style="opacity:1">Create Class</button>
@@ -2367,6 +2497,137 @@ async function openSelectedClassView(classId) {
 
   await renderEnrollmentKeyForClass(c);
   await refreshSelectedClassSubjects(c.id);
+  await loadTeacherUploadedMaterials(c.id);
+}
+
+async function loadTeacherUploadedMaterials(classId) {
+  const area = document.getElementById("teacherMaterialsArea");
+  if (!area || !sb || !currentUser || !classId) return;
+  area.innerHTML = `<div class="lms-small">Loading uploaded materials…</div>`;
+
+  const { data, error } = await sb.from("materials")
+    .select("id,title,description,file_name,mime_type,file_type,file_size,storage_path,storage_bucket,published_at,is_published,is_archived,class_id,subject_id,created_at")
+    .eq("teacher_id", currentUser.id)
+    .eq("class_id", classId)
+    .eq("is_archived", false)
+    .order("created_at", { ascending:false })
+    .range(0,99);
+
+  if (error) {
+    console.error("loadTeacherUploadedMaterials failed:", error);
+    area.innerHTML = `<div class="lms-item"><span class="lms-small lms-danger">Unable to load uploaded materials: ${escapeHtml(error.message)}</span></div>`;
+    return;
+  }
+
+  if (!data?.length) {
+    area.innerHTML = `<div class="lms-item"><span class="lms-small">No uploaded materials for this class yet.</span></div>`;
+    return;
+  }
+
+  const subjectIds = [...new Set(data.map(x=>x.subject_id).filter(Boolean))];
+  let subjectMap = {};
+  if (subjectIds.length) {
+    const { data: subjects } = await sb.from("subjects").select("id,name").in("id", subjectIds);
+    subjectMap = Object.fromEntries((subjects||[]).map(x=>[x.id,x.name]));
+  }
+
+  const classIdSet = classId;
+  area.innerHTML = data.map(m => {
+    const published = m.is_published === true;
+    const subjectName = subjectMap[m.subject_id] || "Subject";
+    const type = academicFileIsPdf(m) ? "PDF" : (m.mime_type || m.file_type || "File").split("/").pop().toUpperCase();
+    return `<div class="lms-item">
+      <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start;">
+        <div style="min-width:0;flex:1;">
+          <strong>${escapeHtml(m.title || m.file_name || "Untitled material")}</strong>
+          <div class="lms-small" style="margin-top:5px;">${escapeHtml(m.file_name || "Unnamed file")} • ${escapeHtml(type)} • ${formatAcademicFileSize(m.file_size)}</div>
+          <div class="lms-small" style="margin-top:4px;">Subject: ${escapeHtml(subjectName)} • ${m.created_at ? new Date(m.created_at).toLocaleString() : ""}</div>
+          <div class="lms-small" style="margin-top:4px;">${published ? "Published to enrolled students" : "Saved but not published to students"}</div>
+        </div>
+        <span class="lms-pill">${published ? "Published" : "Draft"}</span>
+      </div>
+      <div class="lms-item-actions">
+        <button class="primary-btn" style="opacity:1" onclick="openTeacherDocument('${m.id}')"><i class="fa-solid fa-eye"></i> View</button>
+        <button class="primary-btn" style="opacity:1" onclick="downloadAcademicMaterial('${m.id}')"><i class="fa-solid fa-download"></i> Download</button>
+        <button class="primary-btn" style="opacity:1" onclick="showMaterialStudentVisibility('${m.id}')"><i class="fa-solid fa-users"></i> Students</button>
+        <button class="primary-btn" style="opacity:1" onclick="deleteTeacherMaterial('${m.id}')"><i class="fa-solid fa-trash"></i> Delete</button>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+function formatAcademicFileSize(bytes) {
+  const n = Number(bytes || 0);
+  if (!n) return "Size unknown";
+  if (n < 1024) return `${n} B`;
+  if (n < 1024*1024) return `${(n/1024).toFixed(1)} KB`;
+  if (n < 1024*1024*1024) return `${(n/(1024*1024)).toFixed(1)} MB`;
+  return `${(n/(1024*1024*1024)).toFixed(1)} GB`;
+}
+
+async function openTeacherDocument(materialId) {
+  if (!sb || !currentUser) return;
+  const { data:m, error } = await sb.from("materials")
+    .select("id,title,description,file_name,mime_type,file_type,file_size,storage_path,storage_bucket,published_at,class_id,subject_id")
+    .eq("id", materialId).eq("teacher_id", currentUser.id).single();
+  if (error || !m) return toast(error?.message || "Material could not be opened.", "error");
+  try {
+    const { url } = await resolveAcademicFile(m, false);
+    let content;
+    if (academicFileIsPdf(m)) {
+      content = `<iframe class="document-frame" title="${escapeHtml(m.title)}" src="${escapeHtml(url)}#toolbar=1&navpanes=0&view=FitH"></iframe>
+        <div class="lms-small" style="margin-top:8px;">If the embedded PDF does not render in this browser, use Open in Browser.</div>
+        <div class="lms-item-actions"><button class="primary-btn" style="opacity:1" onclick="window.open('${escapeHtml(url)}','_blank','noopener,noreferrer')"><i class="fa-solid fa-up-right-from-square"></i> Open in Browser</button></div>`;
+    } else if (academicFileIsImage(m)) {
+      content = `<div style="text-align:center"><img src="${escapeHtml(url)}" alt="${escapeHtml(m.title)}" style="max-width:100%;max-height:72vh;object-fit:contain;border-radius:14px;"></div>`;
+    } else if (academicFileIsOffice(m)) {
+      const officeUrl=`https://view.officeapps.live.com/op/view.aspx?src=${encodeURIComponent(url)}`;
+      content = `<iframe class="document-frame" title="${escapeHtml(m.title)}" src="${escapeHtml(officeUrl)}"></iframe>`;
+    } else {
+      content = `<div class="lms-item"><strong>${escapeHtml(m.file_name || m.title)}</strong><p class="lms-small" style="margin-top:6px">This file type cannot be previewed safely in the browser.</p></div>`;
+    }
+    openLmsModal(m.title, `${content}<div class="lms-item-actions"><button class="primary-btn" style="opacity:1" onclick="downloadAcademicMaterial('${m.id}')"><i class="fa-solid fa-download"></i> Download</button></div>`);
+  } catch (error) {
+    console.error("openTeacherDocument failed:", error);
+    toast(error.message || "Unable to open this material.", "error");
+  }
+}
+
+async function showMaterialStudentVisibility(materialId) {
+  if (!sb || !currentUser) return;
+  const { data:m, error } = await sb.from("materials")
+    .select("id,title,class_id,subject_id,is_published,is_archived")
+    .eq("id", materialId).eq("teacher_id", currentUser.id).single();
+  if (error || !m) return toast(error?.message || "Material could not be checked.", "error");
+  let total = 0;
+  if (m.is_published && !m.is_archived) {
+    const { data: visibilityRows, error: visibilityError } = await sb.rpc("teacher_material_student_count", { p_material_id: materialId });
+    if (visibilityError) {
+      console.error("teacher_material_student_count failed:", visibilityError);
+      return toast("Unable to verify student visibility. Run the LMS class-system SQL fix first.", "error");
+    }
+    total = Number(visibilityRows?.[0]?.student_count || 0);
+  }
+  if (!m.is_published || m.is_archived) {
+    return openLmsModal("Student Visibility", `<div class="lms-item"><strong>${escapeHtml(m.title)}</strong><p class="lms-small" style="margin-top:8px">This material is not currently published, so students cannot see it.</p></div>`);
+  }
+  openLmsModal("Student Visibility", `<div class="lms-item"><strong>${escapeHtml(m.title)}</strong><p class="lms-small" style="margin-top:8px">Published to the enrolled students in this class.</p><div style="font-size:1.4rem;font-weight:900;margin-top:10px">${total}</div><div class="lms-small">enrolled student${total===1?"":"s"} currently matched by class membership</div></div>`);
+}
+
+async function deleteTeacherMaterial(materialId) {
+  if (!sb || !currentUser) return;
+  if (!window.confirm("Delete this material? Students will no longer be able to access it.")) return;
+  const { data:m, error:fetchError } = await sb.from("materials").select("id,storage_path,storage_bucket").eq("id",materialId).eq("teacher_id",currentUser.id).single();
+  if (fetchError || !m) return toast(fetchError?.message || "Material not found.","error");
+  const { error:delError } = await sb.from("materials").delete().eq("id",materialId).eq("teacher_id",currentUser.id);
+  if (delError) return toast(delError.message,"error");
+  if (m.storage_path) {
+    for (const bucket of [m.storage_bucket,"academic-materials","materials"].filter(Boolean)) {
+      try { await sb.storage.from(bucket).remove([m.storage_path]); } catch (_) {}
+    }
+  }
+  if (selectedClassId) await loadTeacherUploadedMaterials(selectedClassId);
+  toast("Material deleted successfully.","success");
 }
 
 async function refreshSelectedClassSubjects(classId) {
@@ -2404,6 +2665,15 @@ async function copyActiveEnrollmentKey() {
     console.error("Clipboard copy failed:", error);
     toast(`Copy failed. Enrollment key: ${key}`, "error");
   }
+}
+
+function goBackToClassGrid() {
+  activeSelectedClassObj = null;
+  document.getElementById("selectedClassViewSection").style.display = "none";
+  document.getElementById("teacherWorkflowContainer").style.display = "none";
+  document.getElementById("teacherClassesGridSection").style.display = "block";
+  document.getElementById("activeContentFoldArea")?.style.setProperty("display", "none");
+  loadTeacherClasses();
 }
 
 async function deleteTeacherClass(classId, event) {
@@ -2502,12 +2772,21 @@ async function finishCreationFlow() {
 function toggleTeacherLevelSelection(level, el) {
   if (selectedTeacherLevels.includes(level)) {
     selectedTeacherLevels = selectedTeacherLevels.filter(x => x !== level);
-    el.classList.remove("selected");
+    el?.classList.remove("selected");
   } else {
     selectedTeacherLevels.push(level);
-    el.classList.add("selected");
+    el?.classList.add("selected");
   }
   setCreationStatus("foldLevelStatus", selectedTeacherLevels.length ? selectedTeacherLevels.join(", ") : "Select levels");
+}
+function addCustomTeacherLevel() {
+  const input = document.getElementById("customTeacherLevel");
+  const level = input?.value.trim();
+  if (!level) return toast("Enter a level name first.", "error");
+  if (!selectedTeacherLevels.includes(level)) selectedTeacherLevels.push(level);
+  setCreationStatus("foldLevelStatus", selectedTeacherLevels.join(", "));
+  if (input) input.value = "";
+  toast(`Level "${level}" added.`, "success");
 }
 
 function toggleFoldSection(id) {
@@ -2646,14 +2925,9 @@ async function uploadAcademicFile(file, classId, subjectId) {
   if (file.size > 50 * 1024 * 1024) throw new Error("Maximum academic file size is 50 MB.");
   const safe = file.name.replace(/[^a-zA-Z0-9._-]/g,"_");
   const path = `${currentUser.id}/${classId}/${subjectId}/${crypto.randomUUID()}-${safe}`;
-  const buckets = ["academic-materials", "materials"];
-  let lastError = null;
-  for (const bucket of buckets) {
-    const { error } = await sb.storage.from(bucket).upload(path,file,{upsert:false});
-    if (!error) return { path, bucket };
-    lastError = error;
-  }
-  throw lastError || new Error("No academic storage bucket is available.");
+  const { error } = await sb.storage.from("academic-materials").upload(path,file,{upsert:false,contentType:file.type || undefined});
+  if (error) throw error;
+  return { path, bucket:"academic-materials" };
 }
 
 async function createContent(type) {
@@ -2679,7 +2953,7 @@ async function createContent(type) {
       uploadedBucket = uploaded.bucket;
       const { error } = await sb.from("materials").insert({
         teacher_id:currentUser.id,class_id:classId,subject_id:subjectId,title,description:desc||null,
-        storage_path:uploaded.path,file_type:file.type||null,file_size:file.size,
+        storage_path:uploaded.path,storage_bucket:uploaded.bucket,file_name:file.name,mime_type:file.type||null,file_type:file.type||null,file_size:file.size,
         is_published:publish,published_at:publish?new Date().toISOString():null
       });
       if (error) throw error;
@@ -2729,6 +3003,10 @@ async function createContent(type) {
 
     closeLmsModal();
     toast(`${type} saved successfully.`, "success");
+    if (type === "Materials") {
+      await loadTeacherUploadedMaterials(classId);
+      await refreshSelectedClassSubjects(classId);
+    }
   } catch (error) {
     console.error(`createContent(${type}) failed:`, error);
     if (uploadedPath) {
