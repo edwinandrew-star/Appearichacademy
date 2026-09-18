@@ -1583,7 +1583,12 @@ async function bootstrapAuthenticatedUser(user) {
     return;
   }
 
-  currentUserProfile = profile;
+  currentUserProfile = {
+    ...profile,
+    role: String(profile.role || "").trim().toLowerCase()
+  };
+
+  console.log("Profile loaded successfully:", currentUserProfile);
   await launchDashboardBasedOnRole();
 }
 
@@ -1628,32 +1633,127 @@ async function handleLogout() {
 }
 
 async function launchDashboardBasedOnRole() {
-  document.getElementById("screen-auth").classList.remove("active");
+  // ============================================================
+  // ROLE-BASED ROUTING
+  // The Supabase profiles.role value is the ONLY authority used
+  // to decide which portal the authenticated user sees.
+  // ============================================================
+  if (!currentUser || !currentUserProfile) {
+    showAuthScreen();
+    return;
+  }
+
+  const role = String(currentUserProfile.role || "").trim().toLowerCase();
+
+  console.log("Appearich authenticated user:", currentUser.email);
+  console.log("Appearich database role:", role);
+
+  // Always hide every application screen before opening the
+  // authorized destination. This prevents the previous Student
+  // Portal from remaining visible after a Teacher login.
+  document.querySelectorAll(".screen").forEach(screen => {
+    screen.classList.remove("active");
+  });
+
   document.getElementById("mainHeader").style.display = "flex";
   document.getElementById("mainNavBar").style.display = "flex";
 
-  const role = currentUserProfile?.role;
-  if (role === "teacher" || role === "admin") {
-    document.getElementById("screen-teacher-portal").classList.add("active");
-    document.getElementById("headerBrandTitle").innerText = role === "admin" ? "Appearich Admin Portal" : "Appearich Teacher Portal";
-    document.getElementById("teacherPortalGreeting").innerText =
-      `WELCOME, ${(currentUserProfile.full_name || "TEACHER").toUpperCase()}`;
+  // ------------------------------------------------------------
+  // TEACHER / ADMIN
+  // ------------------------------------------------------------
+  if (role === "teacher" || role === "admin" || role === "teacher/admin") {
+    const teacherScreen = document.getElementById("screen-teacher-portal");
+
+    if (!teacherScreen) {
+      console.error("Teacher portal screen was not found in the HTML.");
+      toast("Teacher Portal is missing from this build.", "error");
+      return;
+    }
+
+    teacherScreen.classList.add("active");
+
+    const brand = document.getElementById("headerBrandTitle");
+    if (brand) {
+      brand.innerText = role === "admin"
+        ? "Appearich Admin Portal"
+        : "Appearich Teacher Portal";
+    }
+
+    const greeting = document.getElementById("teacherPortalGreeting");
+    if (greeting) {
+      greeting.innerText =
+        `WELCOME, ${(currentUserProfile.full_name || "TEACHER").toUpperCase()}`;
+    }
+
+    // Teacher data is loaded only after the Teacher screen has been
+    // selected. It cannot redirect the user to the Student Portal.
     await loadTeacherClasses();
-  } else {
-    document.getElementById("screen-home").classList.add("active");
-    document.getElementById("headerBrandTitle").innerText = "Appearich Student Portal";
-    document.getElementById("dynamicGreeting").innerText =
-      `WELCOME, ${(currentUserProfile.full_name || "SCHOLAR").toUpperCase()}`;
-    document.getElementById("dynamicSubGreeting").innerText =
-      `Level: ${currentUserProfile.education_level || "General"}`;
-    document.getElementById("profileDisplayName").innerText = currentUserProfile.full_name || "Scholar";
-    document.getElementById("profileDisplayEmail").innerText = currentUser.email;
-    document.getElementById("profileDisplayProgram").innerText =
-      currentUserProfile.combination || currentUserProfile.education_level || "Academic Programme";
-    document.getElementById("profileInitial").innerText =
-      (currentUserProfile.full_name || "S").charAt(0).toUpperCase();
+    await refreshNotifications();
+    return;
   }
-  await refreshNotifications();
+
+  // ------------------------------------------------------------
+  // STUDENT
+  // ------------------------------------------------------------
+  if (role === "student") {
+    const studentScreen = document.getElementById("screen-home");
+
+    if (!studentScreen) {
+      console.error("Student portal screen was not found in the HTML.");
+      toast("Student Portal is missing from this build.", "error");
+      return;
+    }
+
+    studentScreen.classList.add("active");
+
+    const brand = document.getElementById("headerBrandTitle");
+    if (brand) brand.innerText = "Appearich Student Portal";
+
+    const greeting = document.getElementById("dynamicGreeting");
+    if (greeting) {
+      greeting.innerText =
+        `WELCOME, ${(currentUserProfile.full_name || "SCHOLAR").toUpperCase()}`;
+    }
+
+    const subGreeting = document.getElementById("dynamicSubGreeting");
+    if (subGreeting) {
+      subGreeting.innerText =
+        `Level: ${currentUserProfile.education_level || "General"}`;
+    }
+
+    const profileName = document.getElementById("profileDisplayName");
+    if (profileName) {
+      profileName.innerText = currentUserProfile.full_name || "Scholar";
+    }
+
+    const profileEmail = document.getElementById("profileDisplayEmail");
+    if (profileEmail) profileEmail.innerText = currentUser.email;
+
+    const profileProgram = document.getElementById("profileDisplayProgram");
+    if (profileProgram) {
+      profileProgram.innerText =
+        currentUserProfile.combination ||
+        currentUserProfile.education_level ||
+        "Academic Programme";
+    }
+
+    const profileInitial = document.getElementById("profileInitial");
+    if (profileInitial) {
+      profileInitial.innerText =
+        (currentUserProfile.full_name || "S").charAt(0).toUpperCase();
+    }
+
+    await refreshNotifications();
+    return;
+  }
+
+  // ------------------------------------------------------------
+  // UNKNOWN / INVALID ROLE
+  // ------------------------------------------------------------
+  console.error("Invalid profile role:", currentUserProfile.role);
+  await sb.auth.signOut();
+  showAuthScreen();
+  toast("This account has an invalid role. Please contact the administrator.", "error");
 }
 
 function switchAuthRole(role) {
@@ -1693,13 +1793,21 @@ async function sendPasswordReset() {
 
 /* ---------- 2. NAVIGATION / THEME ---------- */
 function switchTab(screenId, element) {
+  // Teachers/Admins never enter the Student Home through navigation.
+  const role = String(currentUserProfile?.role || "").trim().toLowerCase();
+  if ((role === "teacher" || role === "admin" || role === "teacher/admin") && screenId === "screen-home") {
+    screenId = "screen-teacher-portal";
+  }
+
   document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
   document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active"));
-  if (currentUserProfile?.role === "teacher" && screenId === "screen-home")
-    document.getElementById("screen-teacher-portal").classList.add("active");
-  else document.getElementById(screenId)?.classList.add("active");
+
+  document.getElementById(screenId)?.classList.add("active");
   element?.classList.add("active");
-  if (screenId === "screen-student-classes") loadStudentClasses();
+
+  if (screenId === "screen-student-classes" && role === "student") {
+    loadStudentClasses();
+  }
 }
 function toggleThemeMode() {
   const root = document.documentElement;
