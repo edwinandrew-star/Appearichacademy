@@ -1369,12 +1369,23 @@
 
     <!-- SCREEN 2: AI COMPANION -->
     <div id="screen-ai" class="screen">
-      <div class="ai-companion-hero" style="background: var(--surface-color); border: 1px solid var(--border-color); border-radius: 24px; padding: 32px 24px; text-align: center; margin-top: 40px;">
-        <div class="ai-core-pulse" style="width: 70px; height: 70px; border-radius: 50%; background: var(--accent-gold-glow); border: 2px solid var(--accent-gold); margin: 0 auto 16px auto; display: flex; align-items: center; justify-content: center; color: var(--accent-gold); font-size: 1.6rem;">
-          <i class="fa-solid fa-robot"></i>
+      <div style="background:var(--surface-color);border:1px solid var(--border-color);border-radius:24px;padding:22px;margin-top:20px;">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px;">
+          <div style="width:52px;height:52px;border-radius:16px;background:var(--accent-gold-glow);border:1px solid var(--accent-gold-border);display:flex;align-items:center;justify-content:center;color:var(--accent-gold);font-size:1.3rem;"><i class="fa-solid fa-robot"></i></div>
+          <div><h2 style="font-size:1.25rem;font-weight:900;">Appearich AI Tutor</h2><p style="font-size:.75rem;color:var(--text-sub);">Answers are based only on materials provided by your teacher.</p></div>
         </div>
-        <h2 style="font-size: 1.4rem; font-weight: 900; margin-bottom: 8px;">Coming Soon</h2>
-        <p style="font-size: 0.85rem; color: var(--text-sub); max-width: 280px; margin: 0 auto;">Our advanced AI academic companion is currently under development. Stay tuned for intelligent tutoring!</p>
+        <div class="lms-grid" style="margin-bottom:14px;">
+          <div><label class="lms-small">Class</label><select id="aiClassSelect" class="lms-select"><option value="">Loading classes…</option></select></div>
+          <div><label class="lms-small">Subject</label><select id="aiSubjectSelect" class="lms-select"><option value="">Select a class first</option></select></div>
+        </div>
+        <div id="aiChatMessages" style="min-height:260px;max-height:52vh;overflow:auto;border:1px solid var(--border-color);border-radius:16px;padding:12px;background:var(--surface-elevated);margin-bottom:12px;">
+          <div class="lms-item"><strong>AI Tutor</strong><div class="lms-small" style="margin-top:5px;">Select a class and subject, then ask a question about the teacher's uploaded materials.</div></div>
+        </div>
+        <form id="aiQuestionForm" class="lms-form" onsubmit="event.preventDefault();askAppearichAI();">
+          <textarea id="aiQuestionInput" class="lms-textarea" maxlength="4000" placeholder="Ask a question about your teacher's materials…" required></textarea>
+          <button id="aiAskButton" class="primary-btn" style="opacity:1" type="submit"><i class="fa-solid fa-paper-plane"></i> Ask AI</button>
+        </form>
+        <div class="lms-small" style="margin-top:10px;">The tutor does not use web search for answers. If the information is not in the teacher-provided materials, it will say so.</div>
       </div>
     </div>
 
@@ -1488,6 +1499,9 @@ const sb = (window.supabase && SUPABASE_URL.startsWith("http"))
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
   : null;
 
+const AI_EDGE_FUNCTION = `${SUPABASE_URL}/functions/v1/ai-tutor`;
+let aiTutorInitialized = false;
+let aiTutorHistory = [];
 let currentAuthRole = "student";
 let authMode = "login";
 let expectedLoginRole = null;
@@ -1758,6 +1772,95 @@ function toggleAuthMode() {
   switchAuthRole(currentAuthRole);
 }
 
+async function initializeAiTutor() {
+  if (!sb || !currentUser || String(currentUserProfile?.role || '').toLowerCase() !== 'student') return;
+  const classSelect = document.getElementById('aiClassSelect');
+  if (!classSelect) return;
+  if (aiTutorInitialized && classSelect.options.length > 1) return;
+  classSelect.innerHTML = '<option value="">Loading classes…</option>';
+  try {
+    const { data, error } = await sb.from('class_members').select('class_id, classes(id,name,education_level,academic_year)').eq('student_id', currentUser.id);
+    if (error) throw error;
+    const rows = (data || []).map(x => x.classes).filter(Boolean);
+    const unique = Array.from(new Map(rows.map(x => [x.id, x])).values());
+    classSelect.innerHTML = '<option value="">Select class</option>' + unique.map(x => `<option value="${escapeHtml(x.id)}">${escapeHtml(x.name)}${x.academic_year ? ' • ' + escapeHtml(x.academic_year) : ''}</option>`).join('');
+    classSelect.onchange = () => loadAiSubjectsForClass(classSelect.value);
+    aiTutorInitialized = true;
+  } catch (e) {
+    console.error('AI class loading failed:', e);
+    classSelect.innerHTML = '<option value="">Unable to load classes</option>';
+    appendAiMessage('assistant', 'I could not load your classes. Please refresh and try again.');
+  }
+}
+
+async function loadAiSubjectsForClass(classId) {
+  const subjectSelect = document.getElementById('aiSubjectSelect');
+  if (!subjectSelect) return;
+  aiTutorHistory = [];
+  const chat = document.getElementById('aiChatMessages');
+  if (chat) chat.innerHTML = '<div class="lms-item"><strong>AI Tutor</strong><div class="lms-small" style="margin-top:5px;">Select a subject and ask a question about the teacher\'s uploaded materials.</div></div>';
+  if (!classId) {
+    subjectSelect.innerHTML = '<option value="">Select a class first</option>';
+    return;
+  }
+  subjectSelect.innerHTML = '<option value="">Loading subjects…</option>';
+  const { data, error } = await sb.from('subjects').select('id,name').eq('class_id', classId).eq('is_archived', false).order('name');
+  if (error) {
+    console.error('AI subject loading failed:', error);
+    subjectSelect.innerHTML = '<option value="">Unable to load subjects</option>';
+    return;
+  }
+  subjectSelect.innerHTML = '<option value="">Select subject</option>' + (data || []).map(x => `<option value="${escapeHtml(x.id)}">${escapeHtml(x.name)}</option>`).join('');
+}
+
+function appendAiMessage(role, text) {
+  const chat = document.getElementById('aiChatMessages');
+  if (!chat) return;
+  const safe = escapeHtml(text).replace(/\n/g, '<br>');
+  const label = role === 'user' ? 'You' : 'AI Tutor';
+  chat.insertAdjacentHTML('beforeend', `<div class="lms-item" style="margin-bottom:8px;"><strong>${label}</strong><div style="margin-top:5px;line-height:1.55;">${safe}</div></div>`);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+async function askAppearichAI() {
+  if (!sb || !currentUser) return toast('Please log in first.', 'error');
+  const classId = document.getElementById('aiClassSelect')?.value;
+  const subjectId = document.getElementById('aiSubjectSelect')?.value;
+  const input = document.getElementById('aiQuestionInput');
+  const button = document.getElementById('aiAskButton');
+  const question = input?.value.trim() || '';
+  if (!classId) return toast('Select a class first.', 'error');
+  if (!subjectId) return toast('Select a subject first.', 'error');
+  if (!question) return toast('Enter your question.', 'error');
+  const { data: sessionData, error: sessionError } = await sb.auth.getSession();
+  if (sessionError || !sessionData?.session?.access_token) return toast('Your session has expired. Please log in again.', 'error');
+  appendAiMessage('user', question);
+  if (input) input.value = '';
+  if (button) { button.disabled = true; button.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Thinking…'; }
+  try {
+    const response = await fetch(AI_EDGE_FUNCTION, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${sessionData.session.access_token}`,
+        'apikey': SUPABASE_ANON_KEY
+      },
+      body: JSON.stringify({ class_id: classId, subject_id: subjectId, question, history: aiTutorHistory.slice(-10) })
+    });
+    const result = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(result.error || `AI Tutor request failed (${response.status}).`);
+    const answer = result.answer || 'I can\'t find that answer in the materials provided by your teacher.';
+    appendAiMessage('assistant', answer);
+    aiTutorHistory.push({ role: 'user', content: question });
+    aiTutorHistory.push({ role: 'assistant', content: answer });
+  } catch (e) {
+    console.error('AI Tutor request failed:', e);
+    appendAiMessage('assistant', e.message || 'AI Tutor could not answer right now.');
+  } finally {
+    if (button) { button.disabled = false; button.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Ask AI'; }
+  }
+}
+
 async function sendPasswordReset() {
   if (!requireBackend()) return;
   const email = document.getElementById("authEmail")?.value.trim();
@@ -1787,6 +1890,7 @@ function switchTab(screenId, element) {
   else document.getElementById(screenId)?.classList.add("active");
   element?.classList.add("active");
   if (screenId === "screen-student-classes" && isStudent) loadStudentClasses();
+  if (screenId === "screen-ai" && isStudent) initializeAiTutor();
 }
 function toggleThemeMode() {
   const root = document.documentElement;
