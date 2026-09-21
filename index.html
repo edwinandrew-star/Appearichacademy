@@ -992,6 +992,9 @@
   background:var(--surface-color); border:1px solid var(--accent-gold-border);
   color:var(--accent-gold); font-weight:900; text-align:center; }
 
+
+/* APPEARICH STUDENT LEARNING ANALYTICS */
+.learning-progress-wrap{margin-top:10px}.learning-progress-track{height:8px;border-radius:999px;background:var(--surface-elevated);overflow:hidden;border:1px solid var(--border-color)}.learning-progress-fill{height:100%;width:0;background:var(--accent-gold);transition:width .25s ease}.continue-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;margin:12px 0 22px}.continue-card{background:var(--surface-color);border:1px solid var(--border-color);border-radius:16px;padding:14px;box-shadow:var(--shadow-sm)}.continue-card .pct{font-weight:900;color:var(--accent-gold)}.activity-row{display:flex;gap:12px;align-items:flex-start;padding:13px 0;border-bottom:1px solid var(--border-color)}.activity-row:last-child{border-bottom:0}.activity-icon{width:36px;height:36px;border-radius:11px;background:var(--accent-gold-glow);display:flex;align-items:center;justify-content:center;color:var(--accent-gold);flex:0 0 auto}.ai-shell{display:flex;flex-direction:column;min-height:70vh}.ai-chat-toolbar{display:flex;justify-content:space-between;gap:8px;align-items:center;margin-bottom:10px}.ai-attachments{display:flex;gap:7px;flex-wrap:wrap;margin:8px 0}.ai-attachment{font-size:.72rem;padding:6px 9px;border:1px solid var(--border-color);border-radius:999px;background:var(--surface-elevated)}.ai-composer{border:1px solid var(--border-color);border-radius:18px;padding:10px;background:var(--surface-color)}.ai-composer textarea{border:0!important;box-shadow:none!important;background:transparent!important;resize:none}.ai-composer-actions{display:flex;justify-content:space-between;align-items:center;gap:8px}.ai-file-input{display:none}@media(max-width:640px){.continue-grid{grid-template-columns:1fr}.ai-shell{min-height:74vh}}
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -1099,62 +1102,16 @@
         </div>
       </div>
       <!-- ACADEMIC CORE SECTION -->
-      <div class="academic-core-header">
-        <i class="fa-solid fa-layer-group"></i>
-        <h3>Academic Core</h3>
-      </div>
-      <div class="academic-core-container">
-        <div class="academic-scroll-wrapper">
-          <div class="academic-card" onclick="openStudentClassesView()">
-            <div class="academic-card-top">
-              <div class="academic-icon-box"><i class="fa-solid fa-school"></i></div>
-              <span class="academic-tag">Core</span>
-            </div>
-            <div class="academic-card-mid">
-              <div class="academic-card-title">Classes</div>
-              <div class="academic-card-sub">Access course materials</div>
-            </div>
-          </div>
-          <div class="academic-card" onclick="switchTab('screen-activity', document.querySelectorAll('.nav-item')[2])">
-            <div class="academic-card-top">
-              <div class="academic-icon-box"><i class="fa-solid fa-clock-rotate-left"></i></div>
-              <span class="academic-tag">Recent</span>
-            </div>
-            <div class="academic-card-mid">
-              <div class="academic-card-title">Activity</div>
-              <div class="academic-card-sub">Submissions & updates</div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <!-- QUICK NAVIGATION -->
-      <div class="section-header-title">
-        <span><i class="fa-solid fa-compass" style="color: var(--accent-gold);"></i> Quick Navigation</span>
-      </div>
-      <div class="student-dashboard-cards-row">
-        <div class="dashboard-mini-card" onclick="openStudentClassesView()">
-          <div class="academic-icon-box"><i class="fa-solid fa-school"></i></div>
-          <div style="font-weight: 800; font-size: 0.9rem;">Class</div>
-          <div style="font-size: 0.7rem; color: var(--text-sub);">View your classes & subjects</div>
-        </div>
-        <div class="dashboard-mini-card" onclick="switchTab('screen-activity', document.querySelectorAll('.nav-item')[2])">
-          <div class="academic-icon-box"><i class="fa-solid fa-chart-line"></i></div>
-          <div style="font-weight: 800; font-size: 0.9rem;">Progress</div>
-          <div style="font-size: 0.7rem; color: var(--text-sub);">Academic progression</div>
-        </div>
-        <div class="dashboard-mini-card" onclick="switchTab('screen-activity', document.querySelectorAll('.nav-item')[2])">
-          <div class="academic-icon-box"><i class="fa-solid fa-clock-rotate-left"></i></div>
-          <div style="font-weight: 800; font-size: 0.9rem;">Activity</div>
-          <div style="font-size: 0.7rem; color: var(--text-sub);">Recent submissions</div>
-        </div>
-      </div>
-      <!-- CAMBRIDGE ACADEMIC TOOLS -->
-      <div class="section-header-title"><span><i class="fa-solid fa-graduation-cap" style="color:var(--accent-gold);"></i> Academic Tools</span></div>
-      <div class="student-dashboard-cards-row">
-        <div class="dashboard-mini-card" onclick="openStudentGrades()"><div class="academic-icon-box"><i class="fa-solid fa-chart-column"></i></div><div style="font-weight:800;font-size:.9rem;">My Grades</div><div style="font-size:.7rem;color:var(--text-sub);">Marks and assessment progress</div></div>
-        <div class="dashboard-mini-card" onclick="openAcademicCalendar()"><div class="academic-icon-box"><i class="fa-solid fa-calendar-days"></i></div><div style="font-weight:800;font-size:.9rem;">Calendar</div><div style="font-size:.7rem;color:var(--text-sub);">Deadlines and academic dates</div></div>
-        <div class="dashboard-mini-card" onclick="openNotificationInbox()"><div class="academic-icon-box"><i class="fa-solid fa-bell"></i></div><div style="font-weight:800;font-size:.9rem;">Notifications</div><div style="font-size:.7rem;color:var(--text-sub);">Academic updates</div></div>
-      </div>
+      <div class="academic-core-header"><i class="fa-solid fa-layer-group"></i><h3>Academic Core</h3></div>
+      <div class="academic-core-container"><div class="academic-scroll-wrapper">
+        <div class="academic-card" onclick="openStudentClassesView()"><div class="academic-card-top"><div class="academic-icon-box"><i class="fa-solid fa-school"></i></div><span class="academic-tag">Core</span></div><div class="academic-card-mid"><div class="academic-card-title">Classes</div><div class="academic-card-sub">Classes, subjects & learning materials</div></div></div>
+        <div class="academic-card" onclick="openStudentActivityView()"><div class="academic-card-top"><div class="academic-icon-box"><i class="fa-solid fa-clock-rotate-left"></i></div><span class="academic-tag">Live</span></div><div class="academic-card-mid"><div class="academic-card-title">Activity</div><div class="academic-card-sub">What you opened, submitted & completed</div></div></div>
+        <div class="academic-card" onclick="openStudentProgressView()"><div class="academic-card-top"><div class="academic-icon-box"><i class="fa-solid fa-chart-line"></i></div><span class="academic-tag">Real data</span></div><div class="academic-card-mid"><div class="academic-card-title">Progress</div><div class="academic-card-sub">Completion across your actual learning</div></div></div>
+      </div></div>
+      <div class="section-header-title"><span><i class="fa-solid fa-forward" style="color:var(--accent-gold);"></i> Continue Learning</span></div>
+      <div id="studentContinueLearning" class="continue-grid"><div class="lms-item">Loading your learning activity…</div></div>
+      <div class="section-header-title"><span><i class="fa-solid fa-chart-simple" style="color:var(--accent-gold);"></i> Learning Snapshot</span></div>
+      <div id="studentLearningSnapshot" class="student-dashboard-cards-row"><div class="dashboard-mini-card"><strong>—</strong><span class="lms-small">Materials started</span></div><div class="dashboard-mini-card"><strong>—</strong><span class="lms-small">Materials completed</span></div><div class="dashboard-mini-card"><strong>—</strong><span class="lms-small">Learning actions</span></div></div>
 
       <!-- PHOTOGRAPHIC GRID WITH COMING SOON POPUPS -->
       <div class="photo-grid-2x2">
@@ -1367,40 +1324,29 @@
       <!-- Rendered dynamically via JS -->
     </div>
 
-    <!-- SCREEN 2: AI COMPANION -->
+    <!-- SCREEN 2: AI TUTOR -->
     <div id="screen-ai" class="screen">
-      <div style="background:var(--surface-color);border:1px solid var(--border-color);border-radius:24px;padding:22px;margin-top:20px;">
-        <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px;">
-          <div style="width:52px;height:52px;border-radius:16px;background:var(--accent-gold-glow);border:1px solid var(--accent-gold-border);display:flex;align-items:center;justify-content:center;color:var(--accent-gold);font-size:1.3rem;"><i class="fa-solid fa-robot"></i></div>
-          <div><h2 style="font-size:1.25rem;font-weight:900;">Appearich AI Tutor</h2><p style="font-size:.75rem;color:var(--text-sub);">Answers are based only on materials provided by your teacher.</p></div>
-        </div>
-        <div class="lms-grid" style="margin-bottom:14px;">
-          <div><label class="lms-small">Class</label><select id="aiClassSelect" class="lms-select"><option value="">Loading classes…</option></select></div>
-          <div><label class="lms-small">Subject</label><select id="aiSubjectSelect" class="lms-select"><option value="">Select a class first</option></select></div>
-        </div>
-        <div id="aiChatMessages" style="min-height:260px;max-height:52vh;overflow:auto;border:1px solid var(--border-color);border-radius:16px;padding:12px;background:var(--surface-elevated);margin-bottom:12px;">
-          <div class="lms-item"><strong>AI Tutor</strong><div class="lms-small" style="margin-top:5px;">Select a class and subject, then ask a question about the teacher's uploaded materials.</div></div>
-        </div>
-        <form id="aiQuestionForm" class="lms-form" onsubmit="event.preventDefault();askAppearichAI();">
-          <textarea id="aiQuestionInput" class="lms-textarea" maxlength="4000" placeholder="Ask a question about your teacher's materials…" required></textarea>
-          <button id="aiAskButton" class="primary-btn" style="opacity:1" type="submit"><i class="fa-solid fa-paper-plane"></i> Ask AI</button>
+      <div class="ai-shell">
+        <div class="ai-chat-toolbar"><div><h2 style="font-size:1.25rem;font-weight:900;"><i class="fa-solid fa-robot" style="color:var(--accent-gold);"></i> Appearich AI</h2><div class="lms-small">Ask naturally, learn from your course context, or upload files and images.</div></div><button class="secondary-btn" type="button" onclick="clearAiConversation()"><i class="fa-solid fa-rotate-left"></i> New chat</button></div>
+        <div id="aiChatMessages" style="flex:1;min-height:360px;max-height:58vh;overflow:auto;border:1px solid var(--border-color);border-radius:18px;padding:14px;background:var(--surface-elevated);margin-bottom:10px;"><div class="lms-item"><strong>Appearich AI</strong><div class="lms-small" style="margin-top:5px;">How can I help you learn today?</div></div></div>
+        <div id="aiAttachmentList" class="ai-attachments"></div>
+        <form id="aiQuestionForm" class="ai-composer" onsubmit="event.preventDefault();askAppearichAI();">
+          <textarea id="aiQuestionInput" class="lms-textarea" maxlength="8000" rows="3" placeholder="Message Appearich AI…"></textarea>
+          <div class="ai-composer-actions"><div><input id="aiFileInput" class="ai-file-input" type="file" multiple accept="image/*,.pdf,.doc,.docx,.ppt,.pptx,.txt,.csv,.xlsx"><button type="button" class="secondary-btn" onclick="document.getElementById('aiFileInput').click()"><i class="fa-solid fa-paperclip"></i> Attach</button></div><button id="aiAskButton" class="primary-btn" style="opacity:1" type="submit"><i class="fa-solid fa-paper-plane"></i> Send</button></div>
         </form>
-        <div class="lms-small" style="margin-top:10px;">The tutor does not use web search for answers. If the information is not in the teacher-provided materials, it will say so.</div>
       </div>
     </div>
 
     <!-- SCREEN 3: ACTIVITY -->
     <div id="screen-activity" class="screen">
-      <div class="section-header-title">
-        <span><i class="fa-solid fa-chart-line" style="color: var(--accent-gold);"></i> Academic Progression & Completion</span>
-      </div>
-      <div class="feed-container">
-        <div class="feed-item">
-          <div style="font-size: 0.7rem; color: var(--accent-gold); font-weight: 800; text-transform: uppercase;">Completed Coursework</div>
-          <div style="font-size: 0.9rem; font-weight: 800; margin-top: 2px;">Advanced Academic Modules</div>
-          <div style="font-size: 0.75rem; color: var(--text-sub); margin-top: 4px;">Successfully updated student profile metrics.</div>
-        </div>
-      </div>
+      <div class="section-header-title"><span><i class="fa-solid fa-clock-rotate-left" style="color:var(--accent-gold);"></i> Recent Activity</span></div>
+      <div id="studentActivityFeed" class="feed-container"><div class="lms-item">Loading your activity…</div></div>
+    </div>
+
+    <!-- SCREEN 3B: PROGRESS -->
+    <div id="screen-progress" class="screen">
+      <div class="section-header-title"><span><i class="fa-solid fa-chart-line" style="color:var(--accent-gold);"></i> Learning Progress</span></div>
+      <div id="studentProgressOverview" class="feed-container"><div class="lms-item">Loading your progress…</div></div>
     </div>
 
     <!-- SCREEN 4: PROFILE -->
@@ -1436,7 +1382,7 @@
         <i class="fa-solid fa-robot"></i>
         <span>AI</span>
       </button>
-      <button class="nav-item" onclick="switchTab('screen-activity', this)">
+      <button class="nav-item" onclick="openStudentProgressView(this)">
         <i class="fa-solid fa-chart-pie"></i>
         <span>Progress</span>
       </button>
@@ -1774,131 +1720,92 @@ function toggleAuthMode() {
 
 async function initializeAiTutor() {
   if (!sb || !currentUser || String(currentUserProfile?.role || '').toLowerCase() !== 'student') return;
-  const classSelect = document.getElementById('aiClassSelect');
-  if (!classSelect) return;
-  if (aiTutorInitialized && classSelect.options.length > 1) return;
-  classSelect.innerHTML = '<option value="">Loading classes…</option>';
-  try {
-    const { data, error } = await sb.from('class_members').select('class_id, classes(id,name,education_level,academic_year)').eq('student_id', currentUser.id);
-    if (error) throw error;
-    const rows = (data || []).map(x => x.classes).filter(Boolean);
-    const unique = Array.from(new Map(rows.map(x => [x.id, x])).values());
-    classSelect.innerHTML = '<option value="">Select class</option>' + unique.map(x => `<option value="${escapeHtml(x.id)}">${escapeHtml(x.name)}${x.academic_year ? ' • ' + escapeHtml(x.academic_year) : ''}</option>`).join('');
-    classSelect.onchange = () => loadAiSubjectsForClass(classSelect.value);
-    aiTutorInitialized = true;
-  } catch (e) {
-    console.error('AI class loading failed:', e);
-    classSelect.innerHTML = '<option value="">Unable to load classes</option>';
-    appendAiMessage('assistant', 'I could not load your classes. Please refresh and try again.');
+  const fileInput = document.getElementById('aiFileInput');
+  if (fileInput && !fileInput.dataset.bound) {
+    fileInput.dataset.bound = '1';
+    fileInput.addEventListener('change', renderAiAttachments);
   }
 }
-
-async function loadAiSubjectsForClass(classId) {
-  const subjectSelect = document.getElementById('aiSubjectSelect');
-  if (!subjectSelect) return;
-  aiTutorHistory = [];
-  const chat = document.getElementById('aiChatMessages');
-  if (chat) chat.innerHTML = '<div class="lms-item"><strong>AI Tutor</strong><div class="lms-small" style="margin-top:5px;">Select a subject and ask a question about the teacher\'s uploaded materials.</div></div>';
-  if (!classId) {
-    subjectSelect.innerHTML = '<option value="">Select a class first</option>';
-    return;
-  }
-  subjectSelect.innerHTML = '<option value="">Loading subjects…</option>';
-  const { data, error } = await sb.from('subjects').select('id,name').eq('class_id', classId).eq('is_archived', false).order('name');
-  if (error) {
-    console.error('AI subject loading failed:', error);
-    subjectSelect.innerHTML = '<option value="">Unable to load subjects</option>';
-    return;
-  }
-  subjectSelect.innerHTML = '<option value="">Select subject</option>' + (data || []).map(x => `<option value="${escapeHtml(x.id)}">${escapeHtml(x.name)}</option>`).join('');
+let aiAttachments = [];
+function renderAiAttachments(){
+  const input=document.getElementById('aiFileInput');
+  aiAttachments=Array.from(input?.files||[]).slice(0,5);
+  const box=document.getElementById('aiAttachmentList');
+  if(box) box.innerHTML=aiAttachments.map(f=>`<span class="ai-attachment"><i class="fa-solid fa-paperclip"></i> ${escapeHtml(f.name)} (${(f.size/1024/1024).toFixed(1)} MB)</span>`).join('');
 }
-
-function appendAiMessage(role, text) {
-  const chat = document.getElementById('aiChatMessages');
-  if (!chat) return;
-  const safe = escapeHtml(text).replace(/\n/g, '<br>');
-  const label = role === 'user' ? 'You' : 'AI Tutor';
-  chat.insertAdjacentHTML('beforeend', `<div class="lms-item" style="margin-bottom:8px;"><strong>${label}</strong><div style="margin-top:5px;line-height:1.55;">${safe}</div></div>`);
-  chat.scrollTop = chat.scrollHeight;
+function clearAiConversation(){
+  aiTutorHistory=[]; aiAttachments=[];
+  const input=document.getElementById('aiFileInput'); if(input) input.value='';
+  const list=document.getElementById('aiAttachmentList'); if(list) list.innerHTML='';
+  const chat=document.getElementById('aiChatMessages');
+  if(chat) chat.innerHTML='<div class="lms-item"><strong>Appearich AI</strong><div class="lms-small" style="margin-top:5px;">How can I help you learn today?</div></div>';
 }
-
+function fileToBase64(file){return new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(String(r.result||'').split(',')[1]||'');r.onerror=reject;r.readAsDataURL(file);});}
 async function askAppearichAI() {
   if (!sb || !currentUser) return toast('Please log in first.', 'error');
-  const classId = document.getElementById('aiClassSelect')?.value;
-  const subjectId = document.getElementById('aiSubjectSelect')?.value;
   const input = document.getElementById('aiQuestionInput');
   const button = document.getElementById('aiAskButton');
   const question = input?.value.trim() || '';
-  if (!classId) return toast('Select a class first.', 'error');
-  if (!subjectId) return toast('Select a subject first.', 'error');
-  if (!question) return toast('Enter your question.', 'error');
+  if (!question && !aiAttachments.length) return toast('Enter a message or attach a file.', 'error');
   const { data: sessionData, error: sessionError } = await sb.auth.getSession();
   if (sessionError || !sessionData?.session?.access_token) return toast('Your session has expired. Please log in again.', 'error');
-  appendAiMessage('user', question);
+  appendAiMessage('user', question || 'Please analyze the attached file(s).');
   if (input) input.value = '';
   if (button) { button.disabled = true; button.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Thinking…'; }
   try {
-    const response = await fetch(AI_EDGE_FUNCTION, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${sessionData.session.access_token}`,
-        'apikey': SUPABASE_ANON_KEY
-      },
-      body: JSON.stringify({ class_id: classId, subject_id: subjectId, question, history: aiTutorHistory.slice(-10) })
-    });
-    const result = await response.json().catch(() => ({}));
-    if (!response.ok) throw new Error(result.error || `AI Tutor request failed (${response.status}).`);
-    const answer = result.answer || 'I can\'t find that answer in the materials provided by your teacher.';
-    appendAiMessage('assistant', answer);
-    aiTutorHistory.push({ role: 'user', content: question });
-    aiTutorHistory.push({ role: 'assistant', content: answer });
-  } catch (e) {
-    console.error('AI Tutor request failed:', e);
-    appendAiMessage('assistant', e.message || 'AI Tutor could not answer right now.');
-  } finally {
-    if (button) { button.disabled = false; button.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Ask AI'; }
-  }
+    const attachments=[];
+    for(const file of aiAttachments){
+      if(file.size>12*1024*1024) throw new Error(`${file.name} is too large. Maximum is 12 MB.`);
+      attachments.push({name:file.name,mime_type:file.type||'application/octet-stream',data:await fileToBase64(file)});
+    }
+    const body={question:question||'Please analyze the attached file(s).',history:aiTutorHistory.slice(-10),attachments};
+    if(activeStudentClass?.id) body.context_class_id=activeStudentClass.id;
+    if(activeStudentSubject?.id) body.context_subject_id=activeStudentSubject.id;
+    const response=await fetch(AI_EDGE_FUNCTION,{method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${sessionData.session.access_token}`,'apikey':SUPABASE_ANON_KEY},body:JSON.stringify(body)});
+    const result=await response.json().catch(()=>({}));
+    if(!response.ok) throw new Error(result.error||`AI request failed (${response.status}).`);
+    const answer=result.answer||'I’m ready for your next question.';
+    appendAiMessage('assistant',answer); aiTutorHistory.push({role:'user',content:question||'Attached files'}); aiTutorHistory.push({role:'assistant',content:answer});
+    aiAttachments=[]; const fi=document.getElementById('aiFileInput'); if(fi) fi.value=''; const list=document.getElementById('aiAttachmentList'); if(list) list.innerHTML='';
+  } catch(error){ console.error(error); appendAiMessage('assistant','I could not complete that request. Please try again.'); toast(error.message||'AI request failed.','error'); }
+  finally { if(button){button.disabled=false;button.innerHTML='<i class="fa-solid fa-paper-plane"></i> Send';} }
 }
 
-async function sendPasswordReset() {
-  if (!requireBackend()) return;
-  const email = document.getElementById("authEmail")?.value.trim();
-  if (!email) return toast("Enter your email first.", "error");
-  const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: location.origin + location.pathname });
-  if (error) toast(error.message, "error"); else toast("Password reset email sent.", "success");
+async function logStudentActivity(type, title, meta={}) {
+  if(!sb || !currentUser) return;
+  try { await sb.from('student_activity').insert({student_id:currentUser.id,class_id:meta.class_id||activeStudentClass?.id||null,subject_id:meta.subject_id||activeStudentSubject?.id||null,activity_type:type,title:String(title||'Activity').slice(0,200),entity_id:meta.entity_id||null,metadata:meta}); } catch(e){ console.warn('Activity log failed',e); }
 }
-
-/* ---------- 2. NAVIGATION / THEME ---------- */
-function switchTab(screenId, element) {
-  const role = String(currentUserProfile?.role || "").toLowerCase();
-  const isTeacher = ["teacher", "admin", "teacher/admin"].includes(role);
-  const isStudent = role === "student";
-
-  // Keep teacher and student workspaces strictly separated.
-  if (isStudent && ["screen-teacher-portal"].includes(screenId)) {
-    return toast("This area is for teachers only.", "error");
-  }
-  if (isTeacher && ["screen-student-classes", "screen-student-subject-workspace"].includes(screenId)) {
-    return toast("This area is for students only.", "error");
-  }
-
-  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
-  document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active"));
-  if (isTeacher && screenId === "screen-home")
-    document.getElementById("screen-teacher-portal")?.classList.add("active");
-  else document.getElementById(screenId)?.classList.add("active");
-  element?.classList.add("active");
-  if (screenId === "screen-student-classes" && isStudent) loadStudentClasses();
-  if (screenId === "screen-ai" && isStudent) initializeAiTutor();
+async function saveMaterialProgress(material, percent, position=null, completed=false) {
+  if(!sb||!currentUser||!material?.id) return;
+  const payload={student_id:currentUser.id,material_id:material.id,class_id:material.class_id||activeStudentClass?.id||null,subject_id:material.subject_id||activeStudentSubject?.id||null,progress_percent:Math.max(0,Math.min(100,Math.round(percent))),last_position:position,updated_at:new Date().toISOString(),last_accessed_at:new Date().toISOString()};
+  if(completed||percent>=100) payload.completed_at=new Date().toISOString();
+  await sb.from('student_material_progress').upsert(payload,{onConflict:'student_id,material_id'});
 }
-function toggleThemeMode() {
-  const root = document.documentElement;
-  const next = root.getAttribute("data-theme") === "dark" ? "light" : "dark";
-  root.setAttribute("data-theme", next);
-  localStorage.setItem("appearich_theme_mode", next);
-  const icon = document.getElementById("themeIcon");
-  if (icon) icon.className = next === "dark" ? "fa-solid fa-sun" : "fa-solid fa-moon";
+async function loadStudentLearningSnapshot(){
+  if(!sb||!currentUser) return;
+  const box=document.getElementById('studentContinueLearning'); const snap=document.getElementById('studentLearningSnapshot');
+  if(!box) return;
+  const {data,error}=await sb.from('student_material_progress').select('material_id,progress_percent,last_accessed_at,completed_at,materials(id,title,file_name,class_id,subject_id,subjects(name),classes(name))').eq('student_id',currentUser.id).order('last_accessed_at',{ascending:false}).limit(8);
+  if(error){box.innerHTML='<div class="lms-item">Learning progress is unavailable right now.</div>';return;}
+  const rows=(data||[]).filter(x=>x.materials && Number(x.progress_percent)<100);
+  box.innerHTML=rows.length?rows.slice(0,4).map(x=>{const m=x.materials,p=Number(x.progress_percent)||0;return `<div class="continue-card"><strong>${escapeHtml(m.title||m.file_name||'Material')}</strong><div class="lms-small" style="margin-top:5px;">${escapeHtml(m.subjects?.name||'Subject')} • ${escapeHtml(m.classes?.name||'Class')}</div><div class="learning-progress-wrap"><div class="learning-progress-track"><div class="learning-progress-fill" style="width:${p}%"></div></div><div style="display:flex;justify-content:space-between;margin-top:6px"><span class="lms-small">${p}% complete</span><button class="primary-btn" style="opacity:1;padding:7px 10px" onclick="openStudentDocument('${m.id}')">Continue</button></div></div></div>`}).join(''):'<div class="lms-item">No incomplete learning items yet. Open a class material to start tracking your progress.</div>';
+  const all=(data||[]); const started=all.length, completed=all.filter(x=>Number(x.progress_percent)>=100||x.completed_at).length;
+  if(snap) snap.innerHTML=`<div class="dashboard-mini-card"><strong>${started}</strong><span class="lms-small">Materials started</span></div><div class="dashboard-mini-card"><strong>${completed}</strong><span class="lms-small">Materials completed</span></div><div class="dashboard-mini-card"><strong>Live</strong><span class="lms-small">Progress from your activity</span></div>`;
+}
+async function openStudentActivityView(element){switchTab('screen-activity',element||document.getElementById('navHomeBtn'));await loadStudentActivity();}
+async function loadStudentActivity(){
+  if(!sb||!currentUser) return; const box=document.getElementById('studentActivityFeed'); if(!box)return;
+  const {data,error}=await sb.from('student_activity').select('*').eq('student_id',currentUser.id).order('created_at',{ascending:false}).limit(40);
+  if(error){box.innerHTML='<div class="lms-item">Activity is unavailable right now.</div>';return;}
+  box.innerHTML=(data||[]).length?(data||[]).map(a=>`<div class="activity-row"><div class="activity-icon"><i class="fa-solid ${a.activity_type==='material_opened'?'fa-book-open':a.activity_type==='assignment_submitted'?'fa-file-arrow-up':a.activity_type.includes('attempt')?'fa-pen-to-square':'fa-check'}"></i></div><div><strong>${escapeHtml(a.title||'Learning activity')}</strong><div class="lms-small" style="margin-top:3px;">${escapeHtml(String(a.activity_type||'').replaceAll('_',' '))} • ${a.created_at?new Date(a.created_at).toLocaleString():''}</div></div></div>`).join(''):'<div class="lms-item">No activity yet. Your learning actions will appear here.</div>';
+}
+async function openStudentProgressView(element){switchTab('screen-progress',element||document.getElementById('navHomeBtn'));await loadStudentProgress();}
+async function loadStudentProgress(){
+  if(!sb||!currentUser)return; const box=document.getElementById('studentProgressOverview'); if(!box)return;
+  const {data,error}=await sb.from('student_material_progress').select('progress_percent,completed_at,materials(title,subject_id,subjects(name))').eq('student_id',currentUser.id).order('last_accessed_at',{ascending:false}).limit(100);
+  if(error){box.innerHTML='<div class="lms-item">Progress is unavailable right now.</div>';return;}
+  const rows=data||[]; const overall=rows.length?Math.round(rows.reduce((n,r)=>n+(Number(r.progress_percent)||0),0)/rows.length):0; const by={}; rows.forEach(r=>{const k=r.materials?.subjects?.name||'Other';(by[k]??=[]).push(Number(r.progress_percent)||0)});
+  box.innerHTML=`<div class="lms-item"><strong>Overall learning completion: ${overall}%</strong><div class="learning-progress-wrap"><div class="learning-progress-track"><div class="learning-progress-fill" style="width:${overall}%"></div></div></div><div class="lms-small" style="margin-top:8px;">Calculated from saved material interactions, not placeholder values.</div></div>${Object.entries(by).map(([name,vals])=>{const p=Math.round(vals.reduce((a,b)=>a+b,0)/vals.length);return `<div class="lms-item"><strong>${escapeHtml(name)}</strong><span class="lms-small" style="float:right">${p}%</span><div class="learning-progress-wrap"><div class="learning-progress-track"><div class="learning-progress-fill" style="width:${p}%"></div></div></div></div>`}).join('')}`;
 }
 
 /* ---------- 3. STUDENT CLASS MEMBERSHIP ----------
@@ -2247,6 +2154,14 @@ async function openStudentDocument(materialId) {
   if (error || !m) return toast(error?.message || "Material could not be opened.", "error");
 
   try {
+    await logStudentActivity('material_opened', m.title || m.file_name || 'Material opened', {entity_id:m.id,class_id:m.class_id,subject_id:m.subject_id});
+    await saveMaterialProgress(m, 5, 0, false);
+    let progressTimer = null;
+    const startTime = Date.now();
+    const progressControls = `<div class="learning-progress-wrap"><div class="learning-progress-track"><div id="materialViewerProgressFill" class="learning-progress-fill" style="width:5%"></div></div><div class="lms-small" style="margin-top:6px">Learning progress: <span id="materialViewerProgressText">5%</span></div></div><button class="primary-btn" style="opacity:1;margin-top:8px" onclick="completeCurrentStudentMaterial()"><i class="fa-solid fa-check"></i> Mark as completed</button>`;
+    window.__activeStudentMaterialProgress = { material:m, startTime };
+    progressTimer = setInterval(async()=>{ const elapsed=Math.max(0,Date.now()-startTime); const pct=Math.min(95,5+Math.floor(elapsed/15000)*5); const fill=document.getElementById('materialViewerProgressFill'); const txt=document.getElementById('materialViewerProgressText'); if(fill)fill.style.width=pct+'%'; if(txt)txt.textContent=pct+'%'; await saveMaterialProgress(m,pct,Math.floor(elapsed/1000),false); },15000);
+    window.__activeStudentMaterialProgress.timer=progressTimer;
     const { url } = await resolveAcademicFile(m, false);
     let content = "";
     if (academicFileIsPdf(m)) {
@@ -2261,12 +2176,14 @@ async function openStudentDocument(materialId) {
     } else {
       content = `<div class="lms-item"><strong>${escapeHtml(m.file_name || m.title)}</strong><p class="lms-small" style="margin-top:6px">This file type cannot be previewed safely in the browser. Use Download.</p></div>`;
     }
-    openLmsModal(m.title, `${content}<div class="lms-item-actions"><button class="primary-btn" style="opacity:1" onclick="downloadAcademicMaterial('${m.id}')"><i class="fa-solid fa-download"></i> Download</button></div>`);
+    openLmsModal(m.title, `${content}${progressControls}<div class="lms-item-actions"><button class="primary-btn" style="opacity:1" onclick="downloadAcademicMaterial('${m.id}')"><i class="fa-solid fa-download"></i> Download</button></div>`);
   } catch (error) {
     console.error("openStudentDocument failed:", error);
     toast(error.message || "Unable to open this material.", "error");
   }
 }
+
+async function completeCurrentStudentMaterial(){const state=window.__activeStudentMaterialProgress;if(!state?.material)return;await saveMaterialProgress(state.material,100,state.last_position||0,true);await logStudentActivity('material_completed',state.material.title||'Material completed',{entity_id:state.material.id,class_id:state.material.class_id,subject_id:state.material.subject_id});const fill=document.getElementById('materialViewerProgressFill');const txt=document.getElementById('materialViewerProgressText');if(fill)fill.style.width='100%';if(txt)txt.textContent='100%';toast('Material marked as completed.','success');loadStudentLearningSnapshot();}
 
 async function downloadAcademicMaterial(materialId) {
   if (!sb) return;
@@ -2290,7 +2207,7 @@ async function downloadAcademicMaterial(materialId) {
   }
 }
 
-function closeStudentDocModal() { closeLmsModal(); }
+function closeStudentDocModal() { if(window.__activeStudentMaterialProgress?.timer) clearInterval(window.__activeStudentMaterialProgress.timer); window.__activeStudentMaterialProgress=null; closeLmsModal(); }
 
 /* ---------- 6. ASSIGNMENTS ---------- */
 function openAssignmentSubmission(assignmentId) {
@@ -2475,6 +2392,7 @@ async function submitAssessmentAttempt(kind, attemptId) {
   document.querySelectorAll("[data-attempt-question]").forEach(el => { answers[el.dataset.attemptQuestion] = el.value; });
   const { error } = await sb.rpc(rpc, { p_attempt_id: attemptId, p_answers: answers });
   if (error) return toast(error.message,"error");
+  await logStudentActivity(`${kind.toLowerCase()}_attempt_submitted`,`${kind} submitted`,{entity_id:attemptId});
   closeLmsModal();
   toast(`${kind} submitted successfully.`,"success");
 }
