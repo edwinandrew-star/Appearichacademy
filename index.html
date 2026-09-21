@@ -994,7 +994,7 @@
 
 
 /* APPEARICH STUDENT LEARNING ANALYTICS */
-.learning-progress-wrap{margin-top:10px}.learning-progress-track{height:8px;border-radius:999px;background:var(--surface-elevated);overflow:hidden;border:1px solid var(--border-color)}.learning-progress-fill{height:100%;width:0;background:var(--accent-gold);transition:width .25s ease}.continue-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;margin:12px 0 22px}.continue-card{background:var(--surface-color);border:1px solid var(--border-color);border-radius:16px;padding:14px;box-shadow:var(--shadow-sm)}.continue-card .pct{font-weight:900;color:var(--accent-gold)}.activity-row{display:flex;gap:12px;align-items:flex-start;padding:13px 0;border-bottom:1px solid var(--border-color)}.activity-row:last-child{border-bottom:0}.activity-icon{width:36px;height:36px;border-radius:11px;background:var(--accent-gold-glow);display:flex;align-items:center;justify-content:center;color:var(--accent-gold);flex:0 0 auto}.ai-shell{display:flex;flex-direction:column;min-height:70vh}.ai-chat-toolbar{display:flex;justify-content:space-between;gap:8px;align-items:center;margin-bottom:10px}.ai-attachments{display:flex;gap:7px;flex-wrap:wrap;margin:8px 0}.ai-attachment{font-size:.72rem;padding:6px 9px;border:1px solid var(--border-color);border-radius:999px;background:var(--surface-elevated)}.ai-composer{border:1px solid var(--border-color);border-radius:18px;padding:10px;background:var(--surface-color)}.ai-composer textarea{border:0!important;box-shadow:none!important;background:transparent!important;resize:none}.ai-composer-actions{display:flex;justify-content:space-between;align-items:center;gap:8px}.ai-file-input{display:none}@media(max-width:640px){.continue-grid{grid-template-columns:1fr}.ai-shell{min-height:74vh}}
+.learning-progress-wrap{margin-top:10px}.learning-progress-track{height:8px;border-radius:999px;background:var(--surface-elevated);overflow:hidden;border:1px solid var(--border-color)}.learning-progress-fill{height:100%;width:0;background:var(--accent-gold);transition:width .25s ease}.continue-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;margin:12px 0 22px}.continue-card{background:var(--surface-color);border:1px solid var(--border-color);border-radius:16px;padding:14px;box-shadow:var(--shadow-sm)}.continue-card .pct{font-weight:900;color:var(--accent-gold)}.activity-row{display:flex;gap:12px;align-items:flex-start;padding:13px 0;border-bottom:1px solid var(--border-color)}.activity-row:last-child{border-bottom:0}.activity-icon{width:36px;height:36px;border-radius:11px;background:var(--accent-gold-glow);display:flex;align-items:center;justify-content:center;color:var(--accent-gold);flex:0 0 auto}.academic-tools-primary{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:0 0 14px}.tool-feature-card{display:flex;align-items:center;gap:12px;padding:15px;border:1px solid var(--border-color);border-radius:16px;background:var(--surface-color);cursor:pointer;box-shadow:var(--shadow-sm);transition:transform .15s ease,border-color .15s ease}.tool-feature-card:hover{transform:translateY(-1px);border-color:var(--accent-gold-border)}.tool-feature-icon{width:42px;height:42px;border-radius:12px;background:var(--accent-gold-glow);color:var(--accent-gold);display:flex;align-items:center;justify-content:center;flex:0 0 auto}.tool-feature-title{font-weight:900}.tool-feature-sub{font-size:.72rem;color:var(--text-sub);margin-top:2px}.tool-feature-arrow{margin-left:auto;color:var(--text-sub);font-size:.8rem}.ai-shell{display:flex;flex-direction:column;min-height:72vh}.ai-chat-toolbar{display:flex;justify-content:space-between;gap:8px;align-items:center;margin-bottom:8px}.ai-chat-messages{flex:1;min-height:0;max-height:calc(100vh - 250px);overflow:auto;border:0!important;border-radius:0!important;padding:8px 2px!important;background:transparent!important;margin-bottom:8px!important}.ai-attachments{display:flex;gap:7px;flex-wrap:wrap;margin:0 0 8px}.ai-attachment{font-size:.72rem;padding:6px 9px;border:1px solid var(--border-color);border-radius:999px;background:var(--surface-elevated)}.ai-composer{display:flex;align-items:flex-end;gap:8px;border:1px solid var(--border-color);border-radius:24px;padding:8px 10px;background:var(--surface-color);box-shadow:var(--shadow-sm)}.ai-message-input{flex:1;min-width:0;border:0!important;box-shadow:none!important;background:transparent!important;resize:none!important;padding:8px 2px!important;margin:0!important;line-height:1.45;max-height:140px}.ai-attach-btn,.ai-send-btn{width:38px;height:38px;border-radius:50%;border:1px solid var(--border-color);display:flex;align-items:center;justify-content:center;cursor:pointer;flex:0 0 auto}.ai-attach-btn{background:transparent;color:var(--text-sub)}.ai-send-btn{background:var(--accent-gold);color:#111;border-color:var(--accent-gold);font-size:.9rem}.ai-send-btn:disabled{opacity:.55;cursor:not-allowed}.ai-file-input{display:none}@media(max-width:640px){.continue-grid{grid-template-columns:1fr}.academic-tools-primary{grid-template-columns:1fr}.ai-shell{min-height:78vh}.ai-chat-messages{max-height:calc(100vh - 220px)}}
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -1111,7 +1111,21 @@
       <!-- ACADEMIC TOOLS -->
       <div class="academic-core-header" style="margin-top:4px;"><i class="fa-solid fa-toolbox"></i><h3>Academic Tools</h3></div>
 
-      <!-- PHOTOGRAPHIC GRID WITH COMING SOON POPUPS -->
+      <!-- PRIMARY ACADEMIC TOOLS: CALENDAR + TIMETABLE -->
+      <div class="academic-tools-primary">
+        <div class="tool-feature-card" onclick="showComingSoonModal('Calendar')">
+          <div class="tool-feature-icon"><i class="fa-solid fa-calendar-days"></i></div>
+          <div><div class="tool-feature-title">Calendar</div><div class="tool-feature-sub">Important school dates, events & deadlines</div></div>
+          <i class="fa-solid fa-chevron-right tool-feature-arrow"></i>
+        </div>
+        <div class="tool-feature-card" onclick="showComingSoonModal('Timetable')">
+          <div class="tool-feature-icon"><i class="fa-solid fa-table-list"></i></div>
+          <div><div class="tool-feature-title">Timetable</div><div class="tool-feature-sub">Your classes, subjects & daily schedule</div></div>
+          <i class="fa-solid fa-chevron-right tool-feature-arrow"></i>
+        </div>
+      </div>
+
+      <!-- OTHER ACADEMIC TOOLS -->
       <div class="photo-grid-2x2">
         <div class="photo-card" onclick="showComingSoonModal('Events')">
           <img src="images/events.jpg" alt="Events">
@@ -1325,12 +1339,17 @@
     <!-- SCREEN 2: AI TUTOR -->
     <div id="screen-ai" class="screen">
       <div class="ai-shell">
-        <div class="ai-chat-toolbar"><div><h2 style="font-size:1.25rem;font-weight:900;"><i class="fa-solid fa-robot" style="color:var(--accent-gold);"></i> Appearich AI</h2><div class="lms-small">Ask naturally, learn from your course context, or upload files and images.</div></div><button class="secondary-btn" type="button" onclick="clearAiConversation()"><i class="fa-solid fa-rotate-left"></i> New chat</button></div>
-        <div id="aiChatMessages" style="flex:1;min-height:360px;max-height:58vh;overflow:auto;border:1px solid var(--border-color);border-radius:18px;padding:14px;background:var(--surface-elevated);margin-bottom:10px;"><div class="lms-item"><strong>Appearich AI</strong><div class="lms-small" style="margin-top:5px;">How can I help you learn today?</div></div></div>
+        <div class="ai-chat-toolbar">
+          <div><h2 style="font-size:1.25rem;font-weight:900;"><i class="fa-solid fa-robot" style="color:var(--accent-gold);"></i> Appearich AI</h2></div>
+          <button class="secondary-btn" type="button" onclick="clearAiConversation()"><i class="fa-solid fa-rotate-left"></i> New chat</button>
+        </div>
+        <div id="aiChatMessages" class="ai-chat-messages"><div class="lms-item"><strong>Appearich AI</strong><div class="lms-small" style="margin-top:5px;">How can I help you learn today?</div></div></div>
         <div id="aiAttachmentList" class="ai-attachments"></div>
         <form id="aiQuestionForm" class="ai-composer" onsubmit="event.preventDefault();askAppearichAI();">
-          <textarea id="aiQuestionInput" class="lms-textarea" maxlength="8000" rows="3" placeholder="Message Appearich AI…"></textarea>
-          <div class="ai-composer-actions"><div><input id="aiFileInput" class="ai-file-input" type="file" multiple accept="image/*,.pdf,.doc,.docx,.ppt,.pptx,.txt,.csv,.xlsx"><button type="button" class="secondary-btn" onclick="document.getElementById('aiFileInput').click()"><i class="fa-solid fa-paperclip"></i> Attach</button></div><button id="aiAskButton" class="primary-btn" style="opacity:1" type="submit"><i class="fa-solid fa-paper-plane"></i> Send</button></div>
+          <input id="aiFileInput" class="ai-file-input" type="file" multiple accept="image/*,.pdf,.doc,.docx,.ppt,.pptx,.txt,.csv,.xlsx">
+          <button type="button" class="ai-attach-btn" onclick="document.getElementById('aiFileInput').click()" title="Attach file"><i class="fa-solid fa-paperclip"></i></button>
+          <textarea id="aiQuestionInput" class="ai-message-input" maxlength="8000" rows="1" placeholder="Ask Appearich AI…"></textarea>
+          <button id="aiAskButton" class="ai-send-btn" style="opacity:1" type="submit" title="Send"><i class="fa-solid fa-paper-plane"></i></button>
         </form>
       </div>
     </div>
@@ -1771,6 +1790,20 @@ async function initializeAiTutor() {
     fileInput.dataset.bound = '1';
     fileInput.addEventListener('change', renderAiAttachments);
   }
+  const input = document.getElementById('aiQuestionInput');
+  if (input && !input.dataset.bound) {
+    input.dataset.bound = '1';
+    input.addEventListener('keydown', e => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        document.getElementById('aiQuestionForm')?.requestSubmit();
+      }
+    });
+    input.addEventListener('input', () => {
+      input.style.height = 'auto';
+      input.style.height = Math.min(input.scrollHeight, 140) + 'px';
+    });
+  }
 }
 let aiAttachments = [];
 function renderAiAttachments(){
@@ -1787,6 +1820,17 @@ function clearAiConversation(){
   if(chat) chat.innerHTML='<div class="lms-item"><strong>Appearich AI</strong><div class="lms-small" style="margin-top:5px;">How can I help you learn today?</div></div>';
 }
 function fileToBase64(file){return new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(String(r.result||'').split(',')[1]||'');r.onerror=reject;r.readAsDataURL(file);});}
+function appendAiMessage(role, content){
+  const chat=document.getElementById('aiChatMessages');
+  if(!chat) return;
+  const wrap=document.createElement('div');
+  wrap.style.cssText='display:flex;justify-content:'+(role==='user'?'flex-end':'flex-start')+';margin:8px 0;';
+  const bubble=document.createElement('div');
+  bubble.style.cssText='max-width:82%;padding:10px 13px;border-radius:16px;border:1px solid var(--border-color);background:'+(role==='user'?'var(--accent-gold-glow)':'var(--surface-color)')+';white-space:pre-wrap;line-height:1.5;';
+  bubble.innerHTML='<strong style="font-size:.72rem;">'+(role==='user'?'You':'Appearich AI')+'</strong><div style="margin-top:4px;">'+escapeHtml(String(content||''))+'</div>';
+  wrap.appendChild(bubble); chat.appendChild(wrap); chat.scrollTop=chat.scrollHeight;
+}
+
 async function askAppearichAI() {
   if (!sb || !currentUser) return toast('Please log in first.', 'error');
   const input = document.getElementById('aiQuestionInput');
