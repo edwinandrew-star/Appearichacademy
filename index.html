@@ -1486,6 +1486,49 @@ function toast(message, kind="info") {
   clearTimeout(el._t);
   el._t = setTimeout(() => el.remove(), 3500);
 }
+function switchTab(screenId, buttonEl = null) {
+  const target = document.getElementById(screenId);
+  if (!target) {
+    console.warn("Appearich: screen not found:", screenId);
+    toast("This section could not be opened.", "error");
+    return false;
+  }
+
+  // Only one screen is visible at a time.
+  document.querySelectorAll(".screen").forEach(screen => {
+    screen.classList.remove("active");
+  });
+  target.classList.add("active");
+
+  // Keep the bottom navigation state synchronized.
+  document.querySelectorAll("#mainNavBar .nav-item").forEach(item => {
+    item.classList.remove("active");
+  });
+  if (buttonEl?.classList?.contains("nav-item")) {
+    buttonEl.classList.add("active");
+  } else if (screenId === "screen-home") {
+    document.getElementById("navHomeBtn")?.classList.add("active");
+  }
+
+  // Close old generic modal overlays when changing screens.
+  document.getElementById("lmsGenericModal")?.classList.remove("open");
+
+  return true;
+}
+
+function toggleThemeMode() {
+  const current = document.documentElement.getAttribute("data-theme") || "light";
+  const next = current === "dark" ? "light" : "dark";
+  document.documentElement.setAttribute("data-theme", next);
+  localStorage.setItem("appearich_theme_mode", next);
+  const icon = document.getElementById("themeIcon");
+  if (icon) {
+    icon.className = next === "dark"
+      ? "fa-solid fa-sun"
+      : "fa-solid fa-moon";
+  }
+}
+
 function requireBackend() {
   if (!sb) {
     toast("Supabase is not configured. Add your project URL and anon key.", "error");
