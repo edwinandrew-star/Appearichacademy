@@ -993,8 +993,19 @@
   color:var(--accent-gold); font-weight:900; text-align:center; }
 
 
-/* APPEARICH STUDENT LEARNING ANALYTICS */
-.learning-progress-wrap{margin-top:10px}.learning-progress-track{height:8px;border-radius:999px;background:var(--surface-elevated);overflow:hidden;border:1px solid var(--border-color)}.learning-progress-fill{height:100%;width:0;background:var(--accent-gold);transition:width .25s ease}.continue-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;margin:12px 0 22px}.continue-card{background:var(--surface-color);border:1px solid var(--border-color);border-radius:16px;padding:14px;box-shadow:var(--shadow-sm)}.continue-card .pct{font-weight:900;color:var(--accent-gold)}.activity-row{display:flex;gap:12px;align-items:flex-start;padding:13px 0;border-bottom:1px solid var(--border-color)}.activity-row:last-child{border-bottom:0}.activity-icon{width:36px;height:36px;border-radius:11px;background:var(--accent-gold-glow);display:flex;align-items:center;justify-content:center;color:var(--accent-gold);flex:0 0 auto}.academic-tools-primary{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:0 0 14px}.tool-feature-card{display:flex;align-items:center;gap:12px;padding:15px;border:1px solid var(--border-color);border-radius:16px;background:var(--surface-color);cursor:pointer;box-shadow:var(--shadow-sm);transition:transform .15s ease,border-color .15s ease}.tool-feature-card:hover{transform:translateY(-1px);border-color:var(--accent-gold-border)}.tool-feature-icon{width:42px;height:42px;border-radius:12px;background:var(--accent-gold-glow);color:var(--accent-gold);display:flex;align-items:center;justify-content:center;flex:0 0 auto}.tool-feature-title{font-weight:900}.tool-feature-sub{font-size:.72rem;color:var(--text-sub);margin-top:2px}.tool-feature-arrow{margin-left:auto;color:var(--text-sub);font-size:.8rem}.ai-shell{display:flex;flex-direction:column;min-height:72vh}.ai-chat-toolbar{display:flex;justify-content:space-between;gap:8px;align-items:center;margin-bottom:8px}.ai-chat-messages{flex:1;min-height:0;max-height:calc(100vh - 250px);overflow:auto;border:0!important;border-radius:0!important;padding:8px 2px!important;background:transparent!important;margin-bottom:8px!important}.ai-attachments{display:flex;gap:7px;flex-wrap:wrap;margin:0 0 8px}.ai-attachment{font-size:.72rem;padding:6px 9px;border:1px solid var(--border-color);border-radius:999px;background:var(--surface-elevated)}.ai-composer{display:flex;align-items:flex-end;gap:8px;border:1px solid var(--border-color);border-radius:24px;padding:8px 10px;background:var(--surface-color);box-shadow:var(--shadow-sm)}.ai-message-input{flex:1;min-width:0;border:0!important;box-shadow:none!important;background:transparent!important;resize:none!important;padding:8px 2px!important;margin:0!important;line-height:1.45;max-height:140px}.ai-attach-btn,.ai-send-btn{width:38px;height:38px;border-radius:50%;border:1px solid var(--border-color);display:flex;align-items:center;justify-content:center;cursor:pointer;flex:0 0 auto}.ai-attach-btn{background:transparent;color:var(--text-sub)}.ai-send-btn{background:var(--accent-gold);color:#111;border-color:var(--accent-gold);font-size:.9rem}.ai-send-btn:disabled{opacity:.55;cursor:not-allowed}.ai-file-input{display:none}@media(max-width:640px){.continue-grid{grid-template-columns:1fr}.academic-tools-primary{grid-template-columns:1fr}.ai-shell{min-height:78vh}.ai-chat-messages{max-height:calc(100vh - 220px)}}
+.ai-workspace{display:grid;grid-template-columns:290px minmax(0,1fr);height:calc(100vh - 110px);min-height:620px;margin-top:18px;background:var(--surface-color);border:1px solid var(--border-color);border-radius:24px;overflow:hidden;box-shadow:0 10px 35px rgba(15,23,42,.06)}
+.ai-sidebar{border-right:1px solid var(--border-color);background:var(--surface-elevated);display:flex;flex-direction:column;min-width:0}
+.ai-sidebar-head{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:18px;border-bottom:1px solid var(--border-color)}
+.ai-brand-small{font-weight:900;font-size:1rem}.ai-brand-small i{color:var(--accent-gold);margin-right:5px}.ai-new-chat-btn{padding:9px 11px;font-size:.76rem}
+.ai-search-wrap{margin:12px;position:relative}.ai-search-wrap i{position:absolute;left:12px;top:11px;color:var(--text-sub);font-size:.78rem}.ai-search-wrap input{width:100%;padding:10px 10px 10px 34px;border:1px solid var(--border-color);border-radius:12px;background:var(--surface-color);color:var(--text-main);outline:none}
+.ai-conversation-list{overflow:auto;padding:0 8px 12px}.ai-conversation-item{display:flex;align-items:center;gap:8px;padding:11px 10px;border-radius:12px;cursor:pointer;margin-bottom:3px}.ai-conversation-item:hover{background:var(--surface-color)}.ai-conversation-item.active{background:var(--accent-gold-glow);border:1px solid var(--accent-gold-border)}
+.ai-conversation-main{min-width:0;flex:1}.ai-conversation-name{font-weight:800;font-size:.78rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.ai-conversation-date{font-size:.65rem;color:var(--text-sub);margin-top:3px}.ai-conversation-menu{border:0;background:transparent;color:var(--text-sub);cursor:pointer;padding:6px;border-radius:8px}.ai-conversation-menu:hover{background:var(--surface-color);color:var(--text-main)}
+.ai-chat-panel{min-width:0;display:flex;flex-direction:column;background:var(--surface-color)}.ai-chat-head{height:74px;flex:none;border-bottom:1px solid var(--border-color);display:flex;align-items:center;justify-content:space-between;padding:12px 18px;gap:10px}.ai-logo{width:40px;height:40px;border-radius:13px;display:flex;align-items:center;justify-content:center;background:var(--accent-gold-glow);border:1px solid var(--accent-gold-border);color:var(--accent-gold)}.ai-chat-title{font-weight:900;font-size:.95rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:48vw}.icon-btn{border:1px solid var(--border-color);background:var(--surface-color);color:var(--text-main);width:38px;height:38px;border-radius:11px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center}.icon-btn:hover{border-color:var(--accent-gold);color:var(--accent-gold)}
+.ai-chat-messages{flex:1;overflow:auto;padding:24px clamp(14px,5vw,70px);scroll-behavior:smooth}.ai-empty-state{text-align:center;max-width:560px;margin:13vh auto 0;color:var(--text-sub)}.ai-empty-icon{width:64px;height:64px;border-radius:20px;margin:0 auto 16px;display:flex;align-items:center;justify-content:center;background:var(--accent-gold-glow);border:1px solid var(--accent-gold-border);color:var(--accent-gold);font-size:1.35rem}.ai-empty-state h2{color:var(--text-main);font-size:1.35rem;margin-bottom:7px}.ai-empty-state p{font-size:.82rem;line-height:1.6}
+.ai-message{display:flex;gap:11px;max-width:900px;margin:0 auto 20px}.ai-message-avatar{flex:none;width:32px;height:32px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:900}.ai-message.user .ai-message-avatar{background:var(--surface-elevated);border:1px solid var(--border-color)}.ai-message.assistant .ai-message-avatar{background:var(--accent-gold-glow);color:var(--accent-gold);border:1px solid var(--accent-gold-border)}.ai-message-body{min-width:0;flex:1}.ai-message-role{font-size:.7rem;font-weight:900;margin-bottom:5px}.ai-message-content{font-size:.86rem;line-height:1.7;color:var(--text-main);white-space:normal;overflow-wrap:anywhere}.ai-message-content p{margin:0 0 9px}.ai-message-content p:last-child{margin-bottom:0}.ai-message-content pre{overflow:auto;background:#111827;color:#f8fafc;padding:12px;border-radius:10px}.ai-message-attachment{display:inline-flex;align-items:center;gap:7px;padding:7px 10px;margin-top:7px;border:1px solid var(--border-color);border-radius:9px;font-size:.72rem;background:var(--surface-elevated)}
+.ai-composer{flex:none;border-top:1px solid var(--border-color);padding:12px clamp(12px,5vw,70px) 10px;background:var(--surface-color)}.ai-composer-row{display:flex;align-items:flex-end;gap:8px;border:1px solid var(--border-color);border-radius:17px;padding:7px;background:var(--surface-elevated)}.ai-input{flex:1;resize:none;border:0;outline:0;background:transparent;color:var(--text-main);font:inherit;font-size:.86rem;line-height:1.5;max-height:150px;padding:7px 3px}.ai-send-btn{width:40px;height:40px;padding:0;border-radius:12px}.ai-attach-btn{border:0;background:transparent}.ai-composer-note{text-align:center;color:var(--text-sub);font-size:.62rem;margin-top:6px}.ai-attachment-preview{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:7px}.ai-attachment-chip{display:flex;align-items:center;gap:7px;padding:6px 9px;border:1px solid var(--border-color);border-radius:9px;background:var(--surface-elevated);font-size:.7rem}.ai-attachment-chip button{border:0;background:transparent;color:var(--text-sub);cursor:pointer}.ai-mobile-toggle{display:none;border:0;background:transparent;color:var(--text-main);font-size:1rem}
+@media(max-width:800px){.ai-workspace{grid-template-columns:1fr;height:calc(100vh - 95px);min-height:560px;border-radius:18px}.ai-sidebar{position:absolute;z-index:30;left:12px;right:12px;top:90px;bottom:75px;border:1px solid var(--border-color);border-radius:18px;box-shadow:0 20px 50px rgba(0,0,0,.2);display:none}.ai-sidebar.open{display:flex}.ai-mobile-toggle{display:inline-flex;align-items:center;justify-content:center}.ai-chat-head{padding:10px 12px}.ai-chat-messages{padding:18px 12px}.ai-composer{padding:9px 10px}.ai-chat-title{max-width:42vw}}
+
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -1102,30 +1113,64 @@
         </div>
       </div>
       <!-- ACADEMIC CORE SECTION -->
-      <div class="academic-core-header"><i class="fa-solid fa-layer-group"></i><h3>Academic Core</h3></div>
-      <div class="academic-core-container"><div class="academic-scroll-wrapper">
-        <div class="academic-card" onclick="openStudentClassesView()"><div class="academic-card-top"><div class="academic-icon-box"><i class="fa-solid fa-school"></i></div><span class="academic-tag">Core</span></div><div class="academic-card-mid"><div class="academic-card-title">Classes</div><div class="academic-card-sub">Classes, subjects & learning materials</div></div></div>
-        <div class="academic-card" onclick="openStudentActivityView()"><div class="academic-card-top"><div class="academic-icon-box"><i class="fa-solid fa-clock-rotate-left"></i></div><span class="academic-tag">Live</span></div><div class="academic-card-mid"><div class="academic-card-title">Activity</div><div class="academic-card-sub">What you opened, submitted & completed</div></div></div>
-        <div class="academic-card" onclick="openStudentProgressView()"><div class="academic-card-top"><div class="academic-icon-box"><i class="fa-solid fa-chart-line"></i></div><span class="academic-tag">Real data</span></div><div class="academic-card-mid"><div class="academic-card-title">Progress</div><div class="academic-card-sub">Completion across your actual learning</div></div></div>
-      </div></div>
-      <!-- ACADEMIC TOOLS -->
-      <div class="academic-core-header" style="margin-top:4px;"><i class="fa-solid fa-toolbox"></i><h3>Academic Tools</h3></div>
-
-      <!-- PRIMARY ACADEMIC TOOLS: CALENDAR + TIMETABLE -->
-      <div class="academic-tools-primary">
-        <div class="tool-feature-card" onclick="showComingSoonModal('Calendar')">
-          <div class="tool-feature-icon"><i class="fa-solid fa-calendar-days"></i></div>
-          <div><div class="tool-feature-title">Calendar</div><div class="tool-feature-sub">Important school dates, events & deadlines</div></div>
-          <i class="fa-solid fa-chevron-right tool-feature-arrow"></i>
-        </div>
-        <div class="tool-feature-card" onclick="showComingSoonModal('Timetable')">
-          <div class="tool-feature-icon"><i class="fa-solid fa-table-list"></i></div>
-          <div><div class="tool-feature-title">Timetable</div><div class="tool-feature-sub">Your classes, subjects & daily schedule</div></div>
-          <i class="fa-solid fa-chevron-right tool-feature-arrow"></i>
+      <div class="academic-core-header">
+        <i class="fa-solid fa-layer-group"></i>
+        <h3>Academic Core</h3>
+      </div>
+      <div class="academic-core-container">
+        <div class="academic-scroll-wrapper">
+          <div class="academic-card" onclick="openStudentClassesView()">
+            <div class="academic-card-top">
+              <div class="academic-icon-box"><i class="fa-solid fa-school"></i></div>
+              <span class="academic-tag">Core</span>
+            </div>
+            <div class="academic-card-mid">
+              <div class="academic-card-title">Classes</div>
+              <div class="academic-card-sub">Access course materials</div>
+            </div>
+          </div>
+          <div class="academic-card" onclick="switchTab('screen-activity', document.querySelectorAll('.nav-item')[2])">
+            <div class="academic-card-top">
+              <div class="academic-icon-box"><i class="fa-solid fa-clock-rotate-left"></i></div>
+              <span class="academic-tag">Recent</span>
+            </div>
+            <div class="academic-card-mid">
+              <div class="academic-card-title">Activity</div>
+              <div class="academic-card-sub">Submissions & updates</div>
+            </div>
+          </div>
         </div>
       </div>
+      <!-- QUICK NAVIGATION -->
+      <div class="section-header-title">
+        <span><i class="fa-solid fa-compass" style="color: var(--accent-gold);"></i> Quick Navigation</span>
+      </div>
+      <div class="student-dashboard-cards-row">
+        <div class="dashboard-mini-card" onclick="openStudentClassesView()">
+          <div class="academic-icon-box"><i class="fa-solid fa-school"></i></div>
+          <div style="font-weight: 800; font-size: 0.9rem;">Class</div>
+          <div style="font-size: 0.7rem; color: var(--text-sub);">View your classes & subjects</div>
+        </div>
+        <div class="dashboard-mini-card" onclick="switchTab('screen-activity', document.querySelectorAll('.nav-item')[2])">
+          <div class="academic-icon-box"><i class="fa-solid fa-chart-line"></i></div>
+          <div style="font-weight: 800; font-size: 0.9rem;">Progress</div>
+          <div style="font-size: 0.7rem; color: var(--text-sub);">Academic progression</div>
+        </div>
+        <div class="dashboard-mini-card" onclick="switchTab('screen-activity', document.querySelectorAll('.nav-item')[2])">
+          <div class="academic-icon-box"><i class="fa-solid fa-clock-rotate-left"></i></div>
+          <div style="font-weight: 800; font-size: 0.9rem;">Activity</div>
+          <div style="font-size: 0.7rem; color: var(--text-sub);">Recent submissions</div>
+        </div>
+      </div>
+      <!-- CAMBRIDGE ACADEMIC TOOLS -->
+      <div class="section-header-title"><span><i class="fa-solid fa-graduation-cap" style="color:var(--accent-gold);"></i> Academic Tools</span></div>
+      <div class="student-dashboard-cards-row">
+        <div class="dashboard-mini-card" onclick="openStudentGrades()"><div class="academic-icon-box"><i class="fa-solid fa-chart-column"></i></div><div style="font-weight:800;font-size:.9rem;">My Grades</div><div style="font-size:.7rem;color:var(--text-sub);">Marks and assessment progress</div></div>
+        <div class="dashboard-mini-card" onclick="openAcademicCalendar()"><div class="academic-icon-box"><i class="fa-solid fa-calendar-days"></i></div><div style="font-weight:800;font-size:.9rem;">Calendar</div><div style="font-size:.7rem;color:var(--text-sub);">Deadlines and academic dates</div></div>
+        <div class="dashboard-mini-card" onclick="openNotificationInbox()"><div class="academic-icon-box"><i class="fa-solid fa-bell"></i></div><div style="font-weight:800;font-size:.9rem;">Notifications</div><div style="font-size:.7rem;color:var(--text-sub);">Academic updates</div></div>
+      </div>
 
-      <!-- OTHER ACADEMIC TOOLS -->
+      <!-- PHOTOGRAPHIC GRID WITH COMING SOON POPUPS -->
       <div class="photo-grid-2x2">
         <div class="photo-card" onclick="showComingSoonModal('Events')">
           <img src="images/events.jpg" alt="Events">
@@ -1336,39 +1381,84 @@
       <!-- Rendered dynamically via JS -->
     </div>
 
-    <!-- SCREEN 2: AI TUTOR -->
+    <!-- SCREEN 2: APPEARICH AI -->
     <div id="screen-ai" class="screen">
-      <div class="ai-shell">
-        <div class="ai-chat-toolbar">
-          <div><h2 style="font-size:1.25rem;font-weight:900;"><i class="fa-solid fa-robot" style="color:var(--accent-gold);"></i> Appearich AI</h2></div>
-          <button class="secondary-btn" type="button" onclick="clearAiConversation()"><i class="fa-solid fa-rotate-left"></i> New chat</button>
-        </div>
-        <div id="aiChatMessages" class="ai-chat-messages"><div class="lms-item"><strong>Appearich AI</strong><div class="lms-small" style="margin-top:5px;">How can I help you learn today?</div></div></div>
-        <div id="aiAttachmentList" class="ai-attachments"></div>
-        <form id="aiQuestionForm" class="ai-composer" onsubmit="event.preventDefault();askAppearichAI();">
-          <input id="aiFileInput" class="ai-file-input" type="file" multiple accept="image/*,.pdf,.doc,.docx,.ppt,.pptx,.txt,.csv,.xlsx">
-          <button type="button" class="ai-attach-btn" onclick="document.getElementById('aiFileInput').click()" title="Attach file"><i class="fa-solid fa-paperclip"></i></button>
-          <textarea id="aiQuestionInput" class="ai-message-input" maxlength="8000" rows="1" placeholder="Ask Appearich AI…"></textarea>
-          <button id="aiAskButton" class="ai-send-btn" style="opacity:1" type="submit" title="Send"><i class="fa-solid fa-paper-plane"></i></button>
-        </form>
+      <div class="ai-workspace">
+        <aside class="ai-sidebar" id="aiConversationSidebar">
+          <div class="ai-sidebar-head">
+            <div>
+              <div class="ai-brand-small"><i class="fa-solid fa-sparkles"></i> Appearich AI</div>
+              <div class="lms-small">Your learning conversations</div>
+            </div>
+            <button type="button" class="primary-btn ai-new-chat-btn" onclick="startNewAIChat()">
+              <i class="fa-solid fa-plus"></i> New
+            </button>
+          </div>
+          <div class="ai-search-wrap">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input id="aiConversationSearch" type="search" placeholder="Search chats…" oninput="searchAIConversations(this.value)">
+          </div>
+          <div id="aiConversationList" class="ai-conversation-list">
+            <div class="lms-small" style="padding:12px;">Loading conversations…</div>
+          </div>
+        </aside>
+
+        <section class="ai-chat-panel">
+          <div class="ai-chat-head">
+            <div style="display:flex;align-items:center;gap:12px;min-width:0;">
+              <button type="button" class="ai-mobile-toggle" onclick="toggleAIConversationSidebar()" aria-label="Open conversations">
+                <i class="fa-solid fa-bars"></i>
+              </button>
+              <div class="ai-logo"><i class="fa-solid fa-robot"></i></div>
+              <div style="min-width:0;">
+                <div id="aiConversationTitle" class="ai-chat-title">New Chat</div>
+                <div class="lms-small">Learn, ask, upload, and continue anytime</div>
+              </div>
+            </div>
+            <div style="display:flex;gap:7px;align-items:center;">
+              <button type="button" class="icon-btn" onclick="startNewAIChat()" title="New chat"><i class="fa-solid fa-plus"></i></button>
+              <button type="button" class="icon-btn" onclick="renameActiveAIConversation()" title="Rename chat"><i class="fa-solid fa-pen"></i></button>
+            </div>
+          </div>
+
+          <div id="aiChatMessages" class="ai-chat-messages">
+            <div class="ai-empty-state">
+              <div class="ai-empty-icon"><i class="fa-solid fa-sparkles"></i></div>
+              <h2>How can I help you learn?</h2>
+              <p>Ask a question, explain a difficult topic, or continue one of your previous conversations.</p>
+            </div>
+          </div>
+
+          <form id="aiQuestionForm" class="ai-composer" onsubmit="event.preventDefault();askAppearichAI();">
+            <div id="aiAttachmentPreview" class="ai-attachment-preview"></div>
+            <div class="ai-composer-row">
+              <input id="aiFileInput" type="file" hidden multiple accept=".pdf,.doc,.docx,.ppt,.pptx,.txt,.jpg,.jpeg,.png,.webp">
+              <button type="button" class="icon-btn ai-attach-btn" onclick="document.getElementById('aiFileInput')?.click()" title="Attach files">
+                <i class="fa-solid fa-paperclip"></i>
+              </button>
+              <textarea id="aiQuestionInput" class="ai-input" maxlength="8000" rows="1" placeholder="Message Appearich AI…" required></textarea>
+              <button id="aiAskButton" class="primary-btn ai-send-btn" type="submit" title="Send">
+                <i class="fa-solid fa-paper-plane"></i>
+              </button>
+            </div>
+            <div class="ai-composer-note">Enter to send · Shift + Enter for a new line</div>
+          </form>
+        </section>
       </div>
     </div>
 
     <!-- SCREEN 3: ACTIVITY -->
     <div id="screen-activity" class="screen">
       <div class="section-header-title">
-        <span><i class="fa-solid fa-clock-rotate-left" style="color:var(--accent-gold);"></i> My Activity</span>
+        <span><i class="fa-solid fa-chart-line" style="color: var(--accent-gold);"></i> Academic Progression & Completion</span>
       </div>
-      <div class="lms-small" style="margin-bottom:14px;">
-        Choose a class, then a subject, to see your learning activity for that subject.
+      <div class="feed-container">
+        <div class="feed-item">
+          <div style="font-size: 0.7rem; color: var(--accent-gold); font-weight: 800; text-transform: uppercase;">Completed Coursework</div>
+          <div style="font-size: 0.9rem; font-weight: 800; margin-top: 2px;">Advanced Academic Modules</div>
+          <div style="font-size: 0.75rem; color: var(--text-sub); margin-top: 4px;">Successfully updated student profile metrics.</div>
+        </div>
       </div>
-      <div id="studentActivityFeed" class="feed-container"><div class="lms-item">Loading your activity…</div></div>
-    </div>
-
-    <!-- SCREEN 3B: PROGRESS -->
-    <div id="screen-progress" class="screen">
-      <div class="section-header-title"><span><i class="fa-solid fa-chart-line" style="color:var(--accent-gold);"></i> Learning Progress</span></div>
-      <div id="studentProgressOverview" class="feed-container"><div class="lms-item">Loading your progress…</div></div>
     </div>
 
     <!-- SCREEN 4: PROFILE -->
@@ -1404,7 +1494,7 @@
         <i class="fa-solid fa-robot"></i>
         <span>AI</span>
       </button>
-      <button class="nav-item" onclick="openStudentProgressView(this)">
+      <button class="nav-item" onclick="switchTab('screen-activity', this)">
         <i class="fa-solid fa-chart-pie"></i>
         <span>Progress</span>
       </button>
@@ -1505,49 +1595,6 @@ function toast(message, kind="info") {
   clearTimeout(el._t);
   el._t = setTimeout(() => el.remove(), 3500);
 }
-function switchTab(screenId, buttonEl = null) {
-  const target = document.getElementById(screenId);
-  if (!target) {
-    console.warn("Appearich: screen not found:", screenId);
-    toast("This section could not be opened.", "error");
-    return false;
-  }
-
-  // Only one screen is visible at a time.
-  document.querySelectorAll(".screen").forEach(screen => {
-    screen.classList.remove("active");
-  });
-  target.classList.add("active");
-
-  // Keep the bottom navigation state synchronized.
-  document.querySelectorAll("#mainNavBar .nav-item").forEach(item => {
-    item.classList.remove("active");
-  });
-  if (buttonEl?.classList?.contains("nav-item")) {
-    buttonEl.classList.add("active");
-  } else if (screenId === "screen-home") {
-    document.getElementById("navHomeBtn")?.classList.add("active");
-  }
-
-  // Close old generic modal overlays when changing screens.
-  document.getElementById("lmsGenericModal")?.classList.remove("open");
-
-  return true;
-}
-
-function toggleThemeMode() {
-  const current = document.documentElement.getAttribute("data-theme") || "light";
-  const next = current === "dark" ? "light" : "dark";
-  document.documentElement.setAttribute("data-theme", next);
-  localStorage.setItem("appearich_theme_mode", next);
-  const icon = document.getElementById("themeIcon");
-  if (icon) {
-    icon.className = next === "dark"
-      ? "fa-solid fa-sun"
-      : "fa-solid fa-moon";
-  }
-}
-
 function requireBackend() {
   if (!sb) {
     toast("Supabase is not configured. Add your project URL and anon key.", "error");
@@ -1576,6 +1623,17 @@ window.addEventListener("DOMContentLoaded", async () => {
     const splash = document.getElementById("cinematic-splash");
     if (splash) splash.style.display = "none";
   }, 1200);
+
+  const aiFileInput = document.getElementById("aiFileInput");
+  if (aiFileInput) aiFileInput.addEventListener("change", renderAIAttachmentPreview);
+
+  const aiInput = document.getElementById("aiQuestionInput");
+  if (aiInput) {
+    aiInput.addEventListener("keydown", e => {
+      if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); askAppearichAI(); }
+    });
+    aiInput.addEventListener("input", () => { aiInput.style.height="auto"; aiInput.style.height=Math.min(aiInput.scrollHeight,150)+"px"; });
+  }
 
   if (!sb) return;
 
@@ -1785,50 +1843,222 @@ function toggleAuthMode() {
 
 async function initializeAiTutor() {
   if (!sb || !currentUser || String(currentUserProfile?.role || '').toLowerCase() !== 'student') return;
-  const fileInput = document.getElementById('aiFileInput');
-  if (fileInput && !fileInput.dataset.bound) {
-    fileInput.dataset.bound = '1';
-    fileInput.addEventListener('change', renderAiAttachments);
-  }
-  const input = document.getElementById('aiQuestionInput');
-  if (input && !input.dataset.bound) {
-    input.dataset.bound = '1';
-    input.addEventListener('keydown', e => {
-      if (e.key === 'Enter' && !e.shiftKey) {
-        e.preventDefault();
-        document.getElementById('aiQuestionForm')?.requestSubmit();
-      }
-    });
-    input.addEventListener('input', () => {
-      input.style.height = 'auto';
-      input.style.height = Math.min(input.scrollHeight, 140) + 'px';
-    });
+  await loadAIConversations();
+
+  if (!activeAIConversationId) {
+    const { data } = await sb.from('ai_conversations')
+      .select('id, title, created_at, updated_at')
+      .eq('user_id', currentUser.id)
+      .order('updated_at', { ascending: false })
+      .limit(1);
+
+    if (data?.[0]) await openAIConversation(data[0].id);
+    else renderAIChatMessages([]);
   }
 }
-let aiAttachments = [];
-function renderAiAttachments(){
-  const input=document.getElementById('aiFileInput');
-  aiAttachments=Array.from(input?.files||[]).slice(0,5);
-  const box=document.getElementById('aiAttachmentList');
-  if(box) box.innerHTML=aiAttachments.map(f=>`<span class="ai-attachment"><i class="fa-solid fa-paperclip"></i> ${escapeHtml(f.name)} (${(f.size/1024/1024).toFixed(1)} MB)</span>`).join('');
+
+function toggleAIConversationSidebar() {
+  document.getElementById('aiConversationSidebar')?.classList.toggle('open');
 }
-function clearAiConversation(){
-  aiTutorHistory=[]; aiAttachments=[];
-  const input=document.getElementById('aiFileInput'); if(input) input.value='';
-  const list=document.getElementById('aiAttachmentList'); if(list) list.innerHTML='';
-  const chat=document.getElementById('aiChatMessages');
-  if(chat) chat.innerHTML='<div class="lms-item"><strong>Appearich AI</strong><div class="lms-small" style="margin-top:5px;">How can I help you learn today?</div></div>';
+
+function formatAIConversationDate(value) {
+  if (!value) return '';
+  const d = new Date(value);
+  const now = new Date();
+  const sameDay = d.toDateString() === now.toDateString();
+  return sameDay ? d.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : d.toLocaleDateString([], {month:'short', day:'numeric'});
 }
-function fileToBase64(file){return new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(String(r.result||'').split(',')[1]||'');r.onerror=reject;r.readAsDataURL(file);});}
-function appendAiMessage(role, content){
-  const chat=document.getElementById('aiChatMessages');
-  if(!chat) return;
-  const wrap=document.createElement('div');
-  wrap.style.cssText='display:flex;justify-content:'+(role==='user'?'flex-end':'flex-start')+';margin:8px 0;';
-  const bubble=document.createElement('div');
-  bubble.style.cssText='max-width:82%;padding:10px 13px;border-radius:16px;border:1px solid var(--border-color);background:'+(role==='user'?'var(--accent-gold-glow)':'var(--surface-color)')+';white-space:pre-wrap;line-height:1.5;';
-  bubble.innerHTML='<strong style="font-size:.72rem;">'+(role==='user'?'You':'Appearich AI')+'</strong><div style="margin-top:4px;">'+escapeHtml(String(content||''))+'</div>';
-  wrap.appendChild(bubble); chat.appendChild(wrap); chat.scrollTop=chat.scrollHeight;
+
+function renderAIConversationList(conversations) {
+  const list = document.getElementById('aiConversationList');
+  if (!list) return;
+  if (!conversations.length) {
+    list.innerHTML = '<div class="lms-small" style="padding:14px;text-align:center;">No conversations yet.<br>Start a new chat.</div>';
+    return;
+  }
+  list.innerHTML = conversations.map(c => `
+    <div class="ai-conversation-item ${c.id === activeAIConversationId ? 'active' : ''}" onclick="openAIConversation('${escapeHtml(c.id)}')">
+      <div class="ai-conversation-main">
+        <div class="ai-conversation-name">${escapeHtml(c.title || 'New Chat')}</div>
+        <div class="ai-conversation-date">${escapeHtml(formatAIConversationDate(c.updated_at))}</div>
+      </div>
+      <button class="ai-conversation-menu" type="button" onclick="event.stopPropagation();openAIConversationMenu('${escapeHtml(c.id)}')" title="Chat options"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+    </div>
+  `).join('');
+}
+
+async function loadAIConversations() {
+  if (!sb || !currentUser) return;
+  let query = sb.from('ai_conversations')
+    .select('id,title,created_at,updated_at')
+    .eq('user_id', currentUser.id)
+    .order('updated_at', {ascending:false})
+    .limit(100);
+  const term = document.getElementById('aiConversationSearch')?.value?.trim() || '';
+  if (term) query = query.ilike('title', `%${term}%`);
+  const {data,error} = await query;
+  if (error) { console.error('AI conversations load failed:', error); return; }
+  renderAIConversationList(data || []);
+}
+
+function searchAIConversations() { loadAIConversations(); }
+
+async function startNewAIChat() {
+  if (!sb || !currentUser) return toast('Please log in first.', 'error');
+  const {data,error} = await sb.from('ai_conversations')
+    .insert({user_id:currentUser.id,title:'New Chat'})
+    .select('id,title,created_at,updated_at')
+    .single();
+  if (error) { console.error(error); return toast('Could not start a new chat.', 'error'); }
+  activeAIConversationId = data.id;
+  aiTutorHistory = [];
+  renderAIConversationHeader(data);
+  renderAIChatMessages([]);
+  await loadAIConversations();
+  document.getElementById('aiConversationSidebar')?.classList.remove('open');
+  document.getElementById('aiQuestionInput')?.focus();
+}
+
+async function openAIConversation(conversationId) {
+  if (!sb || !currentUser || !conversationId) return;
+  const {data:conversation,error:conversationError} = await sb.from('ai_conversations')
+    .select('id,title,created_at,updated_at')
+    .eq('id',conversationId).eq('user_id',currentUser.id).single();
+  if (conversationError || !conversation) return toast('This conversation could not be opened.', 'error');
+
+  const {data:messages,error} = await sb.from('ai_messages')
+    .select('id,role,content,metadata,created_at')
+    .eq('conversation_id',conversationId).eq('user_id',currentUser.id)
+    .order('created_at',{ascending:true});
+  if (error) { console.error(error); return toast('Could not load this conversation.', 'error'); }
+
+  activeAIConversationId = conversation.id;
+  aiTutorHistory = (messages || []).map(m => ({role:m.role,content:m.content}));
+  renderAIConversationHeader(conversation);
+  renderAIChatMessages(messages || []);
+  renderAIConversationListFromCurrentSearch();
+  document.getElementById('aiConversationSidebar')?.classList.remove('open');
+}
+
+async function renderAIConversationListFromCurrentSearch() { await loadAIConversations(); }
+
+function renderAIConversationHeader(conversation) {
+  const el = document.getElementById('aiConversationTitle');
+  if (el) el.textContent = conversation?.title || 'New Chat';
+}
+
+function markdownLiteAI(text) {
+  let safe = escapeHtml(text || '');
+  safe = safe.replace(/```([\s\S]*?)```/g, '<pre>$1</pre>');
+  safe = safe.replace(/^###\s+(.+)$/gm, '<h4>$1</h4>');
+  safe = safe.replace(/^##\s+(.+)$/gm, '<h3>$1</h3>');
+  safe = safe.replace(/^#\s+(.+)$/gm, '<h2>$1</h2>');
+  safe = safe.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  safe = safe.replace(/\n\n+/g, '</p><p>');
+  safe = safe.replace(/\n/g, '<br>');
+  return `<p>${safe}</p>`;
+}
+
+function renderAIChatMessages(messages=[]) {
+  const chat = document.getElementById('aiChatMessages');
+  if (!chat) return;
+  if (!messages.length) {
+    chat.innerHTML = `<div class="ai-empty-state"><div class="ai-empty-icon"><i class="fa-solid fa-sparkles"></i></div><h2>How can I help you learn?</h2><p>Ask a question, explain a difficult topic, or continue one of your previous conversations.</p></div>`;
+    return;
+  }
+  chat.innerHTML = messages.map(m => {
+    const role = m.role === 'user' ? 'user' : 'assistant';
+    const label = role === 'user' ? 'You' : 'Appearich AI';
+    const icon = role === 'user' ? 'fa-user' : 'fa-sparkles';
+    const attachments = Array.isArray(m.metadata?.attachments) ? m.metadata.attachments : [];
+    return `<div class="ai-message ${role}">
+      <div class="ai-message-avatar"><i class="fa-solid ${icon}"></i></div>
+      <div class="ai-message-body">
+        <div class="ai-message-role">${label}</div>
+        <div class="ai-message-content">${markdownLiteAI(m.content)}</div>
+        ${attachments.map(a => `<div class="ai-message-attachment"><i class="fa-solid fa-paperclip"></i>${escapeHtml(a.name || 'Attachment')}</div>`).join('')}
+      </div>
+    </div>`;
+  }).join('');
+  requestAnimationFrame(() => { chat.scrollTop = chat.scrollHeight; });
+}
+
+async function saveAIMessage(conversationId, role, content, metadata={}) {
+  const {data,error} = await sb.from('ai_messages').insert({
+    conversation_id:conversationId,
+    user_id:currentUser.id,
+    role,
+    content,
+    metadata
+  }).select('id,role,content,metadata,created_at').single();
+  if (error) throw error;
+  return data;
+}
+
+async function ensureAIConversation(question) {
+  if (activeAIConversationId) return activeAIConversationId;
+  const {data,error} = await sb.from('ai_conversations').insert({
+    user_id:currentUser.id,
+    title:'New Chat'
+  }).select('id,title,created_at,updated_at').single();
+  if (error) throw error;
+  activeAIConversationId = data.id;
+  renderAIConversationHeader(data);
+  return data.id;
+}
+
+async function updateAIConversationTitle(conversationId, question) {
+  const title = String(question || 'New Chat').replace(/\s+/g,' ').trim().slice(0,70) || 'New Chat';
+  const {error} = await sb.from('ai_conversations').update({title}).eq('id',conversationId).eq('user_id',currentUser.id);
+  if (!error) renderAIConversationHeader({title});
+}
+
+async function renameActiveAIConversation() {
+  if (!activeAIConversationId) return startNewAIChat();
+  const current = document.getElementById('aiConversationTitle')?.textContent || 'New Chat';
+  const title = prompt('Rename this chat:', current);
+  if (title === null) return;
+  const clean = title.trim().slice(0,100);
+  if (!clean) return toast('Chat name cannot be empty.', 'error');
+  const {error} = await sb.from('ai_conversations').update({title:clean})
+    .eq('id',activeAIConversationId).eq('user_id',currentUser.id);
+  if (error) return toast('Could not rename chat.', 'error');
+  renderAIConversationHeader({title:clean});
+  await loadAIConversations();
+}
+
+async function openAIConversationMenu(conversationId) {
+  const action = prompt('Type R to rename or D to delete this chat.','R');
+  if (!action) return;
+  if (action.toLowerCase() === 'r') {
+    const {data:c} = await sb.from('ai_conversations').select('title').eq('id',conversationId).eq('user_id',currentUser.id).single();
+    const title = prompt('Rename this chat:', c?.title || 'New Chat');
+    if (title?.trim()) {
+      await sb.from('ai_conversations').update({title:title.trim().slice(0,100)}).eq('id',conversationId).eq('user_id',currentUser.id);
+      await loadAIConversations();
+      if (activeAIConversationId === conversationId) renderAIConversationHeader({title:title.trim().slice(0,100)});
+    }
+  } else if (action.toLowerCase() === 'd') {
+    await deleteAIConversation(conversationId);
+  }
+}
+
+async function deleteAIConversation(conversationId) {
+  if (!conversationId) return;
+  if (!confirm('Delete this conversation? This cannot be undone.')) return;
+  const {error:messageError} = await sb.from('ai_messages').delete().eq('conversation_id',conversationId).eq('user_id',currentUser.id);
+  if (messageError) return toast('Could not delete messages.', 'error');
+  const {error} = await sb.from('ai_conversations').delete().eq('id',conversationId).eq('user_id',currentUser.id);
+  if (error) return toast('Could not delete conversation.', 'error');
+  if (activeAIConversationId === conversationId) {
+    activeAIConversationId = null;
+    aiTutorHistory = [];
+    renderAIChatMessages([]);
+    const {data:next} = await sb.from('ai_conversations').select('id').eq('user_id',currentUser.id).order('updated_at',{ascending:false}).limit(1);
+    if (next?.[0]) await openAIConversation(next[0].id);
+    else renderAIConversationHeader({title:'New Chat'});
+  }
+  await loadAIConversations();
 }
 
 async function askAppearichAI() {
@@ -1836,217 +2066,109 @@ async function askAppearichAI() {
   const input = document.getElementById('aiQuestionInput');
   const button = document.getElementById('aiAskButton');
   const question = input?.value.trim() || '';
-  if (!question && !aiAttachments.length) return toast('Enter a message or attach a file.', 'error');
-  const { data: sessionData, error: sessionError } = await sb.auth.getSession();
-  if (sessionError || !sessionData?.session?.access_token) return toast('Your session has expired. Please log in again.', 'error');
-  appendAiMessage('user', question || 'Please analyze the attached file(s).');
+  if (!question) return;
+
+  const conversationId = await ensureAIConversation(question);
+  const selectedFiles = Array.from(document.getElementById('aiFileInput')?.files || []);
+  const metadata = {attachments:selectedFiles.map(f => ({name:f.name,type:f.type,size:f.size}))};
+  const tempMessages = [...aiTutorHistory.map((x,i)=>({id:`history-${i}`,role:x.role,content:x.content,metadata:{}})), {id:'pending-user',role:'user',content:question,metadata}];
+  renderAIChatMessages(tempMessages);
   if (input) input.value = '';
-  if (button) { button.disabled = true; button.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Thinking…'; }
+  if (button) {button.disabled=true;button.innerHTML='<i class="fa-solid fa-spinner fa-spin"></i>';}
+
   try {
-    const attachments=[];
-    for(const file of aiAttachments){
-      if(file.size>12*1024*1024) throw new Error(`${file.name} is too large. Maximum is 12 MB.`);
-      attachments.push({name:file.name,mime_type:file.type||'application/octet-stream',data:await fileToBase64(file)});
+    await saveAIMessage(conversationId,'user',question,metadata);
+    if ((await sb.from('ai_messages').select('id',{count:'exact',head:true}).eq('conversation_id',conversationId)).count === 1) {
+      await updateAIConversationTitle(conversationId,question);
     }
-    const body={question:question||'Please analyze the attached file(s).',history:aiTutorHistory.slice(-10),attachments};
-    if(activeStudentClass?.id) body.context_class_id=activeStudentClass.id;
-    if(activeStudentSubject?.id) body.context_subject_id=activeStudentSubject.id;
-    const response=await fetch(AI_EDGE_FUNCTION,{method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${sessionData.session.access_token}`,'apikey':SUPABASE_ANON_KEY},body:JSON.stringify(body)});
-    const result=await response.json().catch(()=>({}));
-    if(!response.ok) throw new Error(result.error||`AI request failed (${response.status}).`);
-    const answer=result.answer||'I’m ready for your next question.';
-    appendAiMessage('assistant',answer); aiTutorHistory.push({role:'user',content:question||'Attached files'}); aiTutorHistory.push({role:'assistant',content:answer});
-    aiAttachments=[]; const fi=document.getElementById('aiFileInput'); if(fi) fi.value=''; const list=document.getElementById('aiAttachmentList'); if(list) list.innerHTML='';
-  } catch(error){ console.error(error); appendAiMessage('assistant','I could not complete that request. Please try again.'); toast(error.message||'AI request failed.','error'); }
-  finally { if(button){button.disabled=false;button.innerHTML='<i class="fa-solid fa-paper-plane"></i> Send';} }
+
+    const {data:sessionData,error:sessionError} = await sb.auth.getSession();
+    if (sessionError || !sessionData?.session?.access_token) throw new Error('Your session has expired. Please log in again.');
+
+    const response = await fetch(AI_EDGE_FUNCTION,{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':`Bearer ${sessionData.session.access_token}`,'apikey':SUPABASE_ANON_KEY},
+      body:JSON.stringify({
+        conversation_id:conversationId,
+        question,
+        history:aiTutorHistory.slice(-20),
+        attachments:metadata.attachments
+      })
+    });
+    const result = await response.json().catch(()=>({}));
+    if (!response.ok) throw new Error(result.error || `AI request failed (${response.status}).`);
+    const answer = result.answer || 'I could not generate a response right now.';
+    await saveAIMessage(conversationId,'assistant',answer,{});
+    aiTutorHistory.push({role:'user',content:question});
+    aiTutorHistory.push({role:'assistant',content:answer});
+    renderAIChatMessages([...aiTutorHistory.map((x,i)=>({id:`history-${i}`,role:x.role,content:x.content,metadata:{}}))]);
+    await loadAIConversations();
+  } catch(e) {
+    console.error('AI Tutor request failed:',e);
+    renderAIChatMessages([...aiTutorHistory.map((x,i)=>({id:`history-${i}`,role:x.role,content:x.content,metadata:{}})),{id:'error',role:'assistant',content:e.message || 'AI Tutor could not answer right now.',metadata:{}}]);
+    toast(e.message || 'AI Tutor could not answer right now.','error');
+  } finally {
+    if (button) {button.disabled=false;button.innerHTML='<i class="fa-solid fa-paper-plane"></i>';}
+    document.getElementById('aiFileInput').value='';
+    renderAIAttachmentPreview();
+    document.getElementById('aiQuestionInput')?.focus();
+  }
 }
 
-async function logStudentActivity(type, title, meta={}) {
-  if(!sb || !currentUser) return;
-  try { await sb.from('student_activity').insert({student_id:currentUser.id,class_id:meta.class_id||activeStudentClass?.id||null,subject_id:meta.subject_id||activeStudentSubject?.id||null,activity_type:type,title:String(title||'Activity').slice(0,200),entity_id:meta.entity_id||null,metadata:meta}); } catch(e){ console.warn('Activity log failed',e); }
+function renderAIAttachmentPreview() {
+  const box=document.getElementById('aiAttachmentPreview');
+  const input=document.getElementById('aiFileInput');
+  if(!box || !input) return;
+  const files=Array.from(input.files || []);
+  box.innerHTML=files.map((f,i)=>`<div class="ai-attachment-chip"><i class="fa-solid fa-file"></i><span>${escapeHtml(f.name)}</span><button type="button" onclick="removeAIAttachment(${i})">×</button></div>`).join('');
 }
-async function saveMaterialProgress(material, percent, position=null, completed=false) {
-  if(!sb||!currentUser||!material?.id) return;
-  const payload={student_id:currentUser.id,material_id:material.id,class_id:material.class_id||activeStudentClass?.id||null,subject_id:material.subject_id||activeStudentSubject?.id||null,progress_percent:Math.max(0,Math.min(100,Math.round(percent))),last_position:position,updated_at:new Date().toISOString(),last_accessed_at:new Date().toISOString()};
-  if(completed||percent>=100) payload.completed_at=new Date().toISOString();
-  await sb.from('student_material_progress').upsert(payload,{onConflict:'student_id,material_id'});
-}
-async function loadStudentLearningSnapshot(){
-  // Detailed learning activity belongs inside Activity, not on Home.
-  // Kept as a compatibility function for existing calls.
-  return;
-}
-
-async function openStudentActivityView(element){
-  switchTab('screen-activity', element || document.getElementById('navHomeBtn'));
-  await loadStudentActivityClasses();
+function removeAIAttachment(index) {
+  const input=document.getElementById('aiFileInput');
+  if(!input) return;
+  const dt=new DataTransfer();
+  Array.from(input.files).forEach((f,i)=>{if(i!==index)dt.items.add(f);});
+  input.files=dt.files;
+  renderAIAttachmentPreview();
 }
 
-async function loadStudentActivityClasses(){
-  if(!sb || !currentUser) return;
-  const box=document.getElementById('studentActivityFeed');
-  if(!box) return;
-  box.innerHTML='<div class="lms-item">Loading your classes…</div>';
+async function sendPasswordReset() {
+  if (!requireBackend()) return;
+  const email = document.getElementById("authEmail")?.value.trim();
+  if (!email) return toast("Enter your email first.", "error");
+  const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: location.origin + location.pathname });
+  if (error) toast(error.message, "error"); else toast("Password reset email sent.", "success");
+}
 
-  const {data,error}=await sb.from('class_members')
-    .select('class_id,joined_at,classes(id,name,education_level,academic_year)')
-    .eq('student_id',currentUser.id)
-    .order('joined_at',{ascending:false});
+/* ---------- 2. NAVIGATION / THEME ---------- */
+function switchTab(screenId, element) {
+  const role = String(currentUserProfile?.role || "").toLowerCase();
+  const isTeacher = ["teacher", "admin", "teacher/admin"].includes(role);
+  const isStudent = role === "student";
 
-  if(error){
-    box.innerHTML='<div class="lms-item lms-danger">Unable to load your activity.</div>';
-    return;
+  // Keep teacher and student workspaces strictly separated.
+  if (isStudent && ["screen-teacher-portal"].includes(screenId)) {
+    return toast("This area is for teachers only.", "error");
+  }
+  if (isTeacher && ["screen-student-classes", "screen-student-subject-workspace"].includes(screenId)) {
+    return toast("This area is for students only.", "error");
   }
 
-  const seen=new Set();
-  const classes=(data||[]).map(r=>r.classes).filter(c=>c && !seen.has(c.id) && seen.add(c.id));
-
-  if(!classes.length){
-    box.innerHTML='<div class="lms-item">You are not enrolled in any classes yet.</div>';
-    return;
-  }
-
-  box.innerHTML=classes.map(c=>`
-    <div class="lms-item" style="cursor:pointer;margin-bottom:10px;" onclick="loadStudentActivitySubjects('${c.id}')">
-      <div style="display:flex;align-items:center;gap:12px;">
-        <div class="academic-icon-box"><i class="fa-solid fa-school"></i></div>
-        <div style="flex:1;">
-          <strong>${escapeHtml(c.name||'Class')}</strong>
-          <div class="lms-small" style="margin-top:3px;">
-            ${escapeHtml(c.education_level||'')} ${c.academic_year?'• '+escapeHtml(String(c.academic_year)):''}
-          </div>
-        </div>
-        <i class="fa-solid fa-chevron-right"></i>
-      </div>
-    </div>`).join('');
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active"));
+  if (isTeacher && screenId === "screen-home")
+    document.getElementById("screen-teacher-portal")?.classList.add("active");
+  else document.getElementById(screenId)?.classList.add("active");
+  element?.classList.add("active");
+  if (screenId === "screen-student-classes" && isStudent) loadStudentClasses();
+  if (screenId === "screen-ai" && isStudent) initializeAiTutor();
 }
-
-async function loadStudentActivitySubjects(classId){
-  const box=document.getElementById('studentActivityFeed');
-  if(!box) return;
-  box.innerHTML='<div class="lms-item">Loading subjects…</div>';
-
-  const {data,error}=await sb.from('subjects').select('id,name,code').eq('class_id',classId).order('name');
-  if(error){
-    box.innerHTML='<div class="lms-item lms-danger">Unable to load subjects.</div>';
-    return;
-  }
-
-  box.innerHTML=`
-    <button class="secondary-btn" onclick="loadStudentActivityClasses()" style="margin-bottom:14px;">
-      <i class="fa-solid fa-arrow-left"></i> Classes
-    </button>
-    <div class="section-header-title"><span><i class="fa-solid fa-book" style="color:var(--accent-gold);"></i> Select Subject</span></div>
-    <div class="feed-container" id="studentActivitySubjectList"></div>`;
-
-  const list=document.getElementById('studentActivitySubjectList');
-  if(!data?.length){
-    list.innerHTML='<div class="lms-item">No subjects are available for this class yet.</div>';
-    return;
-  }
-
-  list.innerHTML=data.map(s=>`
-    <div class="lms-item" style="cursor:pointer;" onclick="loadStudentSubjectActivity('${classId}','${s.id}')">
-      <div style="display:flex;align-items:center;gap:12px;">
-        <div class="academic-icon-box"><i class="fa-solid fa-book-open"></i></div>
-        <div style="flex:1;"><strong>${escapeHtml(s.name)}</strong>${s.code?`<div class="lms-small">${escapeHtml(s.code)}</div>`:''}</div>
-        <i class="fa-solid fa-chevron-right"></i>
-      </div>
-    </div>`).join('');
-}
-
-async function loadStudentSubjectActivity(classId,subjectId){
-  const box=document.getElementById('studentActivityFeed');
-  if(!box) return;
-  box.innerHTML='<div class="lms-item">Loading your activity…</div>';
-
-  const {data,error}=await sb.from('student_material_progress')
-    .select('material_id,progress_percent,last_position,last_accessed_at,completed_at,materials(id,title,file_name,file_type,mime_type,class_id,subject_id)')
-    .eq('student_id',currentUser.id)
-    .eq('class_id',classId)
-    .eq('subject_id',subjectId)
-    .order('last_accessed_at',{ascending:false});
-
-  if(error){
-    box.innerHTML='<div class="lms-item lms-danger">Unable to load activity.</div>';
-    return;
-  }
-
-  box.innerHTML=`
-    <button class="secondary-btn" onclick="loadStudentActivitySubjects('${classId}')" style="margin-bottom:14px;">
-      <i class="fa-solid fa-arrow-left"></i> Subjects
-    </button>
-    <div class="section-header-title"><span><i class="fa-solid fa-chart-line" style="color:var(--accent-gold);"></i> Subject Activity</span></div>
-    <div class="lms-small" style="margin-bottom:14px;">Your activity for this subject only.</div>
-    <div id="studentSubjectActivityList" class="feed-container"></div>`;
-
-  const list=document.getElementById('studentSubjectActivityList');
-  const rows=(data||[]).filter(r=>r.materials);
-
-  if(!rows.length){
-    list.innerHTML='<div class="lms-item">No learning activity recorded for this subject yet.</div>';
-    return;
-  }
-
-  list.innerHTML=rows.map(r=>{
-    const m=r.materials;
-    const pct=Math.max(0,Math.min(100,Number(r.progress_percent)||0));
-    const complete=!!r.completed_at || pct>=100;
-    const state=complete?'Completed':(pct>0?'In Progress':'Opened');
-    return `<div class="continue-card">
-      <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start;">
-        <div style="flex:1;"><strong>${escapeHtml(m.title||m.file_name||'Learning activity')}</strong><div class="lms-small" style="margin-top:4px;">${escapeHtml(m.file_type||m.mime_type||'Learning material')}</div></div>
-        <span class="academic-tag">${state}</span>
-      </div>
-      ${pct>0||complete?`<div class="learning-progress-wrap"><div class="learning-progress-track"><div class="learning-progress-fill" style="width:${pct}%"></div></div><div class="lms-small" style="margin-top:6px;">${pct}% measured progress</div></div>`:`<div class="lms-small" style="margin-top:10px;">Opened — percentage is not estimated until measurable progress is available.</div>`}
-      <div class="lms-item-actions"><button class="primary-btn" style="opacity:1;padding:8px 12px;" onclick="openStudentDocument('${m.id}')">${complete?'Open Again':'Continue'}</button></div>
-      ${r.last_accessed_at?`<div class="lms-small" style="margin-top:7px;">Last opened: ${new Date(r.last_accessed_at).toLocaleString()}</div>`:''}
-    </div>`;
-  }).join('');
-}
-
-async function loadStudentActivity(){
-  return loadStudentActivityClasses();
-}
-
-async function openStudentProgressView(element){
-  switchTab('screen-progress',element||document.getElementById('navHomeBtn'));
-  await loadStudentProgress();
-}
-
-async function loadStudentProgress(){
-  if(!sb||!currentUser)return;
-  const box=document.getElementById('studentProgressOverview');
-  if(!box)return;
-  box.innerHTML='<div class="lms-item">Loading your academic progress…</div>';
-
-  const [progressRes,assignmentRes,testRes]=await Promise.all([
-    sb.from('student_material_progress').select('progress_percent,completed_at,materials(title,subject_id,subjects(name))').eq('student_id',currentUser.id).limit(500),
-    sb.from('assignment_submissions').select('*',{count:'exact',head:true}).eq('student_id',currentUser.id),
-    sb.from('test_attempts').select('*',{count:'exact',head:true}).eq('student_id',currentUser.id)
-  ]);
-
-  const rows=progressRes.data||[];
-  const by={};
-  rows.forEach(r=>{
-    const name=r.materials?.subjects?.name||'Other';
-    if(!by[name]) by[name]=[];
-    by[name].push(Number(r.progress_percent)||0);
-  });
-
-  const overall=rows.length?Math.round(rows.reduce((a,r)=>a+(Number(r.progress_percent)||0),0)/rows.length):0;
-  const submitted=assignmentRes.count??0;
-  const attempts=testRes.count??0;
-
-  box.innerHTML=`
-    <div class="lms-grid">
-      <div class="lms-item"><strong>Learning materials</strong><div style="font-size:1.5rem;font-weight:900;margin-top:5px;">${rows.length}</div><div class="lms-small">Tracked materials</div></div>
-      <div class="lms-item"><strong>Assignments</strong><div style="font-size:1.5rem;font-weight:900;margin-top:5px;">${submitted}</div><div class="lms-small">Submission records</div></div>
-      <div class="lms-item"><strong>Tests / quizzes</strong><div style="font-size:1.5rem;font-weight:900;margin-top:5px;">${attempts}</div><div class="lms-small">Attempt records</div></div>
-    </div>
-    <div class="lms-item" style="margin-top:12px;"><strong>Learning performance</strong><div class="learning-progress-wrap"><div class="learning-progress-track"><div class="learning-progress-fill" style="width:${overall}%"></div></div></div><div class="lms-small" style="margin-top:7px;">${rows.length?overall+'% measured material progress':'No material progress recorded yet.'}</div></div>
-    <div class="section-header-title" style="margin-top:18px;"><span><i class="fa-solid fa-book" style="color:var(--accent-gold);"></i> Subject Performance</span></div>
-    ${Object.entries(by).length?Object.entries(by).map(([name,vals])=>{const p=Math.round(vals.reduce((a,b)=>a+b,0)/vals.length);return `<div class="lms-item" style="margin-bottom:10px;"><strong>${escapeHtml(name)}</strong><span class="lms-small" style="float:right;">${p}%</span><div class="learning-progress-wrap"><div class="learning-progress-track"><div class="learning-progress-fill" style="width:${p}%"></div></div></div></div>`}).join(''):'<div class="lms-item">Subject performance will appear after you start learning.</div>'}`;
+function toggleThemeMode() {
+  const root = document.documentElement;
+  const next = root.getAttribute("data-theme") === "dark" ? "light" : "dark";
+  root.setAttribute("data-theme", next);
+  localStorage.setItem("appearich_theme_mode", next);
+  const icon = document.getElementById("themeIcon");
+  if (icon) icon.className = next === "dark" ? "fa-solid fa-sun" : "fa-solid fa-moon";
 }
 
 /* ---------- 3. STUDENT CLASS MEMBERSHIP ----------
@@ -2395,9 +2517,6 @@ async function openStudentDocument(materialId) {
   if (error || !m) return toast(error?.message || "Material could not be opened.", "error");
 
   try {
-    await logStudentActivity('material_opened', m.title || m.file_name || 'Material opened', {entity_id:m.id,class_id:m.class_id,subject_id:m.subject_id});
-    const progressControls = `<div class="lms-small" style="margin-top:10px">Opened — progress will only be shown when it can be measured from the material type.</div><button class="primary-btn" style="opacity:1;margin-top:8px" onclick="completeCurrentStudentMaterial()"><i class="fa-solid fa-check"></i> Mark as completed</button>`;
-    window.__activeStudentMaterialProgress = { material:m, startTime:Date.now(), last_position:0 };
     const { url } = await resolveAcademicFile(m, false);
     let content = "";
     if (academicFileIsPdf(m)) {
@@ -2412,14 +2531,12 @@ async function openStudentDocument(materialId) {
     } else {
       content = `<div class="lms-item"><strong>${escapeHtml(m.file_name || m.title)}</strong><p class="lms-small" style="margin-top:6px">This file type cannot be previewed safely in the browser. Use Download.</p></div>`;
     }
-    openLmsModal(m.title, `${content}${progressControls}<div class="lms-item-actions"><button class="primary-btn" style="opacity:1" onclick="downloadAcademicMaterial('${m.id}')"><i class="fa-solid fa-download"></i> Download</button></div>`);
+    openLmsModal(m.title, `${content}<div class="lms-item-actions"><button class="primary-btn" style="opacity:1" onclick="downloadAcademicMaterial('${m.id}')"><i class="fa-solid fa-download"></i> Download</button></div>`);
   } catch (error) {
     console.error("openStudentDocument failed:", error);
     toast(error.message || "Unable to open this material.", "error");
   }
 }
-
-async function completeCurrentStudentMaterial(){const state=window.__activeStudentMaterialProgress;if(!state?.material)return;await saveMaterialProgress(state.material,100,state.last_position||0,true);await logStudentActivity('material_completed',state.material.title||'Material completed',{entity_id:state.material.id,class_id:state.material.class_id,subject_id:state.material.subject_id});toast('Material marked as completed.','success');}
 
 async function downloadAcademicMaterial(materialId) {
   if (!sb) return;
@@ -2443,7 +2560,7 @@ async function downloadAcademicMaterial(materialId) {
   }
 }
 
-function closeStudentDocModal() { if(window.__activeStudentMaterialProgress?.timer) clearInterval(window.__activeStudentMaterialProgress.timer); window.__activeStudentMaterialProgress=null; closeLmsModal(); }
+function closeStudentDocModal() { closeLmsModal(); }
 
 /* ---------- 6. ASSIGNMENTS ---------- */
 function openAssignmentSubmission(assignmentId) {
@@ -2628,7 +2745,6 @@ async function submitAssessmentAttempt(kind, attemptId) {
   document.querySelectorAll("[data-attempt-question]").forEach(el => { answers[el.dataset.attemptQuestion] = el.value; });
   const { error } = await sb.rpc(rpc, { p_attempt_id: attemptId, p_answers: answers });
   if (error) return toast(error.message,"error");
-  await logStudentActivity(`${kind.toLowerCase()}_attempt_submitted`,`${kind} submitted`,{entity_id:attemptId});
   closeLmsModal();
   toast(`${kind} submitted successfully.`,"success");
 }
