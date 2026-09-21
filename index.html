@@ -1108,10 +1108,8 @@
         <div class="academic-card" onclick="openStudentActivityView()"><div class="academic-card-top"><div class="academic-icon-box"><i class="fa-solid fa-clock-rotate-left"></i></div><span class="academic-tag">Live</span></div><div class="academic-card-mid"><div class="academic-card-title">Activity</div><div class="academic-card-sub">What you opened, submitted & completed</div></div></div>
         <div class="academic-card" onclick="openStudentProgressView()"><div class="academic-card-top"><div class="academic-icon-box"><i class="fa-solid fa-chart-line"></i></div><span class="academic-tag">Real data</span></div><div class="academic-card-mid"><div class="academic-card-title">Progress</div><div class="academic-card-sub">Completion across your actual learning</div></div></div>
       </div></div>
-      <div class="section-header-title"><span><i class="fa-solid fa-forward" style="color:var(--accent-gold);"></i> Continue Learning</span></div>
-      <div id="studentContinueLearning" class="continue-grid"><div class="lms-item">Loading your learning activity…</div></div>
-      <div class="section-header-title"><span><i class="fa-solid fa-chart-simple" style="color:var(--accent-gold);"></i> Learning Snapshot</span></div>
-      <div id="studentLearningSnapshot" class="student-dashboard-cards-row"><div class="dashboard-mini-card"><strong>—</strong><span class="lms-small">Materials started</span></div><div class="dashboard-mini-card"><strong>—</strong><span class="lms-small">Materials completed</span></div><div class="dashboard-mini-card"><strong>—</strong><span class="lms-small">Learning actions</span></div></div>
+      <!-- ACADEMIC TOOLS -->
+      <div class="academic-core-header" style="margin-top:4px;"><i class="fa-solid fa-toolbox"></i><h3>Academic Tools</h3></div>
 
       <!-- PHOTOGRAPHIC GRID WITH COMING SOON POPUPS -->
       <div class="photo-grid-2x2">
@@ -1339,7 +1337,12 @@
 
     <!-- SCREEN 3: ACTIVITY -->
     <div id="screen-activity" class="screen">
-      <div class="section-header-title"><span><i class="fa-solid fa-clock-rotate-left" style="color:var(--accent-gold);"></i> Recent Activity</span></div>
+      <div class="section-header-title">
+        <span><i class="fa-solid fa-clock-rotate-left" style="color:var(--accent-gold);"></i> My Activity</span>
+      </div>
+      <div class="lms-small" style="margin-bottom:14px;">
+        Choose a class, then a subject, to see your learning activity for that subject.
+      </div>
       <div id="studentActivityFeed" class="feed-container"><div class="lms-item">Loading your activity…</div></div>
     </div>
 
@@ -1782,30 +1785,181 @@ async function saveMaterialProgress(material, percent, position=null, completed=
   await sb.from('student_material_progress').upsert(payload,{onConflict:'student_id,material_id'});
 }
 async function loadStudentLearningSnapshot(){
-  if(!sb||!currentUser) return;
-  const box=document.getElementById('studentContinueLearning'); const snap=document.getElementById('studentLearningSnapshot');
+  // Detailed learning activity belongs inside Activity, not on Home.
+  // Kept as a compatibility function for existing calls.
+  return;
+}
+
+async function openStudentActivityView(element){
+  switchTab('screen-activity', element || document.getElementById('navHomeBtn'));
+  await loadStudentActivityClasses();
+}
+
+async function loadStudentActivityClasses(){
+  if(!sb || !currentUser) return;
+  const box=document.getElementById('studentActivityFeed');
   if(!box) return;
-  const {data,error}=await sb.from('student_material_progress').select('material_id,progress_percent,last_accessed_at,completed_at,materials(id,title,file_name,class_id,subject_id,subjects(name),classes(name))').eq('student_id',currentUser.id).order('last_accessed_at',{ascending:false}).limit(8);
-  if(error){box.innerHTML='<div class="lms-item">Learning progress is unavailable right now.</div>';return;}
-  const rows=(data||[]).filter(x=>x.materials && Number(x.progress_percent)<100);
-  box.innerHTML=rows.length?rows.slice(0,4).map(x=>{const m=x.materials,p=Number(x.progress_percent)||0;return `<div class="continue-card"><strong>${escapeHtml(m.title||m.file_name||'Material')}</strong><div class="lms-small" style="margin-top:5px;">${escapeHtml(m.subjects?.name||'Subject')} • ${escapeHtml(m.classes?.name||'Class')}</div><div class="learning-progress-wrap"><div class="learning-progress-track"><div class="learning-progress-fill" style="width:${p}%"></div></div><div style="display:flex;justify-content:space-between;margin-top:6px"><span class="lms-small">${p}% complete</span><button class="primary-btn" style="opacity:1;padding:7px 10px" onclick="openStudentDocument('${m.id}')">Continue</button></div></div></div>`}).join(''):'<div class="lms-item">No incomplete learning items yet. Open a class material to start tracking your progress.</div>';
-  const all=(data||[]); const started=all.length, completed=all.filter(x=>Number(x.progress_percent)>=100||x.completed_at).length;
-  if(snap) snap.innerHTML=`<div class="dashboard-mini-card"><strong>${started}</strong><span class="lms-small">Materials started</span></div><div class="dashboard-mini-card"><strong>${completed}</strong><span class="lms-small">Materials completed</span></div><div class="dashboard-mini-card"><strong>Live</strong><span class="lms-small">Progress from your activity</span></div>`;
+  box.innerHTML='<div class="lms-item">Loading your classes…</div>';
+
+  const {data,error}=await sb.from('class_members')
+    .select('class_id,joined_at,classes(id,name,education_level,academic_year)')
+    .eq('student_id',currentUser.id)
+    .order('joined_at',{ascending:false});
+
+  if(error){
+    box.innerHTML='<div class="lms-item lms-danger">Unable to load your activity.</div>';
+    return;
+  }
+
+  const seen=new Set();
+  const classes=(data||[]).map(r=>r.classes).filter(c=>c && !seen.has(c.id) && seen.add(c.id));
+
+  if(!classes.length){
+    box.innerHTML='<div class="lms-item">You are not enrolled in any classes yet.</div>';
+    return;
+  }
+
+  box.innerHTML=classes.map(c=>`
+    <div class="lms-item" style="cursor:pointer;margin-bottom:10px;" onclick="loadStudentActivitySubjects('${c.id}')">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div class="academic-icon-box"><i class="fa-solid fa-school"></i></div>
+        <div style="flex:1;">
+          <strong>${escapeHtml(c.name||'Class')}</strong>
+          <div class="lms-small" style="margin-top:3px;">
+            ${escapeHtml(c.education_level||'')} ${c.academic_year?'• '+escapeHtml(String(c.academic_year)):''}
+          </div>
+        </div>
+        <i class="fa-solid fa-chevron-right"></i>
+      </div>
+    </div>`).join('');
 }
-async function openStudentActivityView(element){switchTab('screen-activity',element||document.getElementById('navHomeBtn'));await loadStudentActivity();}
+
+async function loadStudentActivitySubjects(classId){
+  const box=document.getElementById('studentActivityFeed');
+  if(!box) return;
+  box.innerHTML='<div class="lms-item">Loading subjects…</div>';
+
+  const {data,error}=await sb.from('subjects').select('id,name,code').eq('class_id',classId).order('name');
+  if(error){
+    box.innerHTML='<div class="lms-item lms-danger">Unable to load subjects.</div>';
+    return;
+  }
+
+  box.innerHTML=`
+    <button class="secondary-btn" onclick="loadStudentActivityClasses()" style="margin-bottom:14px;">
+      <i class="fa-solid fa-arrow-left"></i> Classes
+    </button>
+    <div class="section-header-title"><span><i class="fa-solid fa-book" style="color:var(--accent-gold);"></i> Select Subject</span></div>
+    <div class="feed-container" id="studentActivitySubjectList"></div>`;
+
+  const list=document.getElementById('studentActivitySubjectList');
+  if(!data?.length){
+    list.innerHTML='<div class="lms-item">No subjects are available for this class yet.</div>';
+    return;
+  }
+
+  list.innerHTML=data.map(s=>`
+    <div class="lms-item" style="cursor:pointer;" onclick="loadStudentSubjectActivity('${classId}','${s.id}')">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div class="academic-icon-box"><i class="fa-solid fa-book-open"></i></div>
+        <div style="flex:1;"><strong>${escapeHtml(s.name)}</strong>${s.code?`<div class="lms-small">${escapeHtml(s.code)}</div>`:''}</div>
+        <i class="fa-solid fa-chevron-right"></i>
+      </div>
+    </div>`).join('');
+}
+
+async function loadStudentSubjectActivity(classId,subjectId){
+  const box=document.getElementById('studentActivityFeed');
+  if(!box) return;
+  box.innerHTML='<div class="lms-item">Loading your activity…</div>';
+
+  const {data,error}=await sb.from('student_material_progress')
+    .select('material_id,progress_percent,last_position,last_accessed_at,completed_at,materials(id,title,file_name,file_type,mime_type,class_id,subject_id)')
+    .eq('student_id',currentUser.id)
+    .eq('class_id',classId)
+    .eq('subject_id',subjectId)
+    .order('last_accessed_at',{ascending:false});
+
+  if(error){
+    box.innerHTML='<div class="lms-item lms-danger">Unable to load activity.</div>';
+    return;
+  }
+
+  box.innerHTML=`
+    <button class="secondary-btn" onclick="loadStudentActivitySubjects('${classId}')" style="margin-bottom:14px;">
+      <i class="fa-solid fa-arrow-left"></i> Subjects
+    </button>
+    <div class="section-header-title"><span><i class="fa-solid fa-chart-line" style="color:var(--accent-gold);"></i> Subject Activity</span></div>
+    <div class="lms-small" style="margin-bottom:14px;">Your activity for this subject only.</div>
+    <div id="studentSubjectActivityList" class="feed-container"></div>`;
+
+  const list=document.getElementById('studentSubjectActivityList');
+  const rows=(data||[]).filter(r=>r.materials);
+
+  if(!rows.length){
+    list.innerHTML='<div class="lms-item">No learning activity recorded for this subject yet.</div>';
+    return;
+  }
+
+  list.innerHTML=rows.map(r=>{
+    const m=r.materials;
+    const pct=Math.max(0,Math.min(100,Number(r.progress_percent)||0));
+    const complete=!!r.completed_at || pct>=100;
+    const state=complete?'Completed':(pct>0?'In Progress':'Opened');
+    return `<div class="continue-card">
+      <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start;">
+        <div style="flex:1;"><strong>${escapeHtml(m.title||m.file_name||'Learning activity')}</strong><div class="lms-small" style="margin-top:4px;">${escapeHtml(m.file_type||m.mime_type||'Learning material')}</div></div>
+        <span class="academic-tag">${state}</span>
+      </div>
+      ${pct>0||complete?`<div class="learning-progress-wrap"><div class="learning-progress-track"><div class="learning-progress-fill" style="width:${pct}%"></div></div><div class="lms-small" style="margin-top:6px;">${pct}% measured progress</div></div>`:`<div class="lms-small" style="margin-top:10px;">Opened — percentage is not estimated until measurable progress is available.</div>`}
+      <div class="lms-item-actions"><button class="primary-btn" style="opacity:1;padding:8px 12px;" onclick="openStudentDocument('${m.id}')">${complete?'Open Again':'Continue'}</button></div>
+      ${r.last_accessed_at?`<div class="lms-small" style="margin-top:7px;">Last opened: ${new Date(r.last_accessed_at).toLocaleString()}</div>`:''}
+    </div>`;
+  }).join('');
+}
+
 async function loadStudentActivity(){
-  if(!sb||!currentUser) return; const box=document.getElementById('studentActivityFeed'); if(!box)return;
-  const {data,error}=await sb.from('student_activity').select('*').eq('student_id',currentUser.id).order('created_at',{ascending:false}).limit(40);
-  if(error){box.innerHTML='<div class="lms-item">Activity is unavailable right now.</div>';return;}
-  box.innerHTML=(data||[]).length?(data||[]).map(a=>`<div class="activity-row"><div class="activity-icon"><i class="fa-solid ${a.activity_type==='material_opened'?'fa-book-open':a.activity_type==='assignment_submitted'?'fa-file-arrow-up':a.activity_type.includes('attempt')?'fa-pen-to-square':'fa-check'}"></i></div><div><strong>${escapeHtml(a.title||'Learning activity')}</strong><div class="lms-small" style="margin-top:3px;">${escapeHtml(String(a.activity_type||'').replaceAll('_',' '))} • ${a.created_at?new Date(a.created_at).toLocaleString():''}</div></div></div>`).join(''):'<div class="lms-item">No activity yet. Your learning actions will appear here.</div>';
+  return loadStudentActivityClasses();
 }
-async function openStudentProgressView(element){switchTab('screen-progress',element||document.getElementById('navHomeBtn'));await loadStudentProgress();}
+
+async function openStudentProgressView(element){
+  switchTab('screen-progress',element||document.getElementById('navHomeBtn'));
+  await loadStudentProgress();
+}
+
 async function loadStudentProgress(){
-  if(!sb||!currentUser)return; const box=document.getElementById('studentProgressOverview'); if(!box)return;
-  const {data,error}=await sb.from('student_material_progress').select('progress_percent,completed_at,materials(title,subject_id,subjects(name))').eq('student_id',currentUser.id).order('last_accessed_at',{ascending:false}).limit(100);
-  if(error){box.innerHTML='<div class="lms-item">Progress is unavailable right now.</div>';return;}
-  const rows=data||[]; const overall=rows.length?Math.round(rows.reduce((n,r)=>n+(Number(r.progress_percent)||0),0)/rows.length):0; const by={}; rows.forEach(r=>{const k=r.materials?.subjects?.name||'Other';(by[k]??=[]).push(Number(r.progress_percent)||0)});
-  box.innerHTML=`<div class="lms-item"><strong>Overall learning completion: ${overall}%</strong><div class="learning-progress-wrap"><div class="learning-progress-track"><div class="learning-progress-fill" style="width:${overall}%"></div></div></div><div class="lms-small" style="margin-top:8px;">Calculated from saved material interactions, not placeholder values.</div></div>${Object.entries(by).map(([name,vals])=>{const p=Math.round(vals.reduce((a,b)=>a+b,0)/vals.length);return `<div class="lms-item"><strong>${escapeHtml(name)}</strong><span class="lms-small" style="float:right">${p}%</span><div class="learning-progress-wrap"><div class="learning-progress-track"><div class="learning-progress-fill" style="width:${p}%"></div></div></div></div>`}).join('')}`;
+  if(!sb||!currentUser)return;
+  const box=document.getElementById('studentProgressOverview');
+  if(!box)return;
+  box.innerHTML='<div class="lms-item">Loading your academic progress…</div>';
+
+  const [progressRes,assignmentRes,testRes]=await Promise.all([
+    sb.from('student_material_progress').select('progress_percent,completed_at,materials(title,subject_id,subjects(name))').eq('student_id',currentUser.id).limit(500),
+    sb.from('assignment_submissions').select('*',{count:'exact',head:true}).eq('student_id',currentUser.id),
+    sb.from('test_attempts').select('*',{count:'exact',head:true}).eq('student_id',currentUser.id)
+  ]);
+
+  const rows=progressRes.data||[];
+  const by={};
+  rows.forEach(r=>{
+    const name=r.materials?.subjects?.name||'Other';
+    if(!by[name]) by[name]=[];
+    by[name].push(Number(r.progress_percent)||0);
+  });
+
+  const overall=rows.length?Math.round(rows.reduce((a,r)=>a+(Number(r.progress_percent)||0),0)/rows.length):0;
+  const submitted=assignmentRes.count??0;
+  const attempts=testRes.count??0;
+
+  box.innerHTML=`
+    <div class="lms-grid">
+      <div class="lms-item"><strong>Learning materials</strong><div style="font-size:1.5rem;font-weight:900;margin-top:5px;">${rows.length}</div><div class="lms-small">Tracked materials</div></div>
+      <div class="lms-item"><strong>Assignments</strong><div style="font-size:1.5rem;font-weight:900;margin-top:5px;">${submitted}</div><div class="lms-small">Submission records</div></div>
+      <div class="lms-item"><strong>Tests / quizzes</strong><div style="font-size:1.5rem;font-weight:900;margin-top:5px;">${attempts}</div><div class="lms-small">Attempt records</div></div>
+    </div>
+    <div class="lms-item" style="margin-top:12px;"><strong>Learning performance</strong><div class="learning-progress-wrap"><div class="learning-progress-track"><div class="learning-progress-fill" style="width:${overall}%"></div></div></div><div class="lms-small" style="margin-top:7px;">${rows.length?overall+'% measured material progress':'No material progress recorded yet.'}</div></div>
+    <div class="section-header-title" style="margin-top:18px;"><span><i class="fa-solid fa-book" style="color:var(--accent-gold);"></i> Subject Performance</span></div>
+    ${Object.entries(by).length?Object.entries(by).map(([name,vals])=>{const p=Math.round(vals.reduce((a,b)=>a+b,0)/vals.length);return `<div class="lms-item" style="margin-bottom:10px;"><strong>${escapeHtml(name)}</strong><span class="lms-small" style="float:right;">${p}%</span><div class="learning-progress-wrap"><div class="learning-progress-track"><div class="learning-progress-fill" style="width:${p}%"></div></div></div></div>`}).join(''):'<div class="lms-item">Subject performance will appear after you start learning.</div>'}`;
 }
 
 /* ---------- 3. STUDENT CLASS MEMBERSHIP ----------
@@ -2155,13 +2309,8 @@ async function openStudentDocument(materialId) {
 
   try {
     await logStudentActivity('material_opened', m.title || m.file_name || 'Material opened', {entity_id:m.id,class_id:m.class_id,subject_id:m.subject_id});
-    await saveMaterialProgress(m, 5, 0, false);
-    let progressTimer = null;
-    const startTime = Date.now();
-    const progressControls = `<div class="learning-progress-wrap"><div class="learning-progress-track"><div id="materialViewerProgressFill" class="learning-progress-fill" style="width:5%"></div></div><div class="lms-small" style="margin-top:6px">Learning progress: <span id="materialViewerProgressText">5%</span></div></div><button class="primary-btn" style="opacity:1;margin-top:8px" onclick="completeCurrentStudentMaterial()"><i class="fa-solid fa-check"></i> Mark as completed</button>`;
-    window.__activeStudentMaterialProgress = { material:m, startTime };
-    progressTimer = setInterval(async()=>{ const elapsed=Math.max(0,Date.now()-startTime); const pct=Math.min(95,5+Math.floor(elapsed/15000)*5); const fill=document.getElementById('materialViewerProgressFill'); const txt=document.getElementById('materialViewerProgressText'); if(fill)fill.style.width=pct+'%'; if(txt)txt.textContent=pct+'%'; await saveMaterialProgress(m,pct,Math.floor(elapsed/1000),false); },15000);
-    window.__activeStudentMaterialProgress.timer=progressTimer;
+    const progressControls = `<div class="lms-small" style="margin-top:10px">Opened — progress will only be shown when it can be measured from the material type.</div><button class="primary-btn" style="opacity:1;margin-top:8px" onclick="completeCurrentStudentMaterial()"><i class="fa-solid fa-check"></i> Mark as completed</button>`;
+    window.__activeStudentMaterialProgress = { material:m, startTime:Date.now(), last_position:0 };
     const { url } = await resolveAcademicFile(m, false);
     let content = "";
     if (academicFileIsPdf(m)) {
@@ -2183,7 +2332,7 @@ async function openStudentDocument(materialId) {
   }
 }
 
-async function completeCurrentStudentMaterial(){const state=window.__activeStudentMaterialProgress;if(!state?.material)return;await saveMaterialProgress(state.material,100,state.last_position||0,true);await logStudentActivity('material_completed',state.material.title||'Material completed',{entity_id:state.material.id,class_id:state.material.class_id,subject_id:state.material.subject_id});const fill=document.getElementById('materialViewerProgressFill');const txt=document.getElementById('materialViewerProgressText');if(fill)fill.style.width='100%';if(txt)txt.textContent='100%';toast('Material marked as completed.','success');loadStudentLearningSnapshot();}
+async function completeCurrentStudentMaterial(){const state=window.__activeStudentMaterialProgress;if(!state?.material)return;await saveMaterialProgress(state.material,100,state.last_position||0,true);await logStudentActivity('material_completed',state.material.title||'Material completed',{entity_id:state.material.id,class_id:state.material.class_id,subject_id:state.material.subject_id});toast('Material marked as completed.','success');}
 
 async function downloadAcademicMaterial(materialId) {
   if (!sb) return;
